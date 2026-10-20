@@ -1919,12 +1919,19 @@
                     const c4 = cut4RoadTillasCanvas.getContext("2d");
                     c4.save();
                     c4.translate(100, 0);
+                    // Distant misty Tilla behind the upper-left valley pass
                     drawRealisticTeaTilla(c4, {
-                        cx: 250, baseY: 565, rx: 640, ry: 320, rowCount: 9, seed: 41,
-                        isDusk: false, hasFootpath: false, minBushScale: 0.30, maxBushScale: 0.76
+                        cx: 350, baseY: 465, rx: 460, ry: 195, rowCount: 7, seed: 40,
+                        isDusk: false, hasFootpath: false, minBushScale: 0.22, maxBushScale: 0.48
                     });
+                    // Left flanking Tilla above the road entry pass
                     drawRealisticTeaTilla(c4, {
-                        cx: 1350, baseY: 555, rx: 660, ry: 325, rowCount: 9, seed: 42,
+                        cx: -20, baseY: 515, rx: 420, ry: 275, rowCount: 8, seed: 41,
+                        isDusk: false, hasFootpath: false, minBushScale: 0.28, maxBushScale: 0.68
+                    });
+                    // Grand center-right Tilla rising above the upper road embankment
+                    drawRealisticTeaTilla(c4, {
+                        cx: 1120, baseY: 565, rx: 780, ry: 335, rowCount: 9, seed: 42,
                         isDusk: false, hasFootpath: false, minBushScale: 0.30, maxBushScale: 0.76
                     });
                     c4.restore();
@@ -2941,11 +2948,25 @@
             // 9. CUT 4 (0:15–0:20): MUDDY RED-EARTH TILLA ROAD & LEAF-LADEN TEA TRACTOR
             //    (Low-Angle Puddle-Level Tracking Shot as the Estate Tractor Rumbles Past)
             // ============================================================================
+            // Unified parametric road spine so the muddy laterite road, wheel ruts, puddles,
+            // flanking tea-bush banks, and articulated tractor + trailer share exact geometry.
+            function getCut4RoadState(s) {
+                const x = lerp(60, 1660, s);
+                const y = lerp(456, 856, s) + Math.sin(s * Math.PI) * 16;
+                const dx = 1600;
+                const dy = 400 + Math.cos(s * Math.PI) * 16 * Math.PI;
+                const angle = Math.atan2(dy, dx);
+                const sc = lerp(0.54, 1.46, clamp(s, 0, 1.1));
+                const roadTopHalf = lerp(42, 136, clamp(s, 0, 1.1));
+                const roadBotHalf = lerp(56, 176, clamp(s, 0, 1.1));
+                return { x, y, angle, scale: sc, roadTopHalf, roadBotHalf };
+            }
+
             function renderCut4MuddyRoadAndTractor(ctx, t) {
                 const tractorU = clamp((t - 15.0) / 5.0, 0, 1);
-                const proximity = Math.exp(-Math.pow((tractorU - 0.65) * 3.8, 2));
-                const shakeX = Math.sin(t * 62) * 2.5 * proximity;
-                const shakeY = Math.cos(t * 49) * 1.9 * proximity;
+                const proximity = Math.exp(-Math.pow((tractorU - 0.62) * 3.6, 2));
+                const shakeX = Math.sin(t * 62) * 2.4 * proximity;
+                const shakeY = Math.cos(t * 49) * 1.8 * proximity;
 
                 ctx.save();
                 ctx.translate(shakeX, shakeY);
@@ -2960,34 +2981,71 @@
 
                 ctx.drawImage(cut4RoadTillasCanvas, -100, 0);
 
-                drawKoroiShadeTree(ctx, 210, 295, 0.86, Math.sin(t * 2.0) * 6, 0);
-                drawKoroiShadeTree(ctx, 640, 275, 0.72, Math.cos(t * 1.9) * 5, 1);
+                drawKoroiShadeTree(ctx, 180, 285, 0.82, Math.sin(t * 2.0) * 6, 0);
+                drawKoroiShadeTree(ctx, 680, 275, 0.74, Math.cos(t * 1.9) * 5, 1);
                 drawKoroiShadeTree(ctx, 1290, 280, 0.88, Math.sin(t * 2.1) * 6, 2);
 
-                // 2. Steep Cut Red-Laterite Earth Banks & Grassy Shoulders
-                ctx.fillStyle = "#5c3018";
-                ctx.fillRect(0, 445, CW, CH - 445);
+                // 2. Base Earth Fill & Upper Cut Laterite Road Bank (Behind the Road)
+                ctx.fillStyle = "#4d2612";
+                ctx.fillRect(0, 410, CW, CH - 410);
 
-                // Close-up Individual Tea Bushes Crowning the Left & Right Cut Laterite Road Banks!
-                [
-                    { x: 75, y: 555, sc: 0.92 }, { x: 185, y: 535, sc: 0.84 }, { x: 295, y: 515, sc: 0.76 },
-                    { x: 960, y: 505, sc: 0.74 }, { x: 1085, y: 525, sc: 0.82 }, { x: 1215, y: 545, sc: 0.90 },
-                    { x: 1355, y: 565, sc: 0.98 }, { x: 1495, y: 585, sc: 1.05 }
-                ].forEach((b, idx) => {
-                    const spr = teaBushSpritesDay[idx % teaBushSpritesDay.length];
-                    ctx.drawImage(spr, b.x - spr.width * 0.5 * b.sc, b.y - spr.height * 0.82 * b.sc, spr.width * b.sc, spr.height * b.sc);
-                });
+                // Upper terraced tea bushes crowning the far/upper road bank (strictly above roadTopHalf)
+                for (let i = 0; i <= 15; i++) {
+                    const s = -0.04 + (i / 15) * 1.08;
+                    const rs = getCut4RoadState(s);
+                    const spr = teaBushSpritesDay[i % teaBushSpritesDay.length];
+                    const bSc = lerp(0.54, 0.96, clamp(s, 0, 1));
+                    const bx = rs.x;
+                    const by = rs.y - rs.roadTopHalf - 10;
+                    ctx.drawImage(
+                        spr,
+                        bx - spr.width * 0.5 * bSc,
+                        by - spr.height * 0.82 * bSc,
+                        spr.width * bSc,
+                        spr.height * bSc
+                    );
+                }
 
-                // Winding Perspective Muddy Red-Earth Road ("Lal Matir Rasta")
+                // 3. Winding Perspective Muddy Red-Earth Road ("Lal Matir Rasta") Following Exact Road Spine
                 ctx.save();
+
+                // Grassy / mossy upper and lower road shoulders
+                ctx.fillStyle = "#3f6e28";
                 ctx.beginPath();
-                ctx.moveTo(490, 445);
-                ctx.bezierCurveTo(460, 560, 220, 710, -60, CH + 20);
-                ctx.lineTo(CW + 60, CH + 20);
-                ctx.bezierCurveTo(1380, 710, 920, 560, 740, 445);
+                for (let i = 0; i <= 36; i++) {
+                    const s = -0.14 + (i / 36) * 1.28;
+                    const rs = getCut4RoadState(s);
+                    const py = rs.y - rs.roadTopHalf - 10;
+                    if (i === 0) ctx.moveTo(rs.x, py);
+                    else ctx.lineTo(rs.x, py);
+                }
+                for (let i = 36; i >= 0; i--) {
+                    const s = -0.14 + (i / 36) * 1.28;
+                    const rs = getCut4RoadState(s);
+                    const py = rs.y + rs.roadBotHalf + 14;
+                    ctx.lineTo(rs.x, py);
+                }
+                ctx.closePath();
+                ctx.fill();
+
+                // Main muddy red-laterite road surface polygon
+                ctx.beginPath();
+                for (let i = 0; i <= 36; i++) {
+                    const s = -0.14 + (i / 36) * 1.28;
+                    const rs = getCut4RoadState(s);
+                    const py = rs.y - rs.roadTopHalf;
+                    if (i === 0) ctx.moveTo(rs.x, py);
+                    else ctx.lineTo(rs.x, py);
+                }
+                for (let i = 36; i >= 0; i--) {
+                    const s = -0.14 + (i / 36) * 1.28;
+                    const rs = getCut4RoadState(s);
+                    const py = rs.y + rs.roadBotHalf;
+                    ctx.lineTo(rs.x, py);
+                }
                 ctx.closePath();
 
-                const mudGrad = ctx.createLinearGradient(0, 445, 0, CH);
+                const mudGrad = ctx.createLinearGradient(0, 420, 0, CH);
                 mudGrad.addColorStop(0, "#b86b43");
                 mudGrad.addColorStop(0.45, "#9c522d");
                 mudGrad.addColorStop(0.85, "#783a1d");
@@ -2995,82 +3053,121 @@
                 ctx.fillStyle = mudGrad;
                 ctx.fill();
 
-                for (const side of [-1, 1]) {
-                    ctx.strokeStyle = "rgba(58, 24, 10, 0.65)";
-                    ctx.lineWidth = 18;
+                // Shaded cut laterite bank lip along the upper edge of the road
+                ctx.strokeStyle = "rgba(68, 28, 12, 0.78)";
+                ctx.lineWidth = 8;
+                ctx.beginPath();
+                for (let i = 0; i <= 36; i++) {
+                    const s = -0.14 + (i / 36) * 1.28;
+                    const rs = getCut4RoadState(s);
+                    if (i === 0) ctx.moveTo(rs.x, rs.y - rs.roadTopHalf + 3);
+                    else ctx.lineTo(rs.x, rs.y - rs.roadTopHalf + 3);
+                }
+                ctx.stroke();
+
+                // Twin Muddy Tire Ruts Running Along the Exact Wheel Track of the Tractor & Trailer
+                for (const rutOffset of [-14, 14]) {
+                    ctx.strokeStyle = "rgba(58, 24, 10, 0.68)";
+                    ctx.lineWidth = 16;
                     ctx.beginPath();
-                    ctx.moveTo(615 + side * 48, 448);
-                    ctx.bezierCurveTo(
-                        590 + side * 110, 575,
-                        540 + side * 235, 730,
-                        680 + side * 390, CH + 20
-                    );
+                    for (let i = 0; i <= 36; i++) {
+                        const s = -0.14 + (i / 36) * 1.28;
+                        const rs = getCut4RoadState(s);
+                        const ry = rs.y + rutOffset * rs.scale;
+                        if (i === 0) ctx.moveTo(rs.x, ry);
+                        else ctx.lineTo(rs.x, ry);
+                    }
                     ctx.stroke();
 
-                    ctx.strokeStyle = "rgba(195, 225, 230, 0.35)";
-                    ctx.lineWidth = 5;
+                    // Wet specular water sheen inside the tire ruts
+                    ctx.strokeStyle = "rgba(195, 225, 230, 0.36)";
+                    ctx.lineWidth = 4.5;
                     ctx.stroke();
                 }
 
-                const puddles = [
-                    { x: 485, y: 745, rx: 95, ry: 22 },
-                    { x: 960, y: 795, rx: 115, ry: 26 },
-                    { x: 675, y: 635, rx: 68, ry: 15 }
+                // Rainwater puddles positioned directly along the road surface & wheel ruts
+                const puddleSpecs = [
+                    { s: 0.28, oy: 12, rx: 64, ry: 13 },
+                    { s: 0.52, oy: -10, rx: 88, ry: 18 },
+                    { s: 0.74, oy: 15, rx: 108, ry: 22 }
                 ];
-                puddles.forEach((pd, idx) => {
-                    const pGrad = ctx.createLinearGradient(pd.x, pd.y - pd.ry, pd.x, pd.y + pd.ry);
-                    pGrad.addColorStop(0, "rgba(135, 198, 204, 0.72)");
+                puddleSpecs.forEach((pd, idx) => {
+                    const rs = getCut4RoadState(pd.s);
+                    const px = rs.x;
+                    const py = rs.y + pd.oy * rs.scale;
+                    const pGrad = ctx.createLinearGradient(px, py - pd.ry, px, py + pd.ry);
+                    pGrad.addColorStop(0, "rgba(135, 198, 204, 0.74)");
                     pGrad.addColorStop(0.6, "rgba(45, 95, 88, 0.68)");
-                    pGrad.addColorStop(1, "rgba(78, 42, 24, 0.75)");
+                    pGrad.addColorStop(1, "rgba(78, 42, 24, 0.76)");
                     ctx.fillStyle = pGrad;
                     ctx.beginPath();
-                    ctx.ellipse(pd.x, pd.y, pd.rx, pd.ry, 0.04, 0, Math.PI * 2);
+                    ctx.ellipse(px, py, pd.rx, pd.ry, rs.angle, 0, Math.PI * 2);
                     ctx.fill();
 
-                    if (proximity > 0.15) {
+                    if (proximity > 0.12) {
                         const rp = (t * 4.2 + idx * 0.4) % 1;
                         ctx.strokeStyle = `rgba(255, 255, 255, ${(1 - rp) * proximity * 0.75})`;
                         ctx.lineWidth = 1.5;
                         ctx.beginPath();
-                        ctx.ellipse(pd.x, pd.y, pd.rx * rp * 0.85, pd.ry * rp * 0.85, 0, 0, Math.PI * 2);
+                        ctx.ellipse(px, py, pd.rx * rp * 0.85, pd.ry * rp * 0.85, rs.angle, 0, Math.PI * 2);
                         ctx.stroke();
                     }
                 });
                 ctx.restore();
 
-                // 3. Tea Workers with Tukri Baskets Stepping Aside on the Right Road Shoulder
+                // 4. Tea Workers with Tukri Baskets Standing Safely on the Upper-Right Road Shoulder
                 const roadWorkers = [
-                    { x: 1185, y: 645, sc: 1.52, sari: "#d93829", border: "#fde047", blouse: "#7f1d1d" },
-                    { x: 1285, y: 695, sc: 1.78, sari: "#0d9488", border: "#fde047", blouse: "#115e59" },
-                    { x: 1395, y: 755, sc: 2.05, sari: "#e67e22", border: "#fffbeb", blouse: "#7c2d12" }
+                    { s: 0.60, sari: "#d93829", border: "#fde047", blouse: "#7f1d1d" },
+                    { s: 0.69, sari: "#0d9488", border: "#fde047", blouse: "#115e59" },
+                    { s: 0.78, sari: "#e67e22", border: "#fffbeb", blouse: "#7c2d12" }
                 ];
                 roadWorkers.forEach((rw, idx) => {
+                    const rs = getCut4RoadState(rw.s);
                     drawTeaWorker(ctx, {
-                        x: rw.x, y: rw.y, scale: rw.sc, dir: -1, t, phase: idx * 1.4,
-                        sariColor: rw.sari, borderColor: rw.border, blouseColor: rw.blouse,
-                        mode: "standing", hasTukri: true, hasUmbrellaHat: idx === 1
+                        x: rs.x,
+                        y: rs.y - rs.roadTopHalf + 8,
+                        scale: rs.scale * 1.32,
+                        dir: -1,
+                        t,
+                        phase: idx * 1.4,
+                        sariColor: rw.sari,
+                        borderColor: rw.border,
+                        blouseColor: rw.blouse,
+                        mode: "standing",
+                        hasTukri: true,
+                        hasUmbrellaHat: idx === 1
                     });
                 });
 
-                // 4. Hero Tea Estate Tractor + Overflowing Green Tea Leaf Trailer!
-                const trX = lerp(230, 1240, tractorU);
-                const trY = lerp(555, 795, tractorU);
-                const trScale = lerp(0.66, 1.48, tractorU);
+                // 5. Hero Tea Estate Tractor + Articulated Green Tea Leaf Trailer Locked to the Road Spine!
+                const sTractor = lerp(0.20, 0.82, tractorU);
+                const trState = getCut4RoadState(sTractor);
+                const trailerState = getCut4RoadState(sTractor - 0.088);
+                const trailerRelAngle = trailerState.angle - trState.angle;
+
+                const trX = trState.x;
+                const trY = trState.y;
+                const trScale = trState.scale * 1.04;
                 const wheelRot = t * 14.0;
                 const engineJolt = Math.sin(t * 48) * 1.5;
 
                 ctx.save();
                 ctx.translate(trX, trY);
+                ctx.rotate(trState.angle);
                 ctx.scale(trScale, trScale);
 
+                // Ground shadow aligned with road surface
                 ctx.fillStyle = "rgba(18, 10, 6, 0.45)";
                 ctx.beginPath();
-                ctx.ellipse(-95, 10, 215, 22, 0.08, 0, Math.PI * 2);
+                ctx.ellipse(-95, 10, 215, 22, 0, 0, Math.PI * 2);
                 ctx.fill();
 
                 // --- A. 4-WHEEL TIMBER & STEEL TRAILER PILED HIGH WITH FRESH GREEN TEA SACKS ---
+                // Articulated at the hitch pin (-53, -18) so trailer wheels track the curved road ruts!
                 ctx.save();
-                ctx.translate(-185, -4 + engineJolt * 0.6);
+                ctx.translate(-53, -18);
+                ctx.rotate(trailerRelAngle);
+                ctx.translate(-132, 14 + engineJolt * 0.6);
 
                 const sacks = [
                     { x: -68, y: -62, w: 54, h: 44, col: "#b5925c" },
@@ -3305,6 +3402,23 @@
 
                 ctx.restore();
                 ctx.restore();
+
+                // 6. Foreground Lower-Left Tea Bank Framing (Strictly Below the Road's Bottom Edge!)
+                for (let i = 0; i <= 7; i++) {
+                    const s = (i / 7) * 0.56;
+                    const rs = getCut4RoadState(s);
+                    const spr = teaBushSpritesDay[(i + 2) % teaBushSpritesDay.length];
+                    const bSc = lerp(0.95, 1.35, i / 7);
+                    const bx = rs.x - 18;
+                    const by = rs.y + rs.roadBotHalf + 68;
+                    ctx.drawImage(
+                        spr,
+                        bx - spr.width * 0.5 * bSc,
+                        by - spr.height * 0.82 * bSc,
+                        spr.width * bSc,
+                        spr.height * bSc
+                    );
+                }
 
                 ctx.restore();
             }
