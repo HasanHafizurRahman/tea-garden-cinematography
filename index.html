@@ -713,8 +713,8 @@
             }
 
             // ============================================================================
-            // 3. PROCEDURAL WEB AUDIO ENGINE (PAHARI BANSURI, DOTARA, JHIRI STREAM,
-            //    TEA LEAF PLUCKING SNAPS, BANGLES, HILL BIRDS & DIESEL TEA TRACTOR)
+            // 3. PROCEDURAL NATURAL FOLEY & WILDLIFE WEB AUDIO ENGINE
+            //    (Pure Scene-Specific Natural Sounds — No Continuous Drone or Monotone Loop)
             // ============================================================================
             class TeaEstateSoundEngine {
                 constructor() {
@@ -725,15 +725,11 @@
                     this.userVolume = 0.85;
                     this.initialized = false;
 
-                    this.windGain = null;
-                    this.windFilter = null;
                     this.leafRustleGain = null;
                     this.jhiriGain = null;
                     this.jhiriFilter = null;
                     this.jhiriPan = null;
                     this.cricketGain = null;
-                    this.tanpuraGain = null;
-                    this.musicGain = null;
 
                     this.tractorPan = null;
                     this.tractorGain = null;
@@ -743,12 +739,9 @@
                     this.mudSquelchGain = null;
 
                     this.firedCues = new Set();
-                    this.nextBirdTime = 0.8;
-                    this.nextFluteTime = 0.4;
-                    this.nextDotaraTime = 0.3;
-                    this.nextPluckTime = 5.2;
-                    this.fluteNoteIdx = 0;
-                    this.dotaraIdx = 0;
+                    this.nextBirdTime = 0.5;
+                    this.nextPluckTime = 5.15;
+                    this.nextSplashTime = 10.3;
                 }
 
                 init() {
@@ -795,58 +788,46 @@
                         b6 = white * 0.115926;
                     }
 
-                    this.setupAmbientBeds();
+                    this.setupSceneNaturalBeds();
                     this.initialized = true;
                 }
 
-                setupAmbientBeds() {
+                setupSceneNaturalBeds() {
                     const ac = this.ctx;
                     const now = ac.currentTime;
 
-                    const windSrc = ac.createBufferSource();
-                    windSrc.buffer = this.pinkBuffer;
-                    windSrc.loop = true;
-                    this.windFilter = ac.createBiquadFilter();
-                    this.windFilter.type = "bandpass";
-                    this.windFilter.frequency.value = 320;
-                    this.windFilter.Q.value = 1.5;
-                    this.windGain = ac.createGain();
-                    this.windGain.gain.value = 0.14;
-                    windSrc.connect(this.windFilter);
-                    this.windFilter.connect(this.windGain);
-                    this.windGain.connect(this.compressor);
-                    windSrc.start(now);
-
+                    // 1. Cut 2 Tea-Leaf Rustle (Silent except when plucking in Cut 2)
                     const leafSrc = ac.createBufferSource();
                     leafSrc.buffer = this.whiteBuffer;
                     leafSrc.loop = true;
                     const leafFilter = ac.createBiquadFilter();
                     leafFilter.type = "bandpass";
-                    leafFilter.frequency.value = 2300;
-                    leafFilter.Q.value = 2.8;
+                    leafFilter.frequency.value = 2400;
+                    leafFilter.Q.value = 3.2;
                     this.leafRustleGain = ac.createGain();
-                    this.leafRustleGain.gain.value = 0.025;
+                    this.leafRustleGain.gain.value = 0.0001;
                     leafSrc.connect(leafFilter);
                     leafFilter.connect(this.leafRustleGain);
                     this.leafRustleGain.connect(this.compressor);
                     leafSrc.start(now, 0.4);
 
+                    // 2. Cut 3 Mountain Jhiri Stream Water (Active ONLY during Cut 3: 10.0s–15.0s)
                     const jhiriSrc = ac.createBufferSource();
                     jhiriSrc.buffer = this.pinkBuffer;
                     jhiriSrc.loop = true;
                     this.jhiriFilter = ac.createBiquadFilter();
                     this.jhiriFilter.type = "bandpass";
-                    this.jhiriFilter.frequency.value = 780;
-                    this.jhiriFilter.Q.value = 2.6;
+                    this.jhiriFilter.frequency.value = 820;
+                    this.jhiriFilter.Q.value = 2.8;
                     this.jhiriGain = ac.createGain();
-                    this.jhiriGain.gain.value = 0.03;
+                    this.jhiriGain.gain.value = 0.0001;
                     this.jhiriPan = ac.createStereoPanner();
-                    this.jhiriPan.pan.value = 0.15;
+                    this.jhiriPan.pan.value = 0.0;
 
                     const jLfo = ac.createOscillator();
                     const jLfoG = ac.createGain();
-                    jLfo.frequency.value = 4.2;
-                    jLfoG.gain.value = 210;
+                    jLfo.frequency.value = 4.6;
+                    jLfoG.gain.value = 240;
                     jLfo.connect(jLfoG);
                     jLfoG.connect(this.jhiriFilter.frequency);
                     jLfo.start(now);
@@ -857,18 +838,19 @@
                     this.jhiriPan.connect(this.compressor);
                     jhiriSrc.start(now, 0.9);
 
+                    // 3. Cut 6 Evening Crickets (Active ONLY during Cut 6 Dusk: 25.0s–30.0s)
                     const cOsc1 = ac.createOscillator();
                     const cOsc2 = ac.createOscillator();
                     const cLfo = ac.createOscillator();
                     const cLfoGain = ac.createGain();
                     this.cricketGain = ac.createGain();
-                    this.cricketGain.gain.value = 0.004;
+                    this.cricketGain.gain.value = 0.0001;
                     cOsc1.type = "sine";
                     cOsc2.type = "sine";
                     cOsc1.frequency.setValueAtTime(4420, now);
                     cOsc2.frequency.setValueAtTime(4438, now);
-                    cLfo.frequency.setValueAtTime(17, now);
-                    cLfoGain.gain.value = 0.008;
+                    cLfo.frequency.setValueAtTime(16, now);
+                    cLfoGain.gain.value = 0.006;
                     cLfo.connect(cLfoGain);
                     cLfoGain.connect(this.cricketGain.gain);
                     cOsc1.connect(this.cricketGain);
@@ -878,24 +860,7 @@
                     cOsc2.start(now);
                     cLfo.start(now);
 
-                    const tanSa = ac.createOscillator();
-                    const tanPa = ac.createOscillator();
-                    tanSa.type = "sawtooth";
-                    tanPa.type = "triangle";
-                    tanSa.frequency.setValueAtTime(155.56, now);
-                    tanPa.frequency.setValueAtTime(233.08, now);
-                    const tanFilter = ac.createBiquadFilter();
-                    tanFilter.type = "lowpass";
-                    tanFilter.frequency.value = 510;
-                    this.tanpuraGain = ac.createGain();
-                    this.tanpuraGain.gain.value = 0.024;
-                    tanSa.connect(tanFilter);
-                    tanPa.connect(tanFilter);
-                    tanFilter.connect(this.tanpuraGain);
-                    this.tanpuraGain.connect(this.compressor);
-                    tanSa.start(now);
-                    tanPa.start(now);
-
+                    // 4. Cut 4 Diesel Tea Tractor & Muddy Tire Squelch (Active ONLY during Cut 4: 15.0s–20.0s)
                     this.tractorPan = ac.createStereoPanner();
                     this.tractorPan.pan.value = -0.6;
                     this.tractorGain = ac.createGain();
@@ -946,10 +911,6 @@
                     this.tractorOsc2.start(now);
                     this.tractorLfo.start(now);
                     mudSrc.start(now, 0.2);
-
-                    this.musicGain = ac.createGain();
-                    this.musicGain.gain.value = 0.28;
-                    this.musicGain.connect(this.compressor);
                 }
 
                 setVolume(val) {
@@ -984,10 +945,9 @@
                             this.firedCues.add(cue.id);
                         }
                     }
-                    this.nextBirdTime = time + 0.4;
-                    this.nextFluteTime = time + 0.2;
-                    this.nextDotaraTime = time + 0.2;
+                    this.nextBirdTime = time + 0.35;
                     this.nextPluckTime = Math.max(5.1, time + 0.25);
+                    this.nextSplashTime = Math.max(10.2, time + 0.3);
                 }
 
                 showAudioTag(label) {
@@ -1005,6 +965,57 @@
                     }, 1900);
                 }
 
+                playSoftBreezeGust(panVal = 0.0, dur = 1.6) {
+                    if (!this.initialized || this.ctx.state !== "running") return;
+                    const now = this.ctx.currentTime;
+                    const panner = this.ctx.createStereoPanner();
+                    panner.pan.setValueAtTime(clamp(panVal, -0.8, 0.8), now);
+                    panner.connect(this.compressor);
+
+                    const src = this.ctx.createBufferSource();
+                    src.buffer = this.pinkBuffer;
+                    src.loop = true;
+                    const filt = this.ctx.createBiquadFilter();
+                    filt.type = "bandpass";
+                    filt.frequency.setValueAtTime(380, now);
+                    filt.frequency.exponentialRampToValueAtTime(620, now + dur * 0.5);
+                    filt.frequency.exponentialRampToValueAtTime(340, now + dur);
+                    filt.Q.setValueAtTime(2.2, now);
+
+                    const g = this.ctx.createGain();
+                    g.gain.setValueAtTime(0.0001, now);
+                    g.gain.linearRampToValueAtTime(0.085, now + dur * 0.42);
+                    g.gain.exponentialRampToValueAtTime(0.0001, now + dur);
+
+                    src.connect(filt);
+                    filt.connect(g);
+                    g.connect(panner);
+                    src.start(now, Math.random());
+                    src.stop(now + dur + 0.05);
+                }
+
+                playWaterDropletSplash(panVal = 0.0) {
+                    if (!this.initialized || this.ctx.state !== "running") return;
+                    const now = this.ctx.currentTime;
+                    const panner = this.ctx.createStereoPanner();
+                    panner.pan.setValueAtTime(clamp(panVal, -0.8, 0.8), now);
+                    panner.connect(this.compressor);
+
+                    const osc = this.ctx.createOscillator();
+                    const g = this.ctx.createGain();
+                    osc.type = "sine";
+                    const f0 = 680 + Math.random() * 320;
+                    osc.frequency.setValueAtTime(f0, now);
+                    osc.frequency.exponentialRampToValueAtTime(f0 * 1.85, now + 0.065);
+                    g.gain.setValueAtTime(0.0001, now);
+                    g.gain.linearRampToValueAtTime(0.055, now + 0.008);
+                    g.gain.exponentialRampToValueAtTime(0.0001, now + 0.075);
+                    osc.connect(g);
+                    g.connect(panner);
+                    osc.start(now);
+                    osc.stop(now + 0.08);
+                }
+
                 playTeaPluckSnap(panVal = 0.0) {
                     if (!this.initialized || this.ctx.state !== "running") return;
                     const now = this.ctx.currentTime;
@@ -1018,7 +1029,7 @@
                     osc.frequency.setValueAtTime(1450, now);
                     osc.frequency.exponentialRampToValueAtTime(420, now + 0.035);
                     g.gain.setValueAtTime(0.001, now);
-                    g.gain.linearRampToValueAtTime(0.11, now + 0.004);
+                    g.gain.linearRampToValueAtTime(0.12, now + 0.004);
                     g.gain.exponentialRampToValueAtTime(0.0001, now + 0.04);
                     osc.connect(g);
                     g.connect(panner);
@@ -1033,7 +1044,7 @@
                     filt.Q.setValueAtTime(2.4, now + 0.10);
                     const ng = this.ctx.createGain();
                     ng.gain.setValueAtTime(0.0001, now + 0.10);
-                    ng.gain.linearRampToValueAtTime(0.065, now + 0.13);
+                    ng.gain.linearRampToValueAtTime(0.07, now + 0.13);
                     ng.gain.exponentialRampToValueAtTime(0.0001, now + 0.24);
                     src.connect(filt);
                     filt.connect(ng);
@@ -1055,7 +1066,7 @@
                         o.type = "sine";
                         o.frequency.setValueAtTime(freq, t0);
                         g.gain.setValueAtTime(0.0001, t0);
-                        g.gain.linearRampToValueAtTime(0.045, t0 + 0.005);
+                        g.gain.linearRampToValueAtTime(0.048, t0 + 0.005);
                         g.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.13);
                         o.connect(g);
                         g.connect(panner);
@@ -1065,109 +1076,7 @@
                     this.showAudioTag("চুড়ির রিনিঝিনি · Glass Bangles & Tukri");
                 }
 
-                playDotaraPluck(freq, panVal = -0.15) {
-                    if (!this.initialized || this.ctx.state !== "running") return;
-                    const now = this.ctx.currentTime;
-                    const panner = this.ctx.createStereoPanner();
-                    panner.pan.setValueAtTime(panVal, now);
-                    panner.connect(this.musicGain);
-
-                    const osc = this.ctx.createOscillator();
-                    const osc2 = this.ctx.createOscillator();
-                    const filt = this.ctx.createBiquadFilter();
-                    const g = this.ctx.createGain();
-
-                    osc.type = "sawtooth";
-                    osc2.type = "triangle";
-                    osc.frequency.setValueAtTime(freq * 0.98, now);
-                    osc.frequency.exponentialRampToValueAtTime(freq, now + 0.03);
-                    osc2.frequency.setValueAtTime(freq * 2, now);
-
-                    filt.type = "lowpass";
-                    filt.frequency.setValueAtTime(1850, now);
-                    filt.frequency.exponentialRampToValueAtTime(420, now + 0.40);
-
-                    g.gain.setValueAtTime(0.0001, now);
-                    g.gain.linearRampToValueAtTime(0.11, now + 0.01);
-                    g.gain.exponentialRampToValueAtTime(0.0001, now + 0.45);
-
-                    osc.connect(filt);
-                    osc2.connect(filt);
-                    filt.connect(g);
-                    g.connect(panner);
-
-                    osc.start(now);
-                    osc2.start(now);
-                    osc.stop(now + 0.48);
-                    osc2.stop(now + 0.48);
-                }
-
-                playBansuriNote(freq, prevFreq, dur = 1.65) {
-                    if (!this.initialized || this.ctx.state !== "running") return;
-                    const now = this.ctx.currentTime;
-
-                    const osc1 = this.ctx.createOscillator();
-                    const osc2 = this.ctx.createOscillator();
-                    const vibrato = this.ctx.createOscillator();
-                    const vibGain = this.ctx.createGain();
-
-                    osc1.type = "sine";
-                    osc2.type = "triangle";
-
-                    const startF = prevFreq ? lerp(prevFreq, freq, 0.38) : freq * 0.96;
-                    osc1.frequency.setValueAtTime(startF, now);
-                    osc1.frequency.exponentialRampToValueAtTime(freq, now + 0.16);
-                    osc2.frequency.setValueAtTime(startF * 2, now);
-                    osc2.frequency.exponentialRampToValueAtTime(freq * 2, now + 0.16);
-
-                    vibrato.frequency.setValueAtTime(5.4, now);
-                    vibGain.gain.setValueAtTime(0.01, now);
-                    vibGain.gain.linearRampToValueAtTime(freq * 0.013, now + dur * 0.42);
-                    vibrato.connect(vibGain);
-                    vibGain.connect(osc1.frequency);
-
-                    const g1 = this.ctx.createGain();
-                    const g2 = this.ctx.createGain();
-                    g1.gain.setValueAtTime(0.0001, now);
-                    g1.gain.linearRampToValueAtTime(0.22, now + 0.16);
-                    g1.gain.setValueAtTime(0.18, now + dur * 0.68);
-                    g1.gain.exponentialRampToValueAtTime(0.0001, now + dur);
-
-                    g2.gain.setValueAtTime(0.0001, now);
-                    g2.gain.linearRampToValueAtTime(0.045, now + 0.16);
-                    g2.gain.exponentialRampToValueAtTime(0.0001, now + dur);
-
-                    const breath = this.ctx.createBufferSource();
-                    breath.buffer = this.whiteBuffer;
-                    const bFilt = this.ctx.createBiquadFilter();
-                    bFilt.type = "bandpass";
-                    bFilt.frequency.setValueAtTime(freq * 3, now);
-                    bFilt.Q.setValueAtTime(4.2, now);
-                    const bGain = this.ctx.createGain();
-                    bGain.gain.setValueAtTime(0.0001, now);
-                    bGain.gain.linearRampToValueAtTime(0.018, now + 0.08);
-                    bGain.gain.exponentialRampToValueAtTime(0.0001, now + dur * 0.82);
-
-                    osc1.connect(g1);
-                    osc2.connect(g2);
-                    breath.connect(bFilt);
-                    bFilt.connect(bGain);
-
-                    g1.connect(this.musicGain);
-                    g2.connect(this.musicGain);
-                    bGain.connect(this.musicGain);
-
-                    osc1.start(now);
-                    osc2.start(now);
-                    vibrato.start(now);
-                    breath.start(now);
-                    osc1.stop(now + dur + 0.04);
-                    osc2.stop(now + dur + 0.04);
-                    vibrato.stop(now + dur + 0.04);
-                    breath.stop(now + dur + 0.04);
-                }
-
-                playBird(type = "doel", panVal = 0, distGain = 0.11) {
+                playBird(type = "doel", panVal = 0, distGain = 0.12) {
                     if (!this.initialized || this.ctx.state !== "running") return;
                     const now = this.ctx.currentTime;
                     const panner = this.ctx.createStereoPanner();
@@ -1306,56 +1215,43 @@
                         }
                     }
 
+                    // Natural hill bird calls in non-tractor cuts
                     if (t >= this.nextBirdTime && (t < 15.0 || t > 20.0)) {
                         const types = ["doel", "koel", "kingfisher", "doel"];
                         const choice = (t >= 10 && t < 15) ? "kingfisher" : types[Math.floor((t * 5.7) % types.length)];
                         const pan = Math.sin(t * 1.4) * 0.65;
-                        this.playBird(choice, pan, t > 25 ? 0.08 : 0.11);
-                        this.nextBirdTime = t + 2.4 + (t % 1.2);
+                        this.playBird(choice, pan, t > 25 ? 0.09 : 0.12);
+                        this.nextBirdTime = t + 2.1 + (t % 1.1);
                     }
 
-                    if (t >= 5.1 && t <= 9.8 && t >= this.nextPluckTime) {
+                    // Cut 2: Crisp Tea-Leaf Plucking Snaps & Basket Rustle
+                    if (t >= 5.1 && t <= 9.85 && t >= this.nextPluckTime) {
                         this.playTeaPluckSnap(Math.sin(t * 2.9) * 0.45);
-                        this.nextPluckTime = t + 0.75 + (t % 0.35);
+                        this.nextPluckTime = t + 0.68 + (t % 0.32);
                     }
 
-                    const FLUTE_MELODY = [
-                        311.13, 349.23, 392.00, 466.16, 523.25, 466.16,
-                        392.00, 349.23, 311.13, 261.63, 311.13, 392.00
-                    ];
-                    if (t >= this.nextFluteTime) {
-                        const note = FLUTE_MELODY[this.fluteNoteIdx % FLUTE_MELODY.length];
-                        const prevNote = FLUTE_MELODY[(this.fluteNoteIdx - 1 + FLUTE_MELODY.length) % FLUTE_MELODY.length];
-                        this.fluteNoteIdx++;
-                        this.playBansuriNote(note, prevNote, 1.65);
-                        this.nextFluteTime = t + 1.72;
+                    // Cut 3: Natural Water Droplet / Pebble Ripples in the Jhiri Stream
+                    if (t >= 10.1 && t <= 14.85 && t >= this.nextSplashTime) {
+                        this.playWaterDropletSplash(Math.sin(t * 3.7) * 0.55);
+                        this.nextSplashTime = t + 0.55 + (t % 0.35);
                     }
 
-                    const DOTARA_NOTES = [155.56, 233.08, 311.13, 233.08, 196.00, 233.08];
-                    if (t >= this.nextDotaraTime && (t < 15.0 || t > 20.0)) {
-                        const dNote = DOTARA_NOTES[this.dotaraIdx % DOTARA_NOTES.length];
-                        this.dotaraIdx++;
-                        this.playDotaraPluck(dNote, -0.2);
-                        this.nextDotaraTime = t + 0.86;
-                    }
-
+                    const isPluckCut = (t >= 5.0 && t < 10.0);
                     const isJhiriCut = (t >= 10.0 && t < 15.0);
                     const isTractorCut = (t >= 15.0 && t < 20.0);
                     const isDuskCut = (t >= 25.0);
 
-                    const musicLvl = isTractorCut ? 0.14 : (isDuskCut ? 0.32 : 0.26);
-                    this.musicGain.gain.setTargetAtTime(musicLvl, now, 0.15);
+                    // Leaf rustle active ONLY in Cut 2 (Tea Pluckers), silent elsewhere
+                    this.leafRustleGain.gain.setTargetAtTime(isPluckCut ? 0.032 : 0.0001, now, 0.12);
 
-                    const jhiriTarget = isJhiriCut ? 0.24 : (t < 10.0 ? 0.025 : 0.04);
-                    this.jhiriGain.gain.setTargetAtTime(jhiriTarget, now, 0.15);
-                    this.jhiriPan.pan.setTargetAtTime(isJhiriCut ? Math.sin(t * 1.2) * 0.25 : 0.35, now, 0.15);
+                    // Jhiri water stream active ONLY in Cut 3 (10.0s–15.0s), silent elsewhere
+                    this.jhiriGain.gain.setTargetAtTime(isJhiriCut ? 0.22 : 0.0001, now, 0.15);
+                    this.jhiriPan.pan.setTargetAtTime(isJhiriCut ? Math.sin(t * 1.2) * 0.25 : 0.0, now, 0.15);
 
-                    const windTarget = (t < 5.0 || t >= 20.0) ? 0.16 : 0.10;
-                    this.windGain.gain.setTargetAtTime(windTarget, now, 0.12);
-                    this.leafRustleGain.gain.setTargetAtTime(t >= 5.0 && t < 10.0 ? 0.06 : 0.025, now, 0.12);
+                    // Dusk crickets active ONLY in Cut 6 (25.0s–30.0s), silent elsewhere
+                    this.cricketGain.gain.setTargetAtTime(isDuskCut ? 0.018 : 0.0001, now, 0.2);
 
-                    this.cricketGain.gain.setTargetAtTime(isDuskCut ? 0.028 : 0.003, now, 0.2);
-
+                    // Tractor engine & mud squelch active ONLY in Cut 4 (15.0s–20.0s), silent elsewhere
                     if (isTractorCut) {
                         const u = clamp((t - 15.0) / 5.0, 0, 1);
                         const env = smoothstep(15.0, 15.6, t) * (1 - smoothstep(19.3, 20.0, t));
@@ -1375,9 +1271,9 @@
             }
 
             const TIMELINE_AUDIO_CUES = [
-                { id: "c1_intro", t: 0.2, action: (s) => s.showAudioTag("পাহাড়ি বাঁশি ও দোতারা · Sylhet Tea Estate Motif") },
+                { id: "c1_intro", t: 0.2, action: (s) => { s.playSoftBreezeGust(-0.25, 1.8); s.showAudioTag("টিলার বাতাস ও পাখির ডাক · Tilla Breeze & Birds"); } },
                 { id: "c1_koel", t: 1.8, action: (s) => s.playBird("koel", -0.35, 0.12) },
-                { id: "c1_breeze", t: 3.4, action: (s) => s.showAudioTag("টিলার বাতাস · Misty Tilla Breeze") },
+                { id: "c1_breeze", t: 3.4, action: (s) => { s.playSoftBreezeGust(0.30, 1.5); s.showAudioTag("টিলার বাতাস · Misty Tilla Breeze"); } },
                 { id: "c2_pluck", t: 5.1, action: (s) => s.showAudioTag("দুটি পাতা একটি কুঁড়ি · Plucking Tea Shoots") },
                 { id: "c2_bangles1", t: 6.4, action: (s) => s.playGlassBangles(-0.22) },
                 { id: "c2_doel", t: 7.5, action: (s) => s.playBird("doel", 0.35, 0.11) },
@@ -1390,10 +1286,10 @@
                 { id: "c4_horn1", t: 16.3, action: (s) => s.playTractorHorn(-0.22) },
                 { id: "c4_mud", t: 17.4, action: (s) => s.showAudioTag("লাল মাটির পথ · Muddy Laterite Trail") },
                 { id: "c4_horn2", t: 18.5, action: (s) => s.playTractorHorn(0.30) },
-                { id: "c5_bungalow", t: 20.1, action: (s) => s.showAudioTag("সাহেবি ডাকবাংলো · Hilltop Planter's Bungalow") },
+                { id: "c5_bungalow", t: 20.1, action: (s) => { s.playSoftBreezeGust(-0.20, 1.6); s.showAudioTag("সাহেবি ডাকবাংলো · Hilltop Planter's Bungalow"); } },
                 { id: "c5_gong", t: 21.8, action: (s) => s.playEstateGong(0.35) },
                 { id: "c5_koel2", t: 23.6, action: (s) => s.playBird("koel", -0.28, 0.11) },
-                { id: "c6_dusk", t: 25.1, action: (s) => s.showAudioTag("গোধূলির আলো ও জোনাকি · Golden Dusk & Fireflies") },
+                { id: "c6_dusk", t: 25.1, action: (s) => s.showAudioTag("গোধূলির ঝিঁঝিঁ পোকা ও পাখি · Dusk Crickets & Birds") },
                 { id: "c6_gong2", t: 27.2, action: (s) => s.playEstateGong(-0.25) }
             ];
 
