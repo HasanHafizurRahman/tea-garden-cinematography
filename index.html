@@ -1642,7 +1642,7 @@
             function drawRealisticTeaTilla(ctx, opts) {
                 const {
                     cx, baseY, rx, ry, rowCount = 9, seed = 1,
-                    isDusk = false, hasFootpath = true, pathOffset = 0,
+                    isDusk = false, hasFootpath = false, pathOffset = 0,
                     minBushScale = 0.28, maxBushScale = 0.72
                 } = opts;
 
@@ -1843,15 +1843,15 @@
                     bCtx.translate(120, 0);
                     drawRealisticTeaTilla(bCtx, {
                         cx: 280, baseY: 525, rx: 470, ry: 215, rowCount: 9, seed: 11,
-                        isDusk: dusk, hasFootpath: true, pathOffset: -30, minBushScale: 0.22, maxBushScale: 0.46
+                        isDusk: dusk, hasFootpath: false, pathOffset: -30, minBushScale: 0.22, maxBushScale: 0.46
                     });
                     drawRealisticTeaTilla(bCtx, {
                         cx: 1250, baseY: 515, rx: 520, ry: 225, rowCount: 9, seed: 22,
-                        isDusk: dusk, hasFootpath: true, pathOffset: 40, minBushScale: 0.22, maxBushScale: 0.46
+                        isDusk: dusk, hasFootpath: false, pathOffset: 40, minBushScale: 0.22, maxBushScale: 0.46
                     });
                     drawRealisticTeaTilla(bCtx, {
                         cx: 775, baseY: 550, rx: 520, ry: 220, rowCount: 9, seed: 33,
-                        isDusk: dusk, hasFootpath: true, pathOffset: 10, minBushScale: 0.24, maxBushScale: 0.50
+                        isDusk: dusk, hasFootpath: false, pathOffset: 10, minBushScale: 0.24, maxBushScale: 0.50
                     });
                     bCtx.restore();
 
@@ -1860,11 +1860,11 @@
                     mCtx.translate(120, 0);
                     drawRealisticTeaTilla(mCtx, {
                         cx: 380, baseY: 745, rx: 600, ry: 265, rowCount: 9, seed: 44,
-                        isDusk: dusk, hasFootpath: true, pathOffset: 25, minBushScale: 0.34, maxBushScale: 0.72
+                        isDusk: dusk, hasFootpath: false, pathOffset: 25, minBushScale: 0.34, maxBushScale: 0.72
                     });
                     drawRealisticTeaTilla(mCtx, {
                         cx: 1230, baseY: 755, rx: 610, ry: 270, rowCount: 9, seed: 55,
-                        isDusk: dusk, hasFootpath: true, pathOffset: -35, minBushScale: 0.34, maxBushScale: 0.72
+                        isDusk: dusk, hasFootpath: false, pathOffset: -35, minBushScale: 0.34, maxBushScale: 0.72
                     });
                     mCtx.restore();
 
@@ -1889,7 +1889,7 @@
                     c2.translate(100, 0);
                     drawRealisticTeaTilla(c2, {
                         cx: 460, baseY: 465, rx: 680, ry: 245, rowCount: 8, seed: 88,
-                        isDusk: false, hasFootpath: true, pathOffset: 55, minBushScale: 0.25, maxBushScale: 0.54
+                        isDusk: false, hasFootpath: false, pathOffset: 55, minBushScale: 0.25, maxBushScale: 0.54
                     });
                     drawRealisticTeaTilla(c2, {
                         cx: 1260, baseY: 475, rx: 640, ry: 235, rowCount: 8, seed: 99,
@@ -1905,11 +1905,11 @@
                     c3.translate(100, 0);
                     drawRealisticTeaTilla(c3, {
                         cx: 190, baseY: 545, rx: 560, ry: 310, rowCount: 9, seed: 31,
-                        isDusk: false, hasFootpath: true, pathOffset: 85, minBushScale: 0.30, maxBushScale: 0.72
+                        isDusk: false, hasFootpath: false, pathOffset: 85, minBushScale: 0.30, maxBushScale: 0.72
                     });
                     drawRealisticTeaTilla(c3, {
                         cx: 1410, baseY: 550, rx: 560, ry: 315, rowCount: 9, seed: 32,
-                        isDusk: false, hasFootpath: true, pathOffset: -85, minBushScale: 0.30, maxBushScale: 0.72
+                        isDusk: false, hasFootpath: false, pathOffset: -85, minBushScale: 0.30, maxBushScale: 0.72
                     });
                     c3.restore();
                 }
@@ -2390,36 +2390,7 @@
                     });
                 }
 
-                // Shimmering Jhiri Stream Winding Through the Valley Ravine (Center-Bottom)
-                ctx.save();
-                ctx.beginPath();
-                ctx.moveTo(680, 545);
-                ctx.bezierCurveTo(610, 635, 860, 735, 740, 930);
-                ctx.lineTo(895, 930);
-                ctx.bezierCurveTo(965, 735, 705, 635, 745, 545);
-                ctx.closePath();
-                const jGrad = ctx.createLinearGradient(680, 545, 840, 930);
-                if (isCut6) {
-                    jGrad.addColorStop(0, lerpColor([225, 135, 82], [45, 62, 95], nightAmt));
-                    jGrad.addColorStop(1, lerpColor([65, 95, 88], [18, 28, 48], nightAmt));
-                } else {
-                    jGrad.addColorStop(0, "#8ce0d4");
-                    jGrad.addColorStop(0.5, "#3b9c8e");
-                    jGrad.addColorStop(1, "#1b5e54");
-                }
-                ctx.fillStyle = jGrad;
-                ctx.fill();
-
-                ctx.strokeStyle = "rgba(255, 255, 240, 0.48)";
-                ctx.lineWidth = 1.6;
-                for (let wy = 565; wy < 900; wy += 24) {
-                    const wx = 755 + Math.sin(wy * 0.025) * 45 + Math.sin(t * 4.5 + wy) * 6;
-                    ctx.beginPath();
-                    ctx.moveTo(wx - 12, wy);
-                    ctx.lineTo(wx + 12, wy);
-                    ctx.stroke();
-                }
-                ctx.restore();
+                // Pure uninterrupted tea bush Tillas in Drone View (road/ribbon removed)
                 ctx.restore();
 
                 // 5. Foreground Framing Tilla Slopes Plane (Parallax 1.25x — Close-Up Individual Tea Plants!)
@@ -3390,15 +3361,7 @@
                 // Terraced Individual Tea Bushes Carpeting the Lower Bungalow Hillock Slope!
                 ctx.drawImage(cut5BungalowTillasCanvas, -120, 45);
 
-                ctx.fillStyle = "#b86b43";
-                ctx.beginPath();
-                ctx.moveTo(740, 535);
-                ctx.lineTo(860, 535);
-                ctx.quadraticCurveTo(960, 650, 1140, 720);
-                ctx.lineTo(890, 720);
-                ctx.quadraticCurveTo(820, 635, 740, 535);
-                ctx.closePath();
-                ctx.fill();
+                // Unbroken tea bushes on bungalow tilla slope
 
                 drawKoroiShadeTree(ctx, 355, 515, 1.08, Math.sin(t * 2.0) * 6, 0);
                 drawKoroiShadeTree(ctx, 1245, 510, 1.12, Math.cos(t * 2.1) * 6, 2);
