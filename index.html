@@ -566,10 +566,8 @@
             // ============================================================================
             // 0. CINEMATIC MASTER RULES CONTRACT (GOVERNANCE FOR ALL FUTURE MODIFICATIONS)
             // ============================================================================
-            // Every scene cut, object renderer, camera trajectory, and color grade in this
-            // engine MUST strictly adhere to CINEMATIC_MASTER_RULES.
             const CINEMATIC_MASTER_RULES = Object.freeze({
-                version: "3.0-SYLHET-INDIVIDUAL-TEA-BUSH-REALISM",
+                version: "3.1-SYLHET-JHIRI-STREAM-REALISM",
                 aspectRatio: "16:9 (1600x900 internal render buffer) with optional 2.39:1 Anamorphic mattes",
                 pacingStandard: "Fast-paced viral travel cinematography: 5.0 seconds per cut (30.0s total across 6 cuts) with brisk, continuous camera motion.",
                 botanicalRealism: {
@@ -579,7 +577,7 @@
                 },
                 culturalAuthenticity: {
                     teaPluckers: "Female tea garden workers wear vibrant cotton saris/blouses with woven conical bamboo Tukri baskets suspended on their backs via a taut forehead strap (Mathar Fita).",
-                    jhiriStream: "Mountain Jhiri streams feature clear shallow water flowing over rounded sandstone pebbles, mossy boulders, bamboo footbridges (Shako), and lush taro/fern banks.",
+                    jhiriStream: "Mountain Jhiri streams feature an upper rock-ledge cascade, crystal-clear water with underwater sun caustics, 3D shaded sandstone pebbles, darting silver minnows, sculpted mossy boulders with hydrodynamic wakes, an arched A-frame bamboo footbridge (Basher Shako), bamboo groves, and lush taro/fern banks.",
                     estateTractor: "Muddy red-laterite roads (Lal Matir Rasta) feature rutted wheel tracks, rainwater puddles, and a rugged estate tractor hauling a trailer piled high with bulging green tea leaf sacks.",
                     boroBungalow: "Hilltop Assam-type planter's bungalows sit on brick/timber piers with whitewashed walls, dark timber framing, sloped red corrugated roofs, wide verandas, cane chairs, and bougainvillea."
                 },
@@ -714,7 +712,6 @@
 
             // ============================================================================
             // 3. PROCEDURAL NATURAL FOLEY & WILDLIFE WEB AUDIO ENGINE
-            //    (Pure Scene-Specific Natural Sounds — No Continuous Drone or Monotone Loop)
             // ============================================================================
             class TeaEstateSoundEngine {
                 constructor() {
@@ -796,7 +793,6 @@
                     const ac = this.ctx;
                     const now = ac.currentTime;
 
-                    // 1. Cut 2 Tea-Leaf Rustle (Silent except when plucking in Cut 2)
                     const leafSrc = ac.createBufferSource();
                     leafSrc.buffer = this.whiteBuffer;
                     leafSrc.loop = true;
@@ -811,7 +807,6 @@
                     this.leafRustleGain.connect(this.compressor);
                     leafSrc.start(now, 0.4);
 
-                    // 2. Cut 3 Mountain Jhiri Stream Water (Active ONLY during Cut 3: 10.0s–15.0s)
                     const jhiriSrc = ac.createBufferSource();
                     jhiriSrc.buffer = this.pinkBuffer;
                     jhiriSrc.loop = true;
@@ -838,7 +833,6 @@
                     this.jhiriPan.connect(this.compressor);
                     jhiriSrc.start(now, 0.9);
 
-                    // 3. Cut 6 Evening Crickets (Active ONLY during Cut 6 Dusk: 25.0s–30.0s)
                     const cOsc1 = ac.createOscillator();
                     const cOsc2 = ac.createOscillator();
                     const cLfo = ac.createOscillator();
@@ -860,7 +854,6 @@
                     cOsc2.start(now);
                     cLfo.start(now);
 
-                    // 4. Cut 4 Diesel Tea Tractor & Muddy Tire Squelch (Active ONLY during Cut 4: 15.0s–20.0s)
                     this.tractorPan = ac.createStereoPanner();
                     this.tractorPan.pan.value = -0.6;
                     this.tractorGain = ac.createGain();
@@ -1215,7 +1208,6 @@
                         }
                     }
 
-                    // Natural hill bird calls in non-tractor cuts
                     if (t >= this.nextBirdTime && (t < 15.0 || t > 20.0)) {
                         const types = ["doel", "koel", "kingfisher", "doel"];
                         const choice = (t >= 10 && t < 15) ? "kingfisher" : types[Math.floor((t * 5.7) % types.length)];
@@ -1224,13 +1216,11 @@
                         this.nextBirdTime = t + 2.1 + (t % 1.1);
                     }
 
-                    // Cut 2: Crisp Tea-Leaf Plucking Snaps & Basket Rustle
                     if (t >= 5.1 && t <= 9.85 && t >= this.nextPluckTime) {
                         this.playTeaPluckSnap(Math.sin(t * 2.9) * 0.45);
                         this.nextPluckTime = t + 0.68 + (t % 0.32);
                     }
 
-                    // Cut 3: Natural Water Droplet / Pebble Ripples in the Jhiri Stream
                     if (t >= 10.1 && t <= 14.85 && t >= this.nextSplashTime) {
                         this.playWaterDropletSplash(Math.sin(t * 3.7) * 0.55);
                         this.nextSplashTime = t + 0.55 + (t % 0.35);
@@ -1241,17 +1231,11 @@
                     const isTractorCut = (t >= 15.0 && t < 20.0);
                     const isDuskCut = (t >= 25.0);
 
-                    // Leaf rustle active ONLY in Cut 2 (Tea Pluckers), silent elsewhere
                     this.leafRustleGain.gain.setTargetAtTime(isPluckCut ? 0.032 : 0.0001, now, 0.12);
-
-                    // Jhiri water stream active ONLY in Cut 3 (10.0s–15.0s), silent elsewhere
                     this.jhiriGain.gain.setTargetAtTime(isJhiriCut ? 0.22 : 0.0001, now, 0.15);
                     this.jhiriPan.pan.setTargetAtTime(isJhiriCut ? Math.sin(t * 1.2) * 0.25 : 0.0, now, 0.15);
-
-                    // Dusk crickets active ONLY in Cut 6 (25.0s–30.0s), silent elsewhere
                     this.cricketGain.gain.setTargetAtTime(isDuskCut ? 0.018 : 0.0001, now, 0.2);
 
-                    // Tractor engine & mud squelch active ONLY in Cut 4 (15.0s–20.0s), silent elsewhere
                     if (isTractorCut) {
                         const u = clamp((t - 15.0) / 5.0, 0, 1);
                         const env = smoothstep(15.0, 15.6, t) * (1 - smoothstep(19.3, 20.0, t));
@@ -1304,7 +1288,6 @@
                 return c;
             }
 
-            // Helper: Draw a single pointed, serrated-illusion Camellia sinensis leaf with midrib vein
             function drawSingleTeaLeaf(ctx, x, y, len, wid, angle, fillCol, veinCol) {
                 ctx.save();
                 ctx.translate(x, y);
@@ -1328,9 +1311,6 @@
                 ctx.restore();
             }
 
-            // Generates an authentic, individually-foliated Tea Bush (Camellia sinensis) sprite
-            // with gnarled woody stems at the base, 220+ pointed tea leaves, a flat-domed
-            // pruned plucking table ("Chhat"), and upright "Duti Pata Ekti Kuri" top shoots!
             function createDetailedTeaBushSprite(w, h, seed, isDusk = false) {
                 const c = createOffscreen(w, h);
                 const bctx = c.getContext("2d");
@@ -1342,7 +1322,6 @@
                 const ry = h * 0.36;
                 const crownY = h * 0.48;
 
-                // 1. Deep Ground Occlusion Shadow on the Red-Laterite Soil Terrace
                 const shGrad = bctx.createRadialGradient(cx, baseY - 2, rx * 0.15, cx, baseY - 2, rx * 0.98);
                 shGrad.addColorStop(0, "rgba(6, 12, 8, 0.82)");
                 shGrad.addColorStop(0.65, "rgba(12, 18, 10, 0.48)");
@@ -1352,7 +1331,6 @@
                 bctx.ellipse(cx, baseY - 2, rx * 0.96, h * 0.11, 0, 0, Math.PI * 2);
                 bctx.fill();
 
-                // 2. Gnarled Branched Woody Stems & Root Collar ("Cha Gacher Gora") Under the Bush Skirt
                 const stemOffsets = [-rx * 0.42, -rx * 0.20, 0, rx * 0.22, rx * 0.40];
                 stemOffsets.forEach((sox, idx) => {
                     const baseSpread = sox * 0.55 + (rng() - 0.5) * 5;
@@ -1365,7 +1343,6 @@
                     bctx.quadraticCurveTo(cx + (baseSpread + topSpread) * 0.5, baseY - h * 0.14, cx + topSpread, crownY + ry * 0.35);
                     bctx.stroke();
 
-                    // Highlight on woody bark
                     bctx.strokeStyle = "rgba(148, 106, 72, 0.45)";
                     bctx.lineWidth = 1.0;
                     bctx.beginPath();
@@ -1374,7 +1351,6 @@
                     bctx.stroke();
                 });
 
-                // 3. Interior Core Shadow Mass (Gives 3D spherical/table volume to the bush)
                 const coreGrad = bctx.createRadialGradient(cx, crownY + 6, rx * 0.1, cx, crownY + 4, rx * 0.92);
                 coreGrad.addColorStop(0, "#071a0b");
                 coreGrad.addColorStop(0.75, "#0d2913");
@@ -1384,7 +1360,6 @@
                 bctx.ellipse(cx, crownY + 4, rx * 0.90, ry * 0.85, 0, 0, Math.PI * 2);
                 bctx.fill();
 
-                // 4. Five Botanical Depth Tiers of Pointed Camellia sinensis Leaves
                 const tiers = isDusk
                     ? [
                         { count: 55, fill: "#0a2112", vein: null, yMin: -0.15, yMax: 0.72, len: 12, wid: 4.5 },
@@ -1404,12 +1379,9 @@
                 for (let tIdx = 0; tIdx < tiers.length; tIdx++) {
                     const tier = tiers[tIdx];
                     for (let i = 0; i < tier.count; i++) {
-                        // Distribute across the flat-topped / gently domed plucking table geometry
-                        const u = (rng() * 2 - 1); // -1 .. 1 horizontal spread
+                        const u = (rng() * 2 - 1);
                         const horizFactor = Math.pow(Math.abs(u), 0.75) * Math.sign(u);
                         const lx = cx + horizFactor * rx * (0.94 - tIdx * 0.03) + (rng() - 0.5) * 6;
-
-                        // Pruned plucking-table top curve: flatter across the top, rounded at sides
                         const tableArch = (1 - Math.pow(u, 2) * 0.65);
                         const vFrac = lerp(tier.yMin, tier.yMax, rng());
                         const ly = crownY + vFrac * ry * tableArch + (1 - tableArch) * ry * 0.28;
@@ -1421,7 +1393,6 @@
                     }
                 }
 
-                // 5. Upright "Duti Pata Ekti Kuri" (Two Leaves & A Bud) Flush Shoots Crowning the Plucking Table!
                 const shootCount = 24;
                 for (let s = 0; s < shootCount; s++) {
                     const u = ((s / (shootCount - 1)) * 2 - 1) * 0.88 + (rng() - 0.5) * 0.08;
@@ -1433,11 +1404,9 @@
                     const leafCol2 = isDusk ? "#f0c85b" : "#bdf55c";
                     const budCol = isDusk ? "#ffe48a" : "#e6fc9a";
 
-                    // Left & Right tender unfolded shoot leaves ("Duti Pata")
                     drawSingleTeaLeaf(bctx, sx - 3.2, sy + 1.5, 7.5, 2.6, -0.55, leafCol1, budCol);
                     drawSingleTeaLeaf(bctx, sx + 3.2, sy + 1.5, 7.5, 2.6, 0.55, leafCol2, budCol);
 
-                    // Central upright unopened bud ("Ekti Kuri")
                     bctx.fillStyle = budCol;
                     bctx.beginPath();
                     bctx.ellipse(sx, sy - 3.2, 1.4, 4.6, (rng() - 0.5) * 0.15, 0, Math.PI * 2);
@@ -1460,7 +1429,6 @@
                 createDetailedTeaBushSprite(156, 112, 4404, true)
             ];
 
-            // Feathery horizontal-tiered Koroi (Albizia) & Krishnachura shade tree canopy sprites
             function createShadeCanopySprite(w, h, seed, palette, isFeathery = true) {
                 const c = createOffscreen(w, h);
                 const lctx = c.getContext("2d");
@@ -1533,8 +1501,6 @@
             // ============================================================================
             // 4B. REALISTIC MULTI-BUSH TILLA HILLOCK BUILDER (INDIVIDUAL TEA PLANTS!)
             // ============================================================================
-            // Stamps hundreds of discrete, individually visible Camellia sinensis bushes
-            // onto stepped red-laterite contour terraces over a 3D Tilla hillock.
             function drawRealisticTeaTilla(ctx, opts) {
                 const {
                     cx, baseY, rx, ry, rowCount = 9, seed = 1,
@@ -1547,7 +1513,6 @@
 
                 ctx.save();
 
-                // 1. Underlying Red-Laterite Earth Hillock ("Lal Matir Tilla") & Deep Crevice Base
                 const earthGrad = ctx.createLinearGradient(cx, baseY - ry, cx, baseY + 30);
                 if (isDusk) {
                     earthGrad.addColorStop(0, "#4a2515");
@@ -1571,7 +1536,6 @@
                 ctx.closePath();
                 ctx.fill();
 
-                // Clip to a generous padded silhouette above the Tilla so top-crest tea bushes aren't sliced flat!
                 ctx.beginPath();
                 ctx.moveTo(cx - rx * 1.08, baseY + 50);
                 for (let x = -rx * 1.05; x <= rx * 1.05; x += 18) {
@@ -1584,23 +1548,19 @@
                 ctx.closePath();
                 ctx.clip();
 
-                // Helper for the S-curve red-earth footpath X position at a given row fraction
                 function getPathX(frac) {
                     return cx + pathOffset + Math.sin(frac * Math.PI * 1.65 + seed) * 52;
                 }
 
-                // 2. Render Stepped Contour Terraces & Individual Tea Plants Row by Row (Top Crest -> Bottom Base)
                 for (let r = 0; r < rowCount; r++) {
                     const frac = r / Math.max(1, rowCount - 1);
-                    // Perspective vertical distribution (denser near top crest, wider steps near base)
                     const perspFrac = Math.pow(frac, 1.12);
                     const rowYOffset = perspFrac * (ry * 0.96);
                     const bScale = lerp(minBushScale, maxBushScale, perspFrac);
                     const bushW = 138 * bScale;
                     const bushH = 98 * bScale;
-                    const stepX = bushW * 0.68; // Slight natural overlap between adjacent bushes in the same row
+                    const stepX = bushW * 0.68;
 
-                    // A. Exposed Red-Laterite Soil Terrace Ledge & Dark Inter-Row Plucking Alley
                     ctx.strokeStyle = isDusk ? "#592b18" : "#a65832";
                     ctx.lineWidth = Math.max(2.5, 8 * bScale);
                     ctx.beginPath();
@@ -1614,12 +1574,10 @@
                     }
                     ctx.stroke();
 
-                    // Dark shaded soil crevice right under the terrace ledge
                     ctx.strokeStyle = "rgba(12, 8, 5, 0.72)";
                     ctx.lineWidth = Math.max(1.8, 5 * bScale);
                     ctx.stroke();
 
-                    // B. Stamp Individual Tea Plants (Camellia sinensis) Along This Contour Row!
                     const pathCenterX = getPathX(perspFrac);
                     const pathGapHalf = hasFootpath ? lerp(12, 26, perspFrac) : -1;
 
@@ -1627,9 +1585,7 @@
                         const worldX = cx + x + (rng() - 0.5) * (stepX * 0.18);
                         const u = clamp((worldX - cx) / rx, -1, 1);
 
-                        // Leave an organic gap where the red-laterite footpath climbs the Tilla!
                         if (hasFootpath && Math.abs(worldX - pathCenterX) < pathGapHalf) {
-                            // Draw a small red-earth log/brick step in the footpath gap
                             ctx.fillStyle = isDusk ? "#6e3820" : "#c47247";
                             ctx.fillRect(pathCenterX - pathGapHalf * 0.7, baseY - Math.cos(u * Math.PI * 0.5) * ry + rowYOffset, pathGapHalf * 1.4, Math.max(2, 4.5 * bScale));
                             continue;
@@ -1639,7 +1595,6 @@
                         const wave = Math.sin(u * 4.2 + r * 0.45 + seed) * 5;
                         const worldY = baseY - dome * ry + rowYOffset + wave + (rng() - 0.5) * 3;
 
-                        // Subtle slope tilt so bushes on the left/right flanks follow the hillock contour
                         const slopeTilt = u * 0.18 + (rng() - 0.5) * 0.05;
                         const spr = sprites[(r * 7 + Math.abs(Math.floor(x))) % sprites.length];
                         const scVar = bScale * (0.92 + rng() * 0.16);
@@ -1661,7 +1616,6 @@
                 ctx.restore();
             }
 
-            // Helper: Draw a tall, slender silver-barked Koroi (Albizia) shade tree
             function drawKoroiShadeTree(ctx, x, y, scale, sway = 0, variant = 0) {
                 ctx.save();
                 ctx.translate(x, y);
@@ -1712,7 +1666,6 @@
                 ctx.restore();
             }
 
-            // Pre-rendered Parallax Tilla Layers (So hundreds of individual tea bushes render at 60fps!)
             const cut1BackTillasCanvas = createOffscreen(CW + 240, CH);
             const cut1MidTillasCanvas = createOffscreen(CW + 240, CH);
             const cut1ForeTillasCanvas = createOffscreen(CW + 240, CH);
@@ -1729,7 +1682,6 @@
             function preRenderAllTillaLayers() {
                 renderGrainTexture();
 
-                // --- 1. Cut 1 (Daylight) & Cut 6 (Golden Dusk) 3-Plane Parallax Tilla Layers ---
                 [
                     { back: cut1BackTillasCanvas, mid: cut1MidTillasCanvas, fore: cut1ForeTillasCanvas, dusk: false },
                     { back: cut6BackTillasCanvas, mid: cut6MidTillasCanvas, fore: cut6ForeTillasCanvas, dusk: true }
@@ -1778,7 +1730,6 @@
                     fCtx.restore();
                 });
 
-                // --- 2. Cut 2 Background Tillas ---
                 {
                     const c2 = cut2BgTillasCanvas.getContext("2d");
                     c2.save();
@@ -1794,38 +1745,40 @@
                     c2.restore();
                 }
 
-                // --- 3. Cut 3 Jhiri Ravine Flanking Tillas ---
+                // --- 3. Cut 3 Jhiri Ravine Multi-Plane Flanking & Upper-Valley Tillas ---
                 {
                     const c3 = cut3RavineTillasCanvas.getContext("2d");
                     c3.save();
                     c3.translate(100, 0);
+                    // Distant center-valley Tilla rising behind the Jhiri headwaters
                     drawRealisticTeaTilla(c3, {
-                        cx: 190, baseY: 545, rx: 560, ry: 310, rowCount: 9, seed: 31,
-                        isDusk: false, hasFootpath: false, pathOffset: 85, minBushScale: 0.30, maxBushScale: 0.72
+                        cx: 790, baseY: 418, rx: 560, ry: 215, rowCount: 8, seed: 30,
+                        isDusk: false, hasFootpath: false, minBushScale: 0.20, maxBushScale: 0.44
+                    });
+                    // Left & Right steep terraced tea Tillas forming the lush V-shaped Jhiri ravine
+                    drawRealisticTeaTilla(c3, {
+                        cx: 165, baseY: 545, rx: 620, ry: 335, rowCount: 10, seed: 31,
+                        isDusk: false, hasFootpath: true, pathOffset: 110, minBushScale: 0.28, maxBushScale: 0.74
                     });
                     drawRealisticTeaTilla(c3, {
-                        cx: 1410, baseY: 550, rx: 560, ry: 315, rowCount: 9, seed: 32,
-                        isDusk: false, hasFootpath: false, pathOffset: -85, minBushScale: 0.30, maxBushScale: 0.72
+                        cx: 1435, baseY: 550, rx: 620, ry: 340, rowCount: 10, seed: 32,
+                        isDusk: false, hasFootpath: true, pathOffset: -110, minBushScale: 0.28, maxBushScale: 0.74
                     });
                     c3.restore();
                 }
 
-                // --- 4. Cut 4 Muddy Tractor Road Flanking Tillas ---
                 {
                     const c4 = cut4RoadTillasCanvas.getContext("2d");
                     c4.save();
                     c4.translate(100, 0);
-                    // Distant misty Tilla behind the upper-left valley pass
                     drawRealisticTeaTilla(c4, {
                         cx: 350, baseY: 465, rx: 460, ry: 195, rowCount: 7, seed: 40,
                         isDusk: false, hasFootpath: false, minBushScale: 0.22, maxBushScale: 0.48
                     });
-                    // Left flanking Tilla above the road entry pass
                     drawRealisticTeaTilla(c4, {
                         cx: -20, baseY: 515, rx: 420, ry: 275, rowCount: 8, seed: 41,
                         isDusk: false, hasFootpath: false, minBushScale: 0.28, maxBushScale: 0.68
                     });
-                    // Grand center-right Tilla rising above the upper road embankment
                     drawRealisticTeaTilla(c4, {
                         cx: 1120, baseY: 565, rx: 780, ry: 335, rowCount: 9, seed: 42,
                         isDusk: false, hasFootpath: false, minBushScale: 0.30, maxBushScale: 0.76
@@ -1833,7 +1786,6 @@
                     c4.restore();
                 }
 
-                // --- 5. Cut 5 Hilltop Bungalow Terraced Tea Slope ---
                 {
                     const c5 = cut5BungalowTillasCanvas.getContext("2d");
                     c5.save();
@@ -2123,7 +2075,6 @@
 
             // ============================================================================
             // 6. CUT 1 (0:00–0:05) & CUT 6 (0:25–0:30): MULTI-PLANE TILLA PANORAMA
-            //    (FPV Drone Push-In over Individual-Bush Tea Tillas / Golden Dusk Pull-Back)
             // ============================================================================
             const TILLA_FIREFLIES = Array.from({ length: 75 }, (_, i) => ({
                 x: 80 + ((i * 193) % 1440),
@@ -2137,7 +2088,6 @@
                 const duskAmt = isCut6 ? smoothstep(0.0, 0.72, localU) : 0;
                 const nightAmt = isCut6 ? smoothstep(0.35, 0.92, localU) : 0;
 
-                // Brisk, gratifying 5-second camera movement with true multi-plane parallax
                 const zoom = isCut6 ? lerp(1.24, 1.01, easeInOutCubic(localU)) : lerp(1.01, 1.25, easeInOutCubic(localU));
                 const panX = isCut6 ? lerp(42, -32, easeInOutCubic(localU)) : lerp(-38, 42, easeInOutCubic(localU));
                 const panY = isCut6 ? lerp(24, -12, easeInOutCubic(localU)) : lerp(-18, 26, easeInOutCubic(localU));
@@ -2151,7 +2101,6 @@
                 ctx.scale(zoom, zoom);
                 ctx.translate(-CW * 0.5 - panX * 0.5, -CH * 0.5 - panY * 0.5);
 
-                // 1. Sky Gradient
                 const skyGrad = ctx.createLinearGradient(0, -60, 0, 410);
                 if (isCut6) {
                     skyGrad.addColorStop(0, lerpColor([38, 54, 108], [12, 18, 42], nightAmt));
@@ -2166,7 +2115,6 @@
                 ctx.fillStyle = skyGrad;
                 ctx.fillRect(-140, -80, CW + 280, 500);
 
-                // Glowing Sun Orb
                 const sunX = isCut6 ? lerp(1160, 1240, localU) : lerp(410, 520, localU);
                 const sunY = isCut6 ? lerp(165, 290, localU) : lerp(195, 130, localU);
                 const sunHalo = ctx.createRadialGradient(sunX, sunY, 10, sunX, sunY, 320);
@@ -2184,7 +2132,6 @@
                 ctx.arc(sunX, sunY, 320, 0, Math.PI * 2);
                 ctx.fill();
 
-                // 2. Distant Meghalaya / Sylhet Blue-Green Mountain Ridge (Parallax 0.15x)
                 ctx.save();
                 ctx.translate(-panX * 0.15, 0);
                 ctx.fillStyle = isCut6 ? lerpColor([58, 72, 102], [22, 28, 52], nightAmt) : "#4d7c7d";
@@ -2199,12 +2146,10 @@
                 ctx.fill();
                 ctx.restore();
 
-                // 3. Back-Row Tea Tillas Plane (Parallax 0.35x — Hundreds of Individual Tea Bushes!)
                 ctx.save();
                 ctx.translate(-panX * 0.35, -panY * 0.25);
                 ctx.drawImage(isCut6 ? cut6BackTillasCanvas : cut1BackTillasCanvas, -120, 0);
 
-                // Distant Hilltop Planter's Bango House on the Right Tilla Crown (cx: 1235, y: 285)
                 ctx.save();
                 ctx.translate(1235, 285);
                 ctx.scale(0.58, 0.58);
@@ -2232,7 +2177,6 @@
                 }
                 ctx.restore();
 
-                // Back Tilla Koroi Shade Trees
                 [
                     { x: 240, y: 385, sc: 0.56, v: 0 },
                     { x: 480, y: 410, sc: 0.62, v: 1 },
@@ -2243,7 +2187,6 @@
                 });
                 ctx.restore();
 
-                // Drifting Valley Mist Layer between Back & Mid Tillas
                 for (let m = 0; m < 6; m++) {
                     const mx = ((m * 340 + t * (32 + m * 5)) % (CW + 500)) - 250;
                     const my = 445 + (m % 2) * 32;
@@ -2257,7 +2200,6 @@
                     ctx.fill();
                 }
 
-                // 4. Midground Tea Tillas Plane (Parallax 0.72x — Large Individual Tea Bushes + Pluckers!)
                 ctx.save();
                 ctx.translate(-panX * 0.72, -panY * 0.65);
                 ctx.drawImage(isCut6 ? cut6MidTillasCanvas : cut1MidTillasCanvas, -120, 0);
@@ -2293,10 +2235,8 @@
                     });
                 }
 
-                // Pure uninterrupted tea bush Tillas in Drone View (road/ribbon removed)
                 ctx.restore();
 
-                // 5. Foreground Framing Tilla Slopes Plane (Parallax 1.25x — Close-Up Individual Tea Plants!)
                 ctx.save();
                 ctx.translate(-panX * 1.25, -panY * 1.15);
                 ctx.drawImage(isCut6 ? cut6ForeTillasCanvas : cut1ForeTillasCanvas, -120, 0);
@@ -2304,7 +2244,6 @@
                 drawKoroiShadeTree(ctx, 1465, 805, 1.15, Math.cos(t * 2.0) * 10, 1);
                 ctx.restore();
 
-                // 6. Flock of White Egrets Banking Across the Valley
                 const flockX = lerp(240, 1280, localU);
                 const flockY = 235 + Math.sin(t * 1.8) * 28;
                 for (let b = 0; b < 7; b++) {
@@ -2320,7 +2259,6 @@
                     ctx.stroke();
                 }
 
-                // 7. Volumetric Tyndall God-Rays & Bioluminescent Fireflies (Cut 6)
                 ctx.save();
                 ctx.globalCompositeOperation = "screen";
                 for (let r = 0; r < 5; r++) {
@@ -2363,7 +2301,6 @@
 
             // ============================================================================
             // 7. CUT 2 (0:05–0:10): SHALLOW-DOF TRACKING SHOT — TEA PLUCKERS & TUKRI
-            //    (Individual Tea Bushes with Visible Woody Stems, Leaves & Dewy Macro Bokeh)
             // ============================================================================
             function renderCut2TeaPluckers(ctx, t) {
                 const localU = clamp((t - 5.0) / 5.0, 0, 1);
@@ -2371,7 +2308,6 @@
 
                 ctx.save();
 
-                // 1. Soft Bokeh Misty Tea Valley Sky & Distant Multi-Bush Tilla Backdrop
                 const skyGrad = ctx.createLinearGradient(0, 0, 0, 360);
                 skyGrad.addColorStop(0, "#3a8c96");
                 skyGrad.addColorStop(0.55, "#8fd1c8");
@@ -2379,7 +2315,6 @@
                 ctx.fillStyle = skyGrad;
                 ctx.fillRect(0, 0, CW, 360);
 
-                // Background Tilla Slope (Parallax 0.28x — Individual Tea Bushes)
                 ctx.save();
                 ctx.translate(-dollyX * 0.28, 0);
                 ctx.drawImage(cut2BgTillasCanvas, -100, 0);
@@ -2395,11 +2330,9 @@
                 ctx.fillStyle = mistGrad;
                 ctx.fillRect(0, 250, CW, 190);
 
-                // 2. Midground Terraced Rows of Discrete Individual Tea Bushes (Parallax 0.78x)
                 ctx.save();
                 ctx.translate(-dollyX * 0.78, 0);
 
-                // Red-laterite soil base of the terraced slope
                 const slopeSoil = ctx.createLinearGradient(0, 415, 0, CH);
                 slopeSoil.addColorStop(0, "#8f4928");
                 slopeSoil.addColorStop(0.5, "#6b3319");
@@ -2407,14 +2340,11 @@
                 ctx.fillStyle = slopeSoil;
                 ctx.fillRect(-140, 415, CW + 280, CH - 415);
 
-                // Helper: Stamp a row of large, discrete, individually detailed Camellia sinensis bushes
-                // with visible red-earth terrace ledges & gnarled woody stems at the base of every plant!
                 function drawCloseUpTeaBushRow(yRow, bushScale, rowSeed) {
                     const bushW = 148 * bushScale;
                     const stepX = bushW * 0.74;
                     const swayX = Math.sin(t * 2.8 + rowSeed) * (3.5 * bushScale);
 
-                    // Red-laterite soil terrace ledge under this row of bushes
                     ctx.fillStyle = "#a65832";
                     ctx.fillRect(-140, yRow - 8 * bushScale, CW + 280, 14 * bushScale);
                     ctx.fillStyle = "rgba(14, 9, 5, 0.68)";
@@ -2436,11 +2366,9 @@
                     }
                 }
 
-                // Back two rows of individual tea bushes behind the pluckers
                 drawCloseUpTeaBushRow(468, 0.78, 1);
                 drawCloseUpTeaBushRow(548, 0.92, 2);
 
-                // 3. Hero Plane: 4 Tea Pluckers (Cha Sramik) with Forehead-Strapped Bamboo Tukri Baskets
                 const workers = [
                     {
                         x: 335, y: 642, scale: 2.38, dir: 1, phase: 0.2,
@@ -2468,12 +2396,10 @@
                     });
                 });
 
-                // Front two rows of large, close-up individual tea bushes in front of the workers!
                 drawCloseUpTeaBushRow(690, 1.18, 3);
                 drawCloseUpTeaBushRow(825, 1.42, 4);
                 ctx.restore();
 
-                // 4. Foreground Macro Plane (Parallax 1.48x): Detailed "Duti Pata Ekti Kuri" Shoots & Morning Dew Bokeh
                 ctx.save();
                 ctx.translate(-dollyX * 1.48, 0);
 
@@ -2568,270 +2494,919 @@
                 ctx.restore();
                 ctx.restore();
             }
+            // ============================================================================
+            // 8. CUT 3 (0:10–0:15): MOUNTAIN JHIRI STREAM, CASCADE, BOULDERS & BAMBOO SHAKO
+            //    (Enhanced 35mm Crane Jib Down + Parallax Drift over Sylhet Hill Stream)
+            // ============================================================================
+            function getCut3StreamChannel(y) {
+                const u = clamp((y - 385) / 565, 0, 1);
+                const center = 800 + Math.sin(u * Math.PI * 1.45 - 0.35) * (62 * (0.4 + u * 0.6));
+                const halfW = lerp(118, 700, Math.pow(u, 0.92));
+                return { u, center, left: center - halfW, right: center + halfW, halfW };
+            }
 
-            // ============================================================================
-            // 8. CUT 3 (0:10–0:15): MOUNTAIN JHIRI STREAM, MOSSY BOULDERS & BAMBOO SHAKO
-            //    (Crane Jib Down to Crystal-Clear Jhiri Stream Between Two Tea Tillas)
-            // ============================================================================
-            const JHIRI_PEBBLES = Array.from({ length: 130 }, (_, i) => {
+            const JHIRI_PEBBLES = Array.from({ length: 190 }, (_, i) => {
                 const rng = mulberry32(9001 + i);
+                const u = Math.pow(rng(), 0.78);
+                const y = 415 + u * 515;
+                const ch = getCut3StreamChannel(y);
+                const spread = (rng() * 2 - 1) * 0.92;
+                const x = ch.center + spread * ch.halfW;
+                const scale = lerp(0.45, 1.35, u);
+                const palettes = [
+                    { base: "#9c744f", hi: "#d6b087", sh: "#3d2917" },
+                    { base: "#64748b", hi: "#94a3b8", sh: "#1e293b" },
+                    { base: "#786855", hi: "#b09e86", sh: "#2e261d" },
+                    { base: "#8c583a", hi: "#c28863", sh: "#381f11" },
+                    { base: "#526656", hi: "#849c89", sh: "#1c261e" }
+                ];
+                const pal = palettes[i % palettes.length];
                 return {
-                    x: 240 + rng() * 1120,
-                    y: 520 + Math.pow(rng(), 0.85) * 370,
-                    rx: 6 + rng() * 14,
-                    ry: 3.5 + rng() * 7.5,
-                    ang: (rng() - 0.5) * 0.6,
-                    col: ["#b88b58", "#8c6d4e", "#64748b", "#a3704c", "#576554"][i % 5]
+                    x, y, u,
+                    rx: (6.5 + rng() * 14.5) * scale,
+                    ry: (3.8 + rng() * 7.8) * scale,
+                    ang: (rng() - 0.5) * 0.65,
+                    base: pal.base,
+                    hi: pal.hi,
+                    sh: pal.sh,
+                    glint: rng() > 0.72
                 };
             });
 
+            const JHIRI_MINNOWS = Array.from({ length: 14 }, (_, i) => {
+                const rng = mulberry32(4321 + i);
+                return {
+                    baseU: 0.25 + rng() * 0.65,
+                    laneOffset: (rng() - 0.5) * 0.52,
+                    speed: 0.08 + rng() * 0.06,
+                    phase: rng() * Math.PI * 2,
+                    size: 0.85 + rng() * 0.45
+                };
+            });
+
+            function drawBambooGroveCluster(ctx, baseX, baseY, scale, dir, sway) {
+                ctx.save();
+                ctx.translate(baseX, baseY);
+                ctx.scale(scale, scale);
+
+                const culms = [-22, -11, 0, 10, 21];
+                culms.forEach((cx, idx) => {
+                    const h = 220 + (idx % 3) * 32;
+                    const tipX = cx + dir * (48 + idx * 14) + sway * (0.8 + idx * 0.15);
+                    const tipY = -h + Math.abs(idx - 2) * 14;
+
+                    ctx.strokeStyle = idx % 2 === 0 ? "#3f7a2c" : "#559938";
+                    ctx.lineWidth = 4.6 - idx * 0.35;
+                    ctx.lineCap = "round";
+                    ctx.beginPath();
+                    ctx.moveTo(cx, 0);
+                    ctx.quadraticCurveTo(cx + dir * 16, -h * 0.55, tipX, tipY);
+                    ctx.stroke();
+
+                    // Bamboo nodes & feathery leaf sprays along upper culm
+                    for (let seg = 1; seg <= 6; seg++) {
+                        const su = seg / 6;
+                        const nx = (1 - su) * (1 - su) * cx + 2 * (1 - su) * su * (cx + dir * 16) + su * su * tipX;
+                        const ny = (1 - su) * (1 - su) * 0 + 2 * (1 - su) * su * (-h * 0.55) + su * su * tipY;
+                        ctx.fillStyle = "#254d19";
+                        ctx.fillRect(nx - 2.4, ny - 1, 4.8, 2);
+
+                        if (seg >= 3) {
+                            for (let lf = -1; lf <= 1; lf += 2) {
+                                const lAng = dir * 0.45 + lf * 0.48 + sway * 0.015;
+                                drawSingleTeaLeaf(
+                                    ctx,
+                                    nx + lf * 9 * dir,
+                                    ny - 3,
+                                    22,
+                                    3.6,
+                                    lAng,
+                                    seg % 2 === 0 ? "#68bd42" : "#8ce05a",
+                                    null
+                                );
+                            }
+                        }
+                    }
+                });
+
+                ctx.restore();
+            }
+
+            function drawSculptedJhiriBoulder(ctx, bd, t) {
+                const { x, y, rx, ry, hasMoss = true, seed = 1 } = bd;
+                const foamPulse = Math.sin(t * 6.8 + seed) * 3.5;
+
+                ctx.save();
+                ctx.translate(x, y);
+
+                // 1. Downstream V-Wake Ripples & Trailing White-Water Foam Ribbons
+                ctx.strokeStyle = "rgba(232, 253, 255, 0.38)";
+                ctx.lineWidth = 2.0;
+                for (let w = 0; w < 3; w++) {
+                    const wu = ((t * 1.4 + w / 3 + seed * 0.2) % 1);
+                    const wy = 4 + wu * (ry * 1.65);
+                    const wx = rx * (0.95 + wu * 0.55);
+                    ctx.globalAlpha = (1 - wu) * 0.55;
+                    ctx.beginPath();
+                    ctx.ellipse(0, wy, wx, ry * (0.55 + wu * 0.35), 0, 0.12, Math.PI - 0.12);
+                    ctx.stroke();
+                }
+                ctx.globalAlpha = 1.0;
+
+                // 2. Submerged Dark Waterline Shadow Skirt
+                ctx.fillStyle = "rgba(8, 30, 26, 0.65)";
+                ctx.beginPath();
+                ctx.ellipse(0, 6, rx * 1.08, ry * 0.72, 0, 0, Math.PI * 2);
+                ctx.fill();
+
+                // 3. Sculpted Faceted Sandstone/Basalt Boulder Body
+                const rockGrad = ctx.createLinearGradient(-rx * 0.5, -ry * 1.1, rx * 0.6, ry * 0.8);
+                rockGrad.addColorStop(0, "#7b8a99");
+                rockGrad.addColorStop(0.45, "#475569");
+                rockGrad.addColorStop(0.8, "#293548");
+                rockGrad.addColorStop(1, "#151e2b");
+                ctx.fillStyle = rockGrad;
+
+                ctx.beginPath();
+                ctx.moveTo(-rx * 1.02, ry * 0.18);
+                ctx.quadraticCurveTo(-rx * 0.96, -ry * 0.72, -rx * 0.32, -ry * 0.98);
+                ctx.quadraticCurveTo(rx * 0.22, -ry * 1.05, rx * 0.78, -ry * 0.58);
+                ctx.quadraticCurveTo(rx * 1.04, -ry * 0.05, rx * 0.96, ry * 0.25);
+                ctx.quadraticCurveTo(0, ry * 0.68, -rx * 1.02, ry * 0.18);
+                ctx.closePath();
+                ctx.fill();
+
+                // 4. Sunlit Upper-Left Rock Facet Plane & Wet Lower Rim Sheen
+                ctx.fillStyle = "rgba(186, 210, 224, 0.22)";
+                ctx.beginPath();
+                ctx.moveTo(-rx * 0.82, -ry * 0.08);
+                ctx.quadraticCurveTo(-rx * 0.68, -ry * 0.72, -rx * 0.12, -ry * 0.86);
+                ctx.lineTo(rx * 0.18, -ry * 0.32);
+                ctx.quadraticCurveTo(-rx * 0.35, -ry * 0.15, -rx * 0.82, -ry * 0.08);
+                ctx.closePath();
+                ctx.fill();
+
+                // Dark wet capillary rim just above the water surface
+                ctx.strokeStyle = "rgba(12, 20, 28, 0.75)";
+                ctx.lineWidth = 4.2;
+                ctx.beginPath();
+                ctx.ellipse(0, ry * 0.12, rx * 0.98, ry * 0.45, 0, 0.05, Math.PI - 0.05);
+                ctx.stroke();
+
+                // 5. Lush Velvety Cushion Moss Cap & Tiny Rock Ferns on Crown
+                if (hasMoss) {
+                    const mossGrad = ctx.createLinearGradient(0, -ry * 1.05, 0, -ry * 0.15);
+                    mossGrad.addColorStop(0, "#7cd943");
+                    mossGrad.addColorStop(0.55, "#3f8c27");
+                    mossGrad.addColorStop(1, "#1e4d14");
+                    ctx.fillStyle = mossGrad;
+                    ctx.beginPath();
+                    ctx.ellipse(-rx * 0.06, -ry * 0.46, rx * 0.76, ry * 0.44, -0.06, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    // Velvety moss tufts along the crown
+                    ctx.fillStyle = "#a3ed5a";
+                    for (let m = -3; m <= 3; m++) {
+                        const mx = m * (rx * 0.18);
+                        const my = -ry * 0.64 + Math.abs(m) * (ry * 0.06);
+                        ctx.beginPath();
+                        ctx.arc(mx, my, 4.2 + (m % 2) * 1.5, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
+                }
+
+                // 6. Foaming White-Water Collar & Animated Splash Beads
+                ctx.strokeStyle = "rgba(245, 255, 255, 0.82)";
+                ctx.lineWidth = 3.4;
+                ctx.beginPath();
+                ctx.ellipse(0, ry * 0.20, rx + 5 + foamPulse, ry * 0.50 + 2, 0, 0.08, Math.PI - 0.08);
+                ctx.stroke();
+
+                ctx.fillStyle = "rgba(255, 255, 255, 0.85)";
+                for (let sp = 0; sp < 5; sp++) {
+                    const ang = 0.25 + (sp / 4) * (Math.PI - 0.5);
+                    const spPhase = (t * 4.5 + sp * 0.37 + seed) % 1;
+                    const sx = Math.cos(ang) * (rx + 4 + spPhase * 10);
+                    const sy = Math.sin(ang) * (ry * 0.48) - Math.sin(spPhase * Math.PI) * 7;
+                    ctx.beginPath();
+                    ctx.arc(sx, sy, (1 - spPhase) * 2.4, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+
+                ctx.restore();
+            }
+
             function renderCut3JhiriStream(ctx, t) {
                 const localU = clamp((t - 10.0) / 5.0, 0, 1);
-                const craneY = lerp(-44, 24, easeInOutCubic(localU));
-                const zoom = lerp(1.02, 1.14, easeInOutCubic(localU));
+                const craneY = lerp(-38, 26, easeInOutCubic(localU));
+                const driftX = lerp(-18, 18, easeInOutCubic(localU));
+                const zoom = lerp(1.02, 1.15, easeInOutCubic(localU));
 
                 ctx.save();
                 ctx.translate(CW * 0.5, CH * 0.5);
                 ctx.scale(zoom, zoom);
-                ctx.translate(-CW * 0.5, -CH * 0.5 - craneY);
+                ctx.translate(-CW * 0.5 - driftX * 0.4, -CH * 0.5 - craneY);
 
-                // 1. Misty Ravine Sky & Sunlit Canopy Opening
-                const skyGrad = ctx.createLinearGradient(0, -60, 0, 380);
-                skyGrad.addColorStop(0, "#24696e");
-                skyGrad.addColorStop(0.55, "#74c2b8");
-                skyGrad.addColorStop(1, "#e2f5dc");
+                // 1. Luminous Sub-Tropical Ravine Sky & Misty Sunlit Canopy Gap
+                const skyGrad = ctx.createLinearGradient(0, -60, 0, 390);
+                skyGrad.addColorStop(0, "#19535c");
+                skyGrad.addColorStop(0.45, "#59b5ad");
+                skyGrad.addColorStop(0.82, "#cef0d6");
+                skyGrad.addColorStop(1, "#f7fae1");
                 ctx.fillStyle = skyGrad;
-                ctx.fillRect(-100, -80, CW + 200, 460);
+                ctx.fillRect(-120, -80, CW + 240, 470);
 
-                // 2. Left & Right Steep Tea Tillas Flanking the Jhiri Ravine (Individual Tea Bushes!)
+                // Warm sun-glow at the head of the Jhiri valley
+                const valleyGlow = ctx.createRadialGradient(780, 145, 15, 780, 190, 420);
+                valleyGlow.addColorStop(0, "rgba(255, 252, 215, 0.92)");
+                valleyGlow.addColorStop(0.38, "rgba(218, 248, 185, 0.52)");
+                valleyGlow.addColorStop(1, "rgba(150, 220, 180, 0)");
+                ctx.fillStyle = valleyGlow;
+                ctx.beginPath();
+                ctx.arc(780, 175, 420, 0, Math.PI * 2);
+                ctx.fill();
+
+                // 2. Flanking & Upper-Valley Tea Tillas (Individual Camellia sinensis Bushes!)
+                ctx.save();
+                ctx.translate(-driftX * 0.25, 0);
                 ctx.drawImage(cut3RavineTillasCanvas, -100, 0);
 
-                drawKoroiShadeTree(ctx, 260, 290, 0.85, Math.sin(t * 2.1) * 7, 0);
-                drawKoroiShadeTree(ctx, 1340, 285, 0.88, Math.cos(t * 2.0) * 7, 1);
+                // Koroi Shade Trees & Arching Sylhet Muli-Bamboo Groves Framing the Ravine
+                drawKoroiShadeTree(ctx, 240, 280, 0.86, Math.sin(t * 2.1) * 7, 0);
+                drawKoroiShadeTree(ctx, 520, 330, 0.64, Math.cos(t * 1.9) * 5, 1);
+                drawKoroiShadeTree(ctx, 1080, 325, 0.66, Math.sin(t * 2.0) * 5, 2);
+                drawKoroiShadeTree(ctx, 1355, 275, 0.88, Math.cos(t * 2.0) * 7, 1);
 
-                // 3. Red-Laterite & Mossy Ravine Banks Converging Toward the Jhiri Stream
-                ctx.fillStyle = "#5c341d";
+                drawBambooGroveCluster(ctx, 390, 430, 0.82, 1, Math.sin(t * 2.4) * 8);
+                drawBambooGroveCluster(ctx, 1210, 435, 0.84, -1, Math.cos(t * 2.3) * 8);
+                ctx.restore();
+
+                // 3. Stratified Sandstone Gorge & Multi-Tier Upper Jhiri Waterfall / Cascade (Headwaters)
+                ctx.save();
+                // Gorge rock walls framing the upper waterfall
+                const gorgeGrad = ctx.createLinearGradient(540, 340, 1060, 445);
+                gorgeGrad.addColorStop(0, "#3b2c20");
+                gorgeGrad.addColorStop(0.5, "#28363d");
+                gorgeGrad.addColorStop(1, "#3b2c20");
+                ctx.fillStyle = gorgeGrad;
                 ctx.beginPath();
-                ctx.moveTo(-80, 460);
-                ctx.quadraticCurveTo(380, 470, 560, 430);
-                ctx.lineTo(1040, 430);
-                ctx.quadraticCurveTo(1220, 470, CW + 80, 460);
-                ctx.lineTo(CW + 80, CH + 80);
-                ctx.lineTo(-80, CH + 80);
+                ctx.moveTo(520, 445);
+                ctx.quadraticCurveTo(585, 345, 795, 348);
+                ctx.quadraticCurveTo(1005, 345, 1080, 445);
                 ctx.closePath();
                 ctx.fill();
 
-                // Close-up Individual Tea Bushes Crowning the Left & Right Jhiri Ravine Banks!
+                // Two stepped basalt ledges where the upper Jhiri tumbles into the ravine
                 [
-                    { x: 95, y: 540, sc: 0.82 }, { x: 205, y: 555, sc: 0.88 }, { x: 315, y: 535, sc: 0.78 },
-                    { x: 1285, y: 535, sc: 0.78 }, { x: 1395, y: 555, sc: 0.88 }, { x: 1505, y: 540, sc: 0.82 }
+                    { yTop: 356, yBot: 392, wTop: 115, wBot: 145 },
+                    { yTop: 390, yBot: 432, wTop: 155, wBot: 198 }
+                ].forEach((tier, tIdx) => {
+                    // Dark wet rock step behind falling water
+                    ctx.fillStyle = "#1e293b";
+                    ctx.beginPath();
+                    ctx.roundRect(795 - tier.wBot * 0.58, tier.yTop, tier.wBot * 1.16, tier.yBot - tier.yTop + 6, 8);
+                    ctx.fill();
+
+                    // Mossy shoulder boulders flanking each cascade tier
+                    ctx.fillStyle = "#3f7d28";
+                    ctx.beginPath();
+                    ctx.ellipse(795 - tier.wTop * 0.56, tier.yTop + 6, 26, 11, -0.15, 0, Math.PI * 2);
+                    ctx.ellipse(795 + tier.wTop * 0.56, tier.yTop + 6, 26, 11, 0.15, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    // Silky animated white-water ribbons tumbling down the ledge
+                    const fallGrad = ctx.createLinearGradient(795, tier.yTop, 795, tier.yBot);
+                    fallGrad.addColorStop(0, "rgba(235, 255, 252, 0.92)");
+                    fallGrad.addColorStop(0.5, "rgba(155, 238, 232, 0.78)");
+                    fallGrad.addColorStop(1, "rgba(240, 255, 255, 0.95)");
+                    ctx.fillStyle = fallGrad;
+                    ctx.beginPath();
+                    ctx.moveTo(795 - tier.wTop * 0.45, tier.yTop);
+                    ctx.lineTo(795 + tier.wTop * 0.45, tier.yTop);
+                    ctx.lineTo(795 + tier.wBot * 0.48, tier.yBot);
+                    ctx.lineTo(795 - tier.wBot * 0.48, tier.yBot);
+                    ctx.closePath();
+                    ctx.fill();
+
+                    // Animated vertical water streaks
+                    ctx.strokeStyle = "rgba(255, 255, 255, 0.85)";
+                    ctx.lineWidth = 2.2;
+                    for (let s = -5; s <= 5; s++) {
+                        const sx = 795 + s * (tier.wTop * 0.08) + Math.sin(t * 9 + s + tIdx) * 2.5;
+                        const syOff = ((t * 48 + Math.abs(s) * 7) % (tier.yBot - tier.yTop));
+                        ctx.beginPath();
+                        ctx.moveTo(sx, tier.yTop + syOff * 0.3);
+                        ctx.lineTo(sx * 1.002, tier.yTop + Math.min(tier.yBot - tier.yTop, syOff + 14));
+                        ctx.stroke();
+                    }
+
+                    // Foaming aerated plunge cushion at base of tier
+                    const mistR = tier.wBot * 0.56 + Math.sin(t * 8 + tIdx) * 5;
+                    const plungeGrad = ctx.createRadialGradient(795, tier.yBot, 6, 795, tier.yBot, mistR);
+                    plungeGrad.addColorStop(0, "rgba(255, 255, 255, 0.88)");
+                    plungeGrad.addColorStop(0.55, "rgba(210, 252, 248, 0.42)");
+                    plungeGrad.addColorStop(1, "rgba(210, 252, 248, 0)");
+                    ctx.fillStyle = plungeGrad;
+                    ctx.beginPath();
+                    ctx.ellipse(795, tier.yBot, mistR, 14, 0, 0, Math.PI * 2);
+                    ctx.fill();
+                });
+                ctx.restore();
+
+                // 4. Stratified Red-Laterite Ravine Banks & Wet Golden-Pebble Sandbars
+                ctx.fillStyle = "#4a2513";
+                ctx.beginPath();
+                ctx.moveTo(-100, 420);
+                ctx.quadraticCurveTo(320, 445, 580, 418);
+                ctx.lineTo(1020, 418);
+                ctx.quadraticCurveTo(1280, 445, CW + 100, 420);
+                ctx.lineTo(CW + 100, CH + 90);
+                ctx.lineTo(-100, CH + 90);
+                ctx.closePath();
+                ctx.fill();
+
+                // Exposed Golden-Ochre & Wet Sandstone Gravel Bars along the S-Curve Stream Edges
+                ctx.fillStyle = "#b88a58";
+                ctx.beginPath();
+                for (let y = 415; y <= CH + 60; y += 18) {
+                    const ch = getCut3StreamChannel(y);
+                    const bankW = 28 + Math.sin(y * 0.025) * 14 + ch.u * 36;
+                    if (y === 415) ctx.moveTo(ch.left - bankW, y);
+                    else ctx.lineTo(ch.left - bankW, y);
+                }
+                for (let y = CH + 60; y >= 415; y -= 18) {
+                    const ch = getCut3StreamChannel(y);
+                    const bankW = 28 + Math.cos(y * 0.022) * 14 + ch.u * 36;
+                    ctx.lineTo(ch.right + bankW, y);
+                }
+                ctx.closePath();
+                ctx.fill();
+
+                // 5. Crystal-Clear Multi-Depth Winding Mountain Jhiri Stream
+                ctx.save();
+                ctx.beginPath();
+                for (let y = 412; y <= CH + 60; y += 14) {
+                    const ch = getCut3StreamChannel(y);
+                    const edgeRip = Math.sin(y * 0.04 + t * 2.5) * 4;
+                    if (y === 412) ctx.moveTo(ch.left + edgeRip, y);
+                    else ctx.lineTo(ch.left + edgeRip, y);
+                }
+                for (let y = CH + 60; y >= 412; y -= 14) {
+                    const ch = getCut3StreamChannel(y);
+                    const edgeRip = Math.cos(y * 0.04 - t * 2.5) * 4;
+                    ctx.lineTo(ch.right + edgeRip, y);
+                }
+                ctx.closePath();
+
+                // Multi-stop emerald-jade-amber water depth gradient
+                const streamGrad = ctx.createLinearGradient(0, 412, 0, CH + 40);
+                streamGrad.addColorStop(0, "#9be8df");
+                streamGrad.addColorStop(0.22, "#4ec4b8");
+                streamGrad.addColorStop(0.52, "#248f82");
+                streamGrad.addColorStop(0.80, "#196b5e");
+                streamGrad.addColorStop(1, "#11473d");
+                ctx.fillStyle = streamGrad;
+                ctx.fill();
+                ctx.clip();
+
+                // A. Shallow Amber-Sand Shelf Glow along Left & Right Stream Edges
+                for (const side of [-1, 1]) {
+                    ctx.strokeStyle = "rgba(214, 178, 112, 0.34)";
+                    ctx.lineWidth = 48;
+                    ctx.beginPath();
+                    for (let y = 415; y <= CH + 50; y += 20) {
+                        const ch = getCut3StreamChannel(y);
+                        const sx = side < 0 ? ch.left + 14 : ch.right - 14;
+                        if (y === 415) ctx.moveTo(sx, y);
+                        else ctx.lineTo(sx, y);
+                    }
+                    ctx.stroke();
+                }
+
+                // B. 3D Shaded Riverbed Sandstone & Slate Pebbles Visible Through Crystal Water
+                for (const pb of JHIRI_PEBBLES) {
+                    const refractX = Math.sin(t * 4.4 + pb.x * 0.04 + pb.y * 0.03) * 1.8;
+                    const px = pb.x + refractX;
+                    const py = pb.y;
+
+                    ctx.save();
+                    ctx.translate(px, py);
+                    ctx.rotate(pb.ang);
+                    ctx.globalAlpha = lerp(0.32, 0.58, pb.u);
+
+                    // Pebble under-shadow
+                    ctx.fillStyle = pb.sh;
+                    ctx.beginPath();
+                    ctx.ellipse(1.5, 2.2, pb.rx, pb.ry, 0, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    // Pebble body
+                    ctx.fillStyle = pb.base;
+                    ctx.beginPath();
+                    ctx.ellipse(0, 0, pb.rx, pb.ry, 0, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    // Sunlit underwater caustic highlight on top-left of pebble
+                    ctx.fillStyle = pb.hi;
+                    ctx.beginPath();
+                    ctx.ellipse(-pb.rx * 0.22, -pb.ry * 0.22, pb.rx * 0.52, pb.ry * 0.46, 0, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.restore();
+                }
+                ctx.globalAlpha = 1.0;
+
+                // C. Shimmering Underwater Sun-Caustic Light Ribbons
+                ctx.save();
+                ctx.globalCompositeOperation = "screen";
+                ctx.strokeStyle = "rgba(215, 255, 220, 0.20)";
+                ctx.lineWidth = 2.6;
+                for (let c = 0; c < 28; c++) {
+                    const cu = ((c / 28) + t * 0.09) % 1;
+                    const cy = lerp(430, CH + 20, cu);
+                    const ch = getCut3StreamChannel(cy);
+                    const cx = ch.center + Math.sin(c * 4.7 + t * 1.8) * (ch.halfW * 0.68);
+                    const cw = 26 + cu * 54;
+                    ctx.beginPath();
+                    ctx.moveTo(cx - cw, cy + Math.sin(t * 5 + c) * 4);
+                    ctx.quadraticCurveTo(cx, cy - 8, cx + cw, cy + Math.cos(t * 5 + c) * 4);
+                    ctx.stroke();
+                }
+                ctx.restore();
+
+                // D. Darting Silver Hill-Stream Minnows ("Pahari Puti / Chela Mach") + Riverbed Shadows
+                for (const mn of JHIRI_MINNOWS) {
+                    const swimU = mn.baseU + Math.sin(t * 0.9 + mn.phase) * 0.04;
+                    const my = lerp(475, 880, swimU);
+                    const ch = getCut3StreamChannel(my);
+                    const mx = ch.center + (mn.laneOffset + Math.sin(t * 2.1 + mn.phase) * 0.08) * ch.halfW;
+                    const heading = -Math.PI * 0.5 + Math.cos(t * 2.1 + mn.phase) * 0.28;
+                    const tailWag = Math.sin(t * 18 + mn.phase) * 0.35;
+                    const sc = lerp(0.55, 1.25, swimU) * mn.size;
+
+                    // Submerged fish shadow on the pebbles below
+                    ctx.save();
+                    ctx.translate(mx + 4, my + 8 * sc);
+                    ctx.rotate(heading);
+                    ctx.scale(sc, sc);
+                    ctx.fillStyle = "rgba(6, 22, 18, 0.32)";
+                    ctx.beginPath();
+                    ctx.ellipse(0, 0, 9, 2.4, 0, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.restore();
+
+                    // Translucent silver minnow body & wagging tail fin
+                    ctx.save();
+                    ctx.translate(mx, my);
+                    ctx.rotate(heading);
+                    ctx.scale(sc, sc);
+                    ctx.fillStyle = "rgba(225, 248, 245, 0.78)";
+                    ctx.beginPath();
+                    ctx.ellipse(0, 0, 9.5, 2.5, 0, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.fillStyle = "rgba(180, 230, 225, 0.65)";
+                    ctx.beginPath();
+                    ctx.moveTo(-8.5, 0);
+                    ctx.lineTo(-14, -3.5 + tailWag * 4);
+                    ctx.lineTo(-14, 3.5 + tailWag * 4);
+                    ctx.closePath();
+                    ctx.fill();
+                    ctx.restore();
+                }
+
+                // E. Wave-Distorted Reflections of the Bamboo Bridge & Crossing Tea Workers
+                const workerWalkU = ((t - 10.0) * 0.11) % 1;
+                ctx.save();
+                ctx.globalAlpha = 0.28;
+                // Bridge deck reflection
+                ctx.strokeStyle = "#9c783c";
+                ctx.lineWidth = 8;
+                ctx.beginPath();
+                ctx.moveTo(350, 522);
+                ctx.quadraticCurveTo(800, 536, 1250, 522);
+                ctx.stroke();
+
+                for (let w = 0; w < 3; w++) {
+                    const wu = (workerWalkU + w * 0.24) % 1;
+                    const wx = lerp(390, 1210, wu);
+                    const wy = 515 + Math.sin(wu * Math.PI) * 12;
+                    const col = ["#d93829", "#e67e22", "#8e44ad"][w];
+                    for (let slice = 0; slice < 6; slice++) {
+                        const ripShift = Math.sin(t * 8 + slice * 1.4 + w) * (2.5 + slice * 0.6);
+                        ctx.fillStyle = col;
+                        ctx.fillRect(wx - 9 + ripShift, wy + slice * 6.5, 18, 5);
+                    }
+                }
+                ctx.restore();
+
+                // F. Flowing Surface Current Ribbons & Sunlit Specular Sparkles
+                for (let i = 0; i < 80; i++) {
+                    const flowU = ((i / 80) + t * 0.24) % 1;
+                    const wy = lerp(420, CH + 25, flowU);
+                    const ch = getCut3StreamChannel(wy);
+                    const wx = ch.center + Math.sin(i * 7.3) * (ch.halfW * 0.80);
+                    const rw = 12 + flowU * 28 + Math.sin(t * 5.5 + i) * 6;
+
+                    ctx.strokeStyle = i % 3 === 0 ? "rgba(255, 255, 240, 0.58)" : "rgba(215, 252, 248, 0.38)";
+                    ctx.lineWidth = i % 3 === 0 ? 2.2 : 1.5;
+                    ctx.beginPath();
+                    ctx.moveTo(wx - rw, wy);
+                    ctx.quadraticCurveTo(wx, wy - 2.8, wx + rw, wy);
+                    ctx.stroke();
+                }
+
+                // G. Sculpted 3D Mossy Sandstone Boulders & Stepping Stones in the Jhiri
+                const boulders = [
+                    { x: 645, y: 565, rx: 34, ry: 20, hasMoss: true, seed: 1 },
+                    { x: 965, y: 580, rx: 38, ry: 22, hasMoss: true, seed: 2 },
+                    { x: 515, y: 645, rx: 48, ry: 28, hasMoss: true, seed: 3 },
+                    { x: 1055, y: 630, rx: 54, ry: 31, hasMoss: true, seed: 4 },
+                    { x: 760, y: 745, rx: 68, ry: 38, hasMoss: true, seed: 5 },
+                    { x: 395, y: 815, rx: 60, ry: 34, hasMoss: true, seed: 6 },
+                    { x: 1175, y: 795, rx: 64, ry: 36, hasMoss: true, seed: 7 },
+                    { x: 565, y: 865, rx: 42, ry: 22, hasMoss: false, seed: 8 }
+                ];
+                boulders.forEach(bd => drawSculptedJhiriBoulder(ctx, bd, t));
+
+                // Expanding concentric water-droplet & water-strider ripple rings
+                [
+                    { x: 635, y: 685, p: 0.15 },
+                    { x: 925, y: 705, p: 1.45 },
+                    { x: 605, y: 825, p: 2.75 },
+                    { x: 965, y: 840, p: 4.05 },
+                    { x: 785, y: 625, p: 0.85 }
+                ].forEach(st => {
+                    const rp = ((t * 1.75 + st.p) % 1);
+                    ctx.strokeStyle = `rgba(240, 255, 252, ${(1 - rp) * 0.62})`;
+                    ctx.lineWidth = 1.4;
+                    ctx.beginPath();
+                    ctx.ellipse(st.x, st.y, 5 + rp * 34, 2.5 + rp * 15, 0, 0, Math.PI * 2);
+                    ctx.stroke();
+                });
+
+                ctx.restore(); // End Jhiri Water Clip
+
+                // 6. Bank Boulders, Stratified Mossy Ledges & Individual Tea Bushes Framing the Banks
+                [
+                    { x: 465, y: 495, rx: 32, ry: 18, hasMoss: true, seed: 11 },
+                    { x: 1135, y: 498, rx: 34, ry: 19, hasMoss: true, seed: 12 },
+                    { x: 315, y: 655, rx: 46, ry: 26, hasMoss: true, seed: 13 },
+                    { x: 1295, y: 660, rx: 48, ry: 27, hasMoss: true, seed: 14 }
+                ].forEach(bb => drawSculptedJhiriBoulder(ctx, bb, t));
+
+                // Close-up Individual Camellia sinensis Tea Bushes Crowning Left & Right Ravine Terraces
+                [
+                    { x: 75, y: 525, sc: 0.78 }, { x: 185, y: 542, sc: 0.86 }, { x: 295, y: 528, sc: 0.80 },
+                    { x: 135, y: 625, sc: 0.96 }, { x: 245, y: 640, sc: 0.92 },
+                    { x: 1305, y: 528, sc: 0.80 }, { x: 1415, y: 542, sc: 0.86 }, { x: 1525, y: 525, sc: 0.78 },
+                    { x: 1355, y: 640, sc: 0.92 }, { x: 1465, y: 625, sc: 0.96 }
                 ].forEach((b, idx) => {
                     const spr = teaBushSpritesDay[idx % teaBushSpritesDay.length];
                     ctx.drawImage(spr, b.x - spr.width * 0.5 * b.sc, b.y - spr.height * 0.8 * b.sc, spr.width * b.sc, spr.height * b.sc);
                 });
 
-                // 4. Crystal-Clear Mountain Jhiri Stream Bed & Transparent Flowing Water
+                // 7. Authentic Arched Bamboo Footbridge ("Basher Shako") with Cross-Braced A-Frame Stilts
                 ctx.save();
-                ctx.beginPath();
-                ctx.moveTo(570, 425);
-                ctx.bezierCurveTo(470, 540, 260, 680, 80, CH + 60);
-                ctx.lineTo(CW - 80, CH + 60);
-                ctx.bezierCurveTo(1340, 680, 1130, 540, 1030, 425);
-                ctx.closePath();
+                const brLeftX = 330;
+                const brRightX = 1270;
+                const brBaseY = 482;
+                const getBridgeArchY = (x) => {
+                    const u = clamp((x - brLeftX) / (brRightX - brLeftX), 0, 1);
+                    return brBaseY - Math.sin(u * Math.PI) * 18;
+                };
 
-                const streamGrad = ctx.createLinearGradient(0, 425, 0, CH + 40);
-                streamGrad.addColorStop(0, "#75cfc2");
-                streamGrad.addColorStop(0.38, "#3da194");
-                streamGrad.addColorStop(0.72, "#297a6b");
-                streamGrad.addColorStop(1, "#1e5245");
-                ctx.fillStyle = streamGrad;
-                ctx.fill();
-                ctx.clip();
+                // A. Cross-Braced A-Frame Bamboo Trestle Piers & Water-Surface Ripple Rings
+                const pierXs = [435, 615, 800, 985, 1165];
+                pierXs.forEach((px, pIdx) => {
+                    const topY = getBridgeArchY(px);
+                    const waterY = topY + 76 + (pIdx === 2 ? 6 : 0);
 
-                for (const pb of JHIRI_PEBBLES) {
-                    const refractX = Math.sin(t * 4.2 + pb.x * 0.05) * 1.6;
-                    ctx.fillStyle = pb.col;
-                    ctx.globalAlpha = 0.44;
+                    // Ripple ring where bamboo stilts enter the Jhiri stream
+                    if (pIdx >= 1 && pIdx <= 3) {
+                        const ripP = (t * 2.2 + pIdx * 0.35) % 1;
+                        ctx.strokeStyle = `rgba(235, 255, 252, ${(1 - ripP) * 0.55})`;
+                        ctx.lineWidth = 1.3;
+                        ctx.beginPath();
+                        ctx.ellipse(px, waterY, 16 + ripP * 18, 5 + ripP * 6, 0, 0, Math.PI * 2);
+                        ctx.stroke();
+                    }
+
+                    // A-frame splayed bamboo legs
+                    ctx.strokeStyle = "#6e4f26";
+                    ctx.lineWidth = 6.2;
+                    ctx.lineCap = "round";
                     ctx.beginPath();
-                    ctx.ellipse(pb.x + refractX, pb.y, pb.rx, pb.ry, pb.ang, 0, Math.PI * 2);
-                    ctx.fill();
-                }
-                ctx.globalAlpha = 1.0;
-
-                // Shimmering Inverted Reflection of the Bamboo Bridge & Crossing Tea Workers
-                const workerWalkU = ((t - 10.0) * 0.11) % 1;
-                ctx.save();
-                ctx.globalAlpha = 0.26;
-                for (let w = 0; w < 3; w++) {
-                    const wu = (workerWalkU + w * 0.24) % 1;
-                    const wx = lerp(390, 1210, wu) + Math.sin(t * 6 + w) * 3;
-                    const wy = 525;
-                    ctx.fillStyle = ["#e74c3c", "#f39c12", "#8e44ad"][w];
-                    ctx.fillRect(wx - 9, wy, 18, 38);
-                }
-                ctx.restore();
-
-                ctx.strokeStyle = "rgba(235, 255, 250, 0.45)";
-                ctx.lineWidth = 1.8;
-                for (let i = 0; i < 65; i++) {
-                    const flowU = ((i / 65) + t * 0.22) % 1;
-                    const wy = lerp(435, CH + 20, flowU);
-                    const streamHalfW = lerp(210, 650, flowU);
-                    const wx = CW * 0.5 + Math.sin(i * 7.3) * streamHalfW * 0.78;
-                    const rw = 14 + flowU * 26 + Math.sin(t * 5 + i) * 6;
-                    ctx.beginPath();
-                    ctx.moveTo(wx - rw, wy);
-                    ctx.quadraticCurveTo(wx, wy - 2.5, wx + rw, wy);
+                    ctx.moveTo(px - 7, topY + 2);
+                    ctx.lineTo(px - 18, waterY);
+                    ctx.moveTo(px + 7, topY + 2);
+                    ctx.lineTo(px + 18, waterY);
                     ctx.stroke();
-                }
 
-                const boulders = [
-                    { x: 520, y: 635, rx: 46, ry: 28 },
-                    { x: 1040, y: 615, rx: 52, ry: 30 },
-                    { x: 760, y: 745, rx: 64, ry: 36 },
-                    { x: 410, y: 810, rx: 58, ry: 32 },
-                    { x: 1160, y: 790, rx: 62, ry: 35 }
-                ];
-                boulders.forEach((bd, idx) => {
-                    const foamPulse = Math.sin(t * 7 + idx) * 4;
-                    ctx.strokeStyle = "rgba(255, 255, 255, 0.70)";
+                    // Highlight on bamboo stilt poles
+                    ctx.strokeStyle = "#ba9252";
+                    ctx.lineWidth = 2.0;
+                    ctx.beginPath();
+                    ctx.moveTo(px - 8, topY + 2);
+                    ctx.lineTo(px - 19, waterY);
+                    ctx.moveTo(px + 6, topY + 2);
+                    ctx.lineTo(px + 17, waterY);
+                    ctx.stroke();
+
+                    // Diagonal X-bracing & horizontal transom pole
+                    ctx.strokeStyle = "#8a6632";
                     ctx.lineWidth = 3.2;
                     ctx.beginPath();
-                    ctx.ellipse(bd.x, bd.y + 5, bd.rx + 8 + foamPulse, bd.ry * 0.65 + 4, 0, 0, Math.PI);
-                    ctx.stroke();
-
-                    const rGrad = ctx.createLinearGradient(bd.x, bd.y - bd.ry, bd.x, bd.y + bd.ry);
-                    rGrad.addColorStop(0, "#64748b");
-                    rGrad.addColorStop(0.55, "#334155");
-                    rGrad.addColorStop(1, "#1e293b");
-                    ctx.fillStyle = rGrad;
-                    ctx.beginPath();
-                    ctx.ellipse(bd.x, bd.y, bd.rx, bd.ry, 0, 0, Math.PI * 2);
-                    ctx.fill();
-
-                    ctx.fillStyle = "#3f7d28";
-                    ctx.beginPath();
-                    ctx.ellipse(bd.x - 4, bd.y - bd.ry * 0.38, bd.rx * 0.76, bd.ry * 0.48, -0.08, 0, Math.PI * 2);
-                    ctx.fill();
-                });
-
-                [
-                    { x: 640, y: 680, p: 0.2 },
-                    { x: 920, y: 710, p: 1.5 },
-                    { x: 610, y: 830, p: 2.8 },
-                    { x: 960, y: 845, p: 4.1 }
-                ].forEach(st => {
-                    const rp = ((t * 1.8 + st.p) % 1);
-                    ctx.strokeStyle = `rgba(255, 255, 255, ${(1 - rp) * 0.58})`;
-                    ctx.lineWidth = 1.2;
-                    ctx.beginPath();
-                    ctx.ellipse(st.x, st.y, 6 + rp * 32, 3 + rp * 14, 0, 0, Math.PI * 2);
+                    ctx.moveTo(px - 14, topY + 46);
+                    ctx.lineTo(px + 14, topY + 46);
+                    ctx.moveTo(px - 9, topY + 14);
+                    ctx.lineTo(px + 15, topY + 58);
+                    ctx.moveTo(px + 9, topY + 14);
+                    ctx.lineTo(px - 15, topY + 58);
                     ctx.stroke();
                 });
 
-                ctx.restore();
-
-                // 5. Rustic Woven Bamboo & Timber Footbridge ("Basher Shako") Spanning the Jhiri
-                ctx.save();
-                const bridgeY = 475;
-                ctx.strokeStyle = "#5c4224";
-                ctx.lineWidth = 6.5;
-                [430, 620, 800, 980, 1170].forEach(px => {
+                // B. Far-Side (Back) Handrail Posts & Arched Bamboo Top Rail (Behind Walking Workers)
+                ctx.strokeStyle = "#8c6936";
+                ctx.lineWidth = 3.4;
+                pierXs.forEach(px => {
+                    const py = getBridgeArchY(px);
                     ctx.beginPath();
-                    ctx.moveTo(px - 8, bridgeY);
-                    ctx.lineTo(px - 14, bridgeY + 82);
-                    ctx.moveTo(px + 8, bridgeY);
-                    ctx.lineTo(px + 14, bridgeY + 82);
+                    ctx.moveTo(px - 4, py);
+                    ctx.lineTo(px - 4, py - 46);
                     ctx.stroke();
                 });
+                ctx.strokeStyle = "#b58d4b";
+                ctx.lineWidth = 3.2;
+                ctx.beginPath();
+                for (let bx = brLeftX; bx <= brRightX; bx += 20) {
+                    const by = getBridgeArchY(bx) - 45;
+                    if (bx === brLeftX) ctx.moveTo(bx, by);
+                    else ctx.lineTo(bx, by);
+                }
+                ctx.stroke();
 
-                ctx.fillStyle = "#b58d4b";
-                ctx.fillRect(340, bridgeY - 5, 920, 10);
-                ctx.strokeStyle = "#6e4e23";
-                ctx.lineWidth = 2.0;
-                for (let sx = 350; sx <= 1250; sx += 14) {
+                // C. Arched Main Longitudinal Bamboo Stringers & Split-Bamboo Deck Slats ("Chatai")
+                ctx.strokeStyle = "#5c3f1c";
+                ctx.lineWidth = 9.5;
+                ctx.beginPath();
+                for (let bx = brLeftX; bx <= brRightX; bx += 18) {
+                    const by = getBridgeArchY(bx) + 2;
+                    if (bx === brLeftX) ctx.moveTo(bx, by);
+                    else ctx.lineTo(bx, by);
+                }
+                ctx.stroke();
+
+                ctx.strokeStyle = "#cfa55e";
+                ctx.lineWidth = 5.5;
+                ctx.beginPath();
+                for (let bx = brLeftX; bx <= brRightX; bx += 18) {
+                    const by = getBridgeArchY(bx);
+                    if (bx === brLeftX) ctx.moveTo(bx, by);
+                    else ctx.lineTo(bx, by);
+                }
+                ctx.stroke();
+
+                // Transverse woven bamboo deck slats & dark coir-rope lashings
+                for (let sx = brLeftX + 8; sx <= brRightX - 8; sx += 11) {
+                    const sy = getBridgeArchY(sx);
+                    ctx.strokeStyle = (sx % 22 === 0) ? "#e0b870" : "#9e7638";
+                    ctx.lineWidth = 3.2;
                     ctx.beginPath();
-                    ctx.moveTo(sx, bridgeY - 6);
-                    ctx.lineTo(sx, bridgeY + 6);
+                    ctx.moveTo(sx, sy - 5);
+                    ctx.lineTo(sx, sy + 5);
                     ctx.stroke();
                 }
 
+                // D. Three Tea Pluckers ("Cha Sramik") Crossing the Arched Bamboo Shako
                 const bridgeWorkers = [
-                    { offset: 0.15, sari: "#d93829", border: "#fde047", blouse: "#7f1d1d" },
-                    { offset: 0.39, sari: "#e67e22", border: "#fffbeb", blouse: "#7c2d12" },
-                    { offset: 0.63, sari: "#8e44ad", border: "#facc15", blouse: "#4c1d95" }
+                    { offset: 0.15, sari: "#d93829", border: "#fde047", blouse: "#7f1d1d", hat: false },
+                    { offset: 0.39, sari: "#e67e22", border: "#fffbeb", blouse: "#7c2d12", hat: true },
+                    { offset: 0.63, sari: "#8e44ad", border: "#facc15", blouse: "#4c1d95", hat: false }
                 ];
                 bridgeWorkers.forEach((bw, idx) => {
                     const u = ((t - 10.0) * 0.11 + bw.offset) % 1;
                     const wx = lerp(390, 1210, u);
-                    const archY = -Math.sin(u * Math.PI) * 10;
+                    const wy = getBridgeArchY(wx) - 2;
                     drawTeaWorker(ctx, {
-                        x: wx, y: bridgeY - 4 + archY, scale: 1.05, dir: 1, t, phase: idx * 1.7,
+                        x: wx, y: wy, scale: 1.06, dir: 1, t, phase: idx * 1.7,
                         sariColor: bw.sari, borderColor: bw.border, blouseColor: bw.blouse,
-                        mode: "walking", hasTukri: true
+                        mode: "walking", hasTukri: true, hasUmbrellaHat: bw.hat
                     });
                 });
 
-                ctx.strokeStyle = "#c9a259";
-                ctx.lineWidth = 3.8;
-                ctx.beginPath();
-                ctx.moveTo(340, bridgeY - 42);
-                ctx.quadraticCurveTo(800, bridgeY - 52, 1260, bridgeY - 42);
-                ctx.stroke();
-                [430, 620, 800, 980, 1170].forEach(px => {
+                // E. Near-Side (Foreground) Bamboo Handrail Posts, Coir Lashings & Segmented Rail (In Front of Workers)
+                pierXs.forEach(px => {
+                    const py = getBridgeArchY(px);
+                    ctx.strokeStyle = "#b58d4b";
+                    ctx.lineWidth = 4.0;
                     ctx.beginPath();
-                    ctx.moveTo(px, bridgeY + 2);
-                    ctx.lineTo(px, bridgeY - 46);
+                    ctx.moveTo(px + 3, py + 3);
+                    ctx.lineTo(px + 3, py - 42);
                     ctx.stroke();
+
+                    // Dark coir-rope lashing knot ("Dorir Badhon") at handrail joint
+                    ctx.fillStyle = "#36220e";
+                    ctx.beginPath();
+                    ctx.arc(px + 3, py - 41, 4.2, 0, Math.PI * 2);
+                    ctx.arc(px + 3, py + 1, 4.0, 0, Math.PI * 2);
+                    ctx.fill();
                 });
+
+                ctx.strokeStyle = "#dfb66c";
+                ctx.lineWidth = 4.2;
+                ctx.beginPath();
+                for (let bx = brLeftX; bx <= brRightX; bx += 18) {
+                    const by = getBridgeArchY(bx) - 41;
+                    if (bx === brLeftX) ctx.moveTo(bx, by);
+                    else ctx.lineTo(bx, by);
+                }
+                ctx.stroke();
+
+                // Bamboo node rings along the front handrail
+                ctx.strokeStyle = "#6e4e23";
+                ctx.lineWidth = 2.0;
+                for (let nx = brLeftX + 35; nx < brRightX; nx += 52) {
+                    const ny = getBridgeArchY(nx) - 41;
+                    ctx.beginPath();
+                    ctx.moveTo(nx, ny - 3);
+                    ctx.lineTo(nx, ny + 3);
+                    ctx.stroke();
+                }
                 ctx.restore();
 
-                // 6. Turquoise & Orange Kingfisher ("Machranga") Perched on Boulder
+                // 8. Detailed Common Kingfisher ("Machranga") Perched on Hero Foreground Boulder + Dragonflies
                 ctx.save();
-                ctx.translate(765, 712);
-                ctx.fillStyle = "#e67e22";
+                const kfBob = Math.sin(t * 4.8) * 0.08;
+                ctx.translate(768, 706);
+                ctx.scale(1.22, 1.22);
+
+                // Tiny bird claws gripping the mossy rock crown
+                ctx.strokeStyle = "#ea580c";
+                ctx.lineWidth = 1.6;
                 ctx.beginPath();
-                ctx.ellipse(0, 2, 7.5, 4.5, -0.2, 0, Math.PI * 2);
-                ctx.fill();
-                ctx.fillStyle = "#0ea5e9";
+                ctx.moveTo(-2, 4); ctx.lineTo(-4, 9);
+                ctx.moveTo(2, 4); ctx.lineTo(4, 9);
+                ctx.stroke();
+
+                ctx.rotate(kfBob);
+                // Tail feathers
+                ctx.fillStyle = "#0369a1";
                 ctx.beginPath();
-                ctx.ellipse(-2, -1, 8.2, 3.8, -0.2, 0, Math.PI * 2);
-                ctx.arc(5, -5, 4.5, 0, Math.PI * 2);
+                ctx.moveTo(-7, 2);
+                ctx.lineTo(-17, 6);
+                ctx.lineTo(-15, 1);
+                ctx.closePath();
                 ctx.fill();
+
+                // Warm rufous-orange breast
+                ctx.fillStyle = "#ea580c";
+                ctx.beginPath();
+                ctx.ellipse(1, 2, 8.2, 4.8, -0.22, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Iridescent turquoise-cobalt wing & back
+                const wingGrad = ctx.createLinearGradient(-8, -6, 8, 4);
+                wingGrad.addColorStop(0, "#38bdf8");
+                wingGrad.addColorStop(0.55, "#0284c7");
+                wingGrad.addColorStop(1, "#1e3a8a");
+                ctx.fillStyle = wingGrad;
+                ctx.beginPath();
+                ctx.ellipse(-2, -1.2, 8.8, 4.2, -0.22, 0, Math.PI * 2);
+                ctx.arc(5.2, -5.5, 4.8, 0, Math.PI * 2);
+                ctx.fill();
+
+                // White neck patch & eye glint
+                ctx.fillStyle = "#fffbeb";
+                ctx.beginPath();
+                ctx.ellipse(2.2, -4.0, 2.2, 1.3, 0.3, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.fillStyle = "#0f172a";
+                ctx.beginPath();
+                ctx.arc(6.6, -6.2, 1.1, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.fillStyle = "#ffffff";
+                ctx.beginPath();
+                ctx.arc(6.9, -6.5, 0.45, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Sharp dagger bill scanning the minnows below
                 ctx.fillStyle = "#1e293b";
                 ctx.beginPath();
-                ctx.moveTo(9, -6);
-                ctx.lineTo(18, -4);
-                ctx.lineTo(9, -3);
+                ctx.moveTo(9.2, -6.8);
+                ctx.lineTo(20.5, -4.2);
+                ctx.lineTo(9.2, -3.4);
                 ctx.closePath();
                 ctx.fill();
                 ctx.restore();
 
-                // 7. Foreground Framing Wild Ferns & Elephant-Ear Taro Leaves ("Kochu Pata")
+                // Two Iridescent Stream Dragonflies ("Foring") Skimming Over the Jhiri
+                [
+                    { cx: 585, cy: 665, rx: 48, ry: 18, spd: 2.6, ph: 0.4, col: "#38bdf8" },
+                    { cx: 990, cy: 735, rx: 55, ry: 22, spd: 2.3, ph: 2.1, col: "#a3e635" }
+                ].forEach(df => {
+                    const dx = df.cx + Math.cos(t * df.spd + df.ph) * df.rx;
+                    const dy = df.cy + Math.sin(t * df.spd * 2 + df.ph) * df.ry;
+                    const wingBlur = Math.sin(t * 48 + df.ph) * 4.5;
+
+                    ctx.save();
+                    ctx.translate(dx, dy);
+                    ctx.strokeStyle = df.col;
+                    ctx.lineWidth = 2.0;
+                    ctx.beginPath();
+                    ctx.moveTo(-8, 0);
+                    ctx.lineTo(6, 0);
+                    ctx.stroke();
+
+                    ctx.fillStyle = "rgba(235, 255, 255, 0.55)";
+                    ctx.beginPath();
+                    ctx.ellipse(0, -3, 7, Math.max(1.2, Math.abs(wingBlur)), 0.25, 0, Math.PI * 2);
+                    ctx.ellipse(-2, 3, 6.5, Math.max(1.2, Math.abs(wingBlur)), -0.25, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.restore();
+                });
+
+                // 9. Volumetric Canopy Sunbeams & Foreground Dewy Taro ("Kochu Pata") & Ravine Ferns
                 ctx.save();
+                ctx.globalCompositeOperation = "screen";
+                for (let r = 0; r < 4; r++) {
+                    const rxTop = 640 + r * 95;
+                    const rxBot = 460 + r * 210;
+                    const rGrad = ctx.createLinearGradient(rxTop, 120, rxBot, CH);
+                    rGrad.addColorStop(0, "rgba(245, 255, 200, 0.14)");
+                    rGrad.addColorStop(0.65, "rgba(185, 248, 210, 0.08)");
+                    rGrad.addColorStop(1, "rgba(185, 248, 210, 0)");
+                    ctx.fillStyle = rGrad;
+                    ctx.beginPath();
+                    ctx.moveTo(rxTop - 24, 120);
+                    ctx.lineTo(rxTop + 24, 120);
+                    ctx.lineTo(rxBot + 95, CH);
+                    ctx.lineTo(rxBot - 95, CH);
+                    ctx.closePath();
+                    ctx.fill();
+                }
+                ctx.restore();
+
+                // Foreground Framing Wild Ravine Ferns & Heart-Shaped Taro Leaves with Dewdrops
+                ctx.save();
+                ctx.translate(-driftX * 0.85, 0);
                 const fernSway = Math.sin(t * 2.8) * 9;
                 [
-                    { x: 60, y: 920, dir: 1, sc: 1.4 },
-                    { x: 210, y: 940, dir: 1, sc: 1.2 },
-                    { x: 1540, y: 920, dir: -1, sc: 1.4 },
-                    { x: 1390, y: 940, dir: -1, sc: 1.2 }
-                ].forEach(taro => {
+                    { x: 55, y: 925, dir: 1, sc: 1.45 },
+                    { x: 215, y: 945, dir: 1, sc: 1.22 },
+                    { x: 1545, y: 925, dir: -1, sc: 1.45 },
+                    { x: 1385, y: 945, dir: -1, sc: 1.22 }
+                ].forEach((taro, idx) => {
                     ctx.save();
                     ctx.translate(taro.x + fernSway * taro.dir, taro.y);
                     ctx.scale(taro.sc * taro.dir, taro.sc);
-                    ctx.strokeStyle = "#3b6e22";
-                    ctx.lineWidth = 5;
+
+                    // Lacy pinnate ravine fern frond behind taro
+                    ctx.strokeStyle = "#2d6a22";
+                    ctx.lineWidth = 2.6;
+                    ctx.beginPath();
+                    ctx.moveTo(10, 0);
+                    ctx.quadraticCurveTo(60, -65, 118, -95);
+                    ctx.stroke();
+                    for (let f = 1; f <= 8; f++) {
+                        const fu = f / 8;
+                        const fx = 10 + fu * 102;
+                        const fy = -fu * 88 + Math.pow(fu, 2) * 8;
+                        drawSingleTeaLeaf(ctx, fx, fy - 6, 16 * (1 - fu * 0.35), 3.2, -0.65, "#5ec239", null);
+                        drawSingleTeaLeaf(ctx, fx, fy + 5, 16 * (1 - fu * 0.35), 3.2, 0.45, "#429925", null);
+                    }
+
+                    // Taro stem
+                    ctx.strokeStyle = "#33661d";
+                    ctx.lineWidth = 5.2;
                     ctx.beginPath();
                     ctx.moveTo(0, 0);
                     ctx.quadraticCurveTo(35, -75, 65, -125);
                     ctx.stroke();
 
+                    // Sculpted heart-shaped Colocasia taro leaf blade
                     const tGrad = ctx.createLinearGradient(30, -155, 95, -95);
-                    tGrad.addColorStop(0, "#76c442");
-                    tGrad.addColorStop(1, "#275918");
+                    tGrad.addColorStop(0, "#84d948");
+                    tGrad.addColorStop(0.55, "#4ea32a");
+                    tGrad.addColorStop(1, "#225214");
                     ctx.fillStyle = tGrad;
                     ctx.beginPath();
-                    ctx.ellipse(68, -125, 42, 26, 0.35, 0, Math.PI * 2);
+                    ctx.ellipse(68, -125, 44, 27, 0.32, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    // Pale lime taro leaf veins & glistening water droplet
+                    ctx.strokeStyle = "rgba(216, 252, 168, 0.55)";
+                    ctx.lineWidth = 1.3;
+                    ctx.beginPath();
+                    ctx.moveTo(42, -135);
+                    ctx.lineTo(96, -114);
+                    ctx.moveTo(64, -127);
+                    ctx.lineTo(74, -142);
+                    ctx.moveTo(68, -125);
+                    ctx.lineTo(58, -106);
+                    ctx.stroke();
+
+                    ctx.fillStyle = "rgba(235, 255, 255, 0.88)";
+                    ctx.beginPath();
+                    ctx.arc(74, -122 + (idx % 2) * 4, 3.2, 0, Math.PI * 2);
                     ctx.fill();
                     ctx.restore();
                 });
@@ -2842,10 +3417,7 @@
 
             // ============================================================================
             // 9. CUT 4 (0:15–0:20): MUDDY RED-EARTH TILLA ROAD & LEAF-LADEN TEA TRACTOR
-            //    (Low-Angle Puddle-Level Tracking Shot as the Estate Tractor Rumbles Past)
             // ============================================================================
-            // Unified parametric road spine so the muddy laterite road, wheel ruts, puddles,
-            // flanking tea-bush banks, and articulated tractor + trailer share exact geometry.
             function getCut4RoadState(s) {
                 const x = lerp(60, 1660, s);
                 const y = lerp(456, 856, s) + Math.sin(s * Math.PI) * 16;
@@ -2867,7 +3439,6 @@
                 ctx.save();
                 ctx.translate(shakeX, shakeY);
 
-                // 1. Sky & Terraced Tea Tillas Flanking the Winding Muddy Road (Individual Tea Bushes!)
                 const skyGrad = ctx.createLinearGradient(0, 0, 0, 340);
                 skyGrad.addColorStop(0, "#296d78");
                 skyGrad.addColorStop(0.55, "#7fc4be");
@@ -2881,11 +3452,9 @@
                 drawKoroiShadeTree(ctx, 680, 275, 0.74, Math.cos(t * 1.9) * 5, 1);
                 drawKoroiShadeTree(ctx, 1290, 280, 0.88, Math.sin(t * 2.1) * 6, 2);
 
-                // 2. Base Earth Fill & Upper Cut Laterite Road Bank (Behind the Road)
                 ctx.fillStyle = "#4d2612";
                 ctx.fillRect(0, 410, CW, CH - 410);
 
-                // Upper terraced tea bushes crowning the far/upper road bank (strictly above roadTopHalf)
                 for (let i = 0; i <= 15; i++) {
                     const s = -0.04 + (i / 15) * 1.08;
                     const rs = getCut4RoadState(s);
@@ -2902,10 +3471,8 @@
                     );
                 }
 
-                // 3. Winding Perspective Muddy Red-Earth Road ("Lal Matir Rasta") Following Exact Road Spine
                 ctx.save();
 
-                // Grassy / mossy upper and lower road shoulders
                 ctx.fillStyle = "#3f6e28";
                 ctx.beginPath();
                 for (let i = 0; i <= 36; i++) {
@@ -2924,7 +3491,6 @@
                 ctx.closePath();
                 ctx.fill();
 
-                // Main muddy red-laterite road surface polygon
                 ctx.beginPath();
                 for (let i = 0; i <= 36; i++) {
                     const s = -0.14 + (i / 36) * 1.28;
@@ -2949,7 +3515,6 @@
                 ctx.fillStyle = mudGrad;
                 ctx.fill();
 
-                // Shaded cut laterite bank lip along the upper edge of the road
                 ctx.strokeStyle = "rgba(68, 28, 12, 0.78)";
                 ctx.lineWidth = 8;
                 ctx.beginPath();
@@ -2961,7 +3526,6 @@
                 }
                 ctx.stroke();
 
-                // Twin Muddy Tire Ruts Running Along the Exact Wheel Track of the Tractor & Trailer
                 for (const rutOffset of [-14, 14]) {
                     ctx.strokeStyle = "rgba(58, 24, 10, 0.68)";
                     ctx.lineWidth = 16;
@@ -2975,13 +3539,11 @@
                     }
                     ctx.stroke();
 
-                    // Wet specular water sheen inside the tire ruts
                     ctx.strokeStyle = "rgba(195, 225, 230, 0.36)";
                     ctx.lineWidth = 4.5;
                     ctx.stroke();
                 }
 
-                // Rainwater puddles positioned directly along the road surface & wheel ruts
                 const puddleSpecs = [
                     { s: 0.28, oy: 12, rx: 64, ry: 13 },
                     { s: 0.52, oy: -10, rx: 88, ry: 18 },
@@ -3011,7 +3573,6 @@
                 });
                 ctx.restore();
 
-                // 4. Tea Workers with Tukri Baskets Standing Safely on the Upper-Right Road Shoulder
                 const roadWorkers = [
                     { s: 0.60, sari: "#d93829", border: "#fde047", blouse: "#7f1d1d" },
                     { s: 0.69, sari: "#0d9488", border: "#fde047", blouse: "#115e59" },
@@ -3035,7 +3596,6 @@
                     });
                 });
 
-                // 5. Hero Tea Estate Tractor + Articulated Green Tea Leaf Trailer Locked to the Road Spine!
                 const sTractor = lerp(0.20, 0.82, tractorU);
                 const trState = getCut4RoadState(sTractor);
                 const trailerState = getCut4RoadState(sTractor - 0.088);
@@ -3052,14 +3612,11 @@
                 ctx.rotate(trState.angle);
                 ctx.scale(trScale, trScale);
 
-                // Ground shadow aligned with road surface
                 ctx.fillStyle = "rgba(18, 10, 6, 0.45)";
                 ctx.beginPath();
                 ctx.ellipse(-95, 10, 215, 22, 0, 0, Math.PI * 2);
                 ctx.fill();
 
-                // --- A. 4-WHEEL TIMBER & STEEL TRAILER PILED HIGH WITH FRESH GREEN TEA SACKS ---
-                // Articulated at the hitch pin (-53, -18) so trailer wheels track the curved road ruts!
                 ctx.save();
                 ctx.translate(-53, -18);
                 ctx.rotate(trailerRelAngle);
@@ -3150,7 +3707,6 @@
                 });
                 ctx.restore();
 
-                // --- B. VINTAGE BLUE & IRON DIESEL TEA ESTATE TRACTOR ---
                 ctx.save();
                 ctx.translate(0, engineJolt);
 
@@ -3299,7 +3855,6 @@
                 ctx.restore();
                 ctx.restore();
 
-                // 6. Foreground Lower-Left Tea Bank Framing (Strictly Below the Road's Bottom Edge!)
                 for (let i = 0; i <= 7; i++) {
                     const s = (i / 7) * 0.56;
                     const rs = getCut4RoadState(s);
@@ -3321,7 +3876,6 @@
 
             // ============================================================================
             // 10. CUT 5 (0:20–0:25): HILLTOP COLONIAL PLANTER'S BANGO HOUSE (DAKBUNGALOW)
-            //     (50mm Anamorphic Parallax Slider Reveal Above Individual Tea Bushes)
             // ============================================================================
             function renderCut5HilltopBungalow(ctx, t) {
                 const localU = clamp((t - 20.0) / 5.0, 0, 1);
@@ -3333,7 +3887,6 @@
                 ctx.scale(pushZoom, pushZoom);
                 ctx.translate(-CW * 0.5, -CH * 0.5);
 
-                // 1. Warm Late-Afternoon Sky Over the Tea Valley
                 const skyGrad = ctx.createLinearGradient(0, 0, 0, 410);
                 skyGrad.addColorStop(0, "#245473");
                 skyGrad.addColorStop(0.45, "#6aa8b8");
@@ -3342,7 +3895,6 @@
                 ctx.fillStyle = skyGrad;
                 ctx.fillRect(0, 0, CW, 410);
 
-                // 2. Background Panorama of Misty Tea Tillas Below the Bungalow Hill (Parallax 0.25x)
                 ctx.save();
                 ctx.translate(-slideX * 0.25, 0);
                 ctx.drawImage(cut1BackTillasCanvas, -120, 40);
@@ -3354,11 +3906,9 @@
                 ctx.fillRect(-100, 360, CW + 200, 160);
                 ctx.restore();
 
-                // 3. Hero Plane (Parallax 0.78x): Hilltop Tilla Crown of Individual Tea Bushes & Boro Bungalow
                 ctx.save();
                 ctx.translate(-slideX * 0.78, 0);
 
-                // Manicured Emerald Bungalow Lawn Crown & Red-Gravel Driveway
                 const lawnGrad = ctx.createLinearGradient(0, 495, 0, 680);
                 lawnGrad.addColorStop(0, "#5eb53e");
                 lawnGrad.addColorStop(0.6, "#3f8c2b");
@@ -3368,15 +3918,11 @@
                 ctx.ellipse(800, 575, 640, 88, 0, 0, Math.PI * 2);
                 ctx.fill();
 
-                // Terraced Individual Tea Bushes Carpeting the Lower Bungalow Hillock Slope!
                 ctx.drawImage(cut5BungalowTillasCanvas, -120, 45);
-
-                // Unbroken tea bushes on bungalow tilla slope
 
                 drawKoroiShadeTree(ctx, 355, 515, 1.08, Math.sin(t * 2.0) * 6, 0);
                 drawKoroiShadeTree(ctx, 1245, 510, 1.12, Math.cos(t * 2.1) * 6, 2);
 
-                // --- THE HILLTOP ASSAM-TYPE BORO BUNGALOW ---
                 ctx.save();
                 ctx.translate(790, 495);
 
@@ -3540,7 +4086,6 @@
 
                 ctx.restore();
 
-                // Vintage Land Rover Defender Parked Beside Bungalow
                 ctx.save();
                 ctx.translate(415, 542);
                 ctx.scale(0.88, 0.88);
@@ -3576,7 +4121,6 @@
 
                 ctx.restore();
 
-                // 4. Foreground Frame (Parallax 1.42x): Cascading Magenta Bougainvillea ("Baganbilash") Branches
                 ctx.save();
                 ctx.translate(-slideX * 1.42, 0);
                 const bSway = Math.sin(t * 2.6) * 9;
@@ -3710,7 +4254,6 @@
                     ctx.restore();
                 }
 
-                // Crisp Cinema Cut Transitions at 5.0s, 10.0s, 15.0s, 20.0s, 25.0s
                 const cutBoundaries = [5.0, 10.0, 15.0, 20.0, 25.0];
                 for (const cb of cutBoundaries) {
                     if (Math.abs(t - cb) < 0.18) {
