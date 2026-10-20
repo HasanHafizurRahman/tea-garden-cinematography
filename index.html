@@ -1,0 +1,4086 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>সিলেটের চা বাগান — টিলা, ঝিরি ও দুটি পাতা একটি কুঁড়ি (Tea Garden 6-Cut Cinematic Short)</title>
+    <style>
+        :root {
+            --bg-dark: #070b09;
+            --panel-bg: rgba(9, 15, 12, 0.82);
+            --accent: #a7e163;
+            --accent-gold: #f0b85c;
+            --accent-soft: rgba(167, 225, 99, 0.22);
+            --text-main: #f3f7ee;
+            --text-muted: #b8c9b0;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, "Noto Sans Bengali", sans-serif;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #stage-wrapper {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: radial-gradient(circle at center, #111d16 0%, #050806 100%);
+        }
+
+        #viewport {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            max-width: calc(100vh * (16 / 9));
+            max-height: calc(100vw * (9 / 16));
+            aspect-ratio: 16 / 9;
+            background: #0c140f;
+            box-shadow: 0 28px 80px rgba(0, 0, 0, 0.92), 0 0 0 1px rgba(210, 235, 195, 0.14);
+            overflow: hidden;
+            border-radius: 6px;
+        }
+
+        canvas#film-canvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+            cursor: pointer;
+        }
+
+        /* Start Screen Overlay */
+        #start-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(180deg, rgba(8, 16, 12, 0.52) 0%, rgba(5, 10, 8, 0.92) 100%);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 35;
+            padding: 24px;
+            text-align: center;
+            transition: opacity 0.55s ease, visibility 0.55s ease;
+        }
+
+        #start-overlay.hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        .film-badge {
+            font-size: 11px;
+            letter-spacing: 0.22em;
+            text-transform: uppercase;
+            color: #c8f58e;
+            background: rgba(167, 225, 99, 0.14);
+            border: 1px solid rgba(167, 225, 99, 0.42);
+            padding: 5px 16px;
+            border-radius: 999px;
+            margin-bottom: 12px;
+        }
+
+        .film-title-bn {
+            font-size: clamp(24px, 4.2vw, 46px);
+            font-weight: 700;
+            font-family: "Noto Serif Bengali", "SolaimanLipi", Georgia, serif;
+            color: #f6faef;
+            text-shadow: 0 4px 24px rgba(0, 0, 0, 0.85);
+            margin-bottom: 4px;
+            letter-spacing: 0.02em;
+        }
+
+        .film-title-en {
+            font-size: clamp(15px, 2.1vw, 23px);
+            font-weight: 400;
+            font-family: Georgia, "Times New Roman", serif;
+            font-style: italic;
+            color: #f0b85c;
+            margin-bottom: 12px;
+        }
+
+        .film-desc {
+            max-width: 660px;
+            font-size: clamp(12px, 1.3vw, 14px);
+            line-height: 1.62;
+            color: rgba(243, 247, 238, 0.88);
+            margin-bottom: 22px;
+        }
+
+        #tap-start-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            padding: 13px 34px;
+            font-size: clamp(14px, 1.6vw, 16.5px);
+            font-weight: 600;
+            color: #0b170e;
+            background: linear-gradient(135deg, #d8f8a0 0%, #8cd147 55%, #f0b85c 100%);
+            border: none;
+            border-radius: 999px;
+            cursor: pointer;
+            box-shadow: 0 12px 34px rgba(140, 209, 71, 0.38), inset 0 1px 0 rgba(255, 255, 255, 0.72);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        #tap-start-btn:hover {
+            transform: translateY(-2px) scale(1.03);
+            box-shadow: 0 16px 40px rgba(140, 209, 71, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+        }
+
+        #tap-start-btn:active {
+            transform: translateY(0) scale(0.99);
+        }
+
+        .scene-pills-preview {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 7px;
+            margin-top: 22px;
+            max-width: 780px;
+        }
+
+        .scene-pill-tag {
+            font-size: 11px;
+            color: #dff7b5;
+            background: rgba(243, 247, 238, 0.08);
+            padding: 5px 12px;
+            border-radius: 999px;
+            border: 1px solid rgba(167, 225, 99, 0.24);
+            cursor: pointer;
+            transition: all 0.18s ease;
+        }
+
+        .scene-pill-tag:hover {
+            background: rgba(167, 225, 99, 0.22);
+            border-color: rgba(167, 225, 99, 0.65);
+            color: #ffffff;
+        }
+
+        /* Top HUD: Camera Spec & Active Audio Cues */
+        #hud-top {
+            position: absolute;
+            top: 12px;
+            left: 16px;
+            right: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            pointer-events: none;
+            z-index: 22;
+            transition: opacity 0.45s ease;
+        }
+
+        #camera-telemetry-badge {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+            background: rgba(8, 14, 11, 0.68);
+            border: 1px solid rgba(167, 225, 99, 0.32);
+            padding: 6px 12px;
+            border-radius: 8px;
+            backdrop-filter: blur(4px);
+        }
+
+        .cam-cut-name {
+            font-size: 12px;
+            font-weight: 600;
+            color: #e4f8c4;
+            letter-spacing: 0.02em;
+        }
+
+        .cam-lens-meta {
+            font-size: 10.5px;
+            color: #f0b85c;
+            font-variant-numeric: tabular-nums;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+        }
+
+        #active-audio-tags {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+            max-width: 50%;
+        }
+
+        .audio-cue-chip {
+            font-size: 11px;
+            padding: 3px 10px;
+            border-radius: 999px;
+            background: rgba(18, 32, 22, 0.78);
+            border: 1px solid rgba(167, 225, 99, 0.5);
+            color: #d8f8a0;
+            animation: fadePulse 0.25s ease-out;
+        }
+
+        @keyframes fadePulse {
+            from {
+                transform: scale(0.9);
+                opacity: 0.4;
+            }
+
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        /* Bottom Controls Bar */
+        #controls-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(0deg, rgba(6, 11, 8, 0.94) 0%, rgba(6, 11, 8, 0.72) 72%, transparent 100%);
+            padding: 16px 16px 11px;
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+            z-index: 25;
+            transition: opacity 0.4s ease;
+        }
+
+        #viewport.idle-cursor #controls-bar,
+        #viewport.idle-cursor #hud-top {
+            opacity: 0.14;
+        }
+
+        #controls-bar:hover,
+        #hud-top:hover {
+            opacity: 1 !important;
+        }
+
+        /* Interactive Cut Jump Bar */
+        .cut-jump-row {
+            display: flex;
+            gap: 5px;
+            overflow-x: auto;
+            padding-bottom: 2px;
+            scrollbar-width: none;
+        }
+
+        .cut-jump-row::-webkit-scrollbar {
+            display: none;
+        }
+
+        .cut-chip-btn {
+            background: rgba(14, 24, 18, 0.72);
+            border: 1px solid rgba(210, 235, 195, 0.18);
+            color: var(--text-muted);
+            font-size: 10.5px;
+            padding: 3px 9px;
+            border-radius: 999px;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.16s ease;
+        }
+
+        .cut-chip-btn:hover {
+            background: rgba(167, 225, 99, 0.18);
+            color: #ffffff;
+            border-color: rgba(167, 225, 99, 0.45);
+        }
+
+        .cut-chip-btn.active-cut {
+            background: rgba(167, 225, 99, 0.26);
+            color: #e4f8c4;
+            border-color: rgba(167, 225, 99, 0.75);
+            font-weight: 600;
+        }
+
+        /* Timeline Slider */
+        .timeline-container {
+            position: relative;
+            width: 100%;
+            display: flex;
+            align-items: center;
+        }
+
+        #timeline-slider {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 100%;
+            height: 6px;
+            border-radius: 999px;
+            background: linear-gradient(90deg,
+                    rgba(122, 198, 92, 0.42) 0%,
+                    rgba(88, 178, 110, 0.42) 33%,
+                    rgba(76, 165, 178, 0.42) 50%,
+                    rgba(218, 146, 78, 0.42) 75%,
+                    rgba(240, 172, 72, 0.48) 100%);
+            outline: none;
+            cursor: pointer;
+        }
+
+        #timeline-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: #d8f8a0;
+            box-shadow: 0 0 10px rgba(167, 225, 99, 0.95);
+            cursor: pointer;
+        }
+
+        /* Controls Row */
+        .controls-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .controls-group {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+        }
+
+        .ctrl-btn {
+            background: rgba(13, 21, 16, 0.76);
+            border: 1px solid rgba(220, 240, 210, 0.2);
+            color: var(--text-main);
+            height: 31px;
+            padding: 0 11px;
+            border-radius: 999px;
+            font-size: 11.5px;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            transition: all 0.18s ease;
+        }
+
+        .ctrl-btn:hover {
+            background: rgba(167, 225, 99, 0.22);
+            border-color: rgba(167, 225, 99, 0.5);
+            color: #ffffff;
+        }
+
+        .ctrl-btn.active-mode {
+            background: rgba(240, 184, 92, 0.25);
+            border-color: rgba(240, 184, 92, 0.7);
+            color: #ffe2a8;
+        }
+
+        .ctrl-btn svg {
+            width: 14px;
+            height: 14px;
+            fill: currentColor;
+        }
+
+        .time-readout {
+            font-variant-numeric: tabular-nums;
+            font-size: 12px;
+            color: #d8f8a0;
+            margin-left: 4px;
+        }
+
+        #volume-slider {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 74px;
+            height: 5px;
+            border-radius: 999px;
+            background: rgba(243, 247, 238, 0.25);
+            outline: none;
+            cursor: pointer;
+        }
+
+        #volume-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #d8f8a0;
+            cursor: pointer;
+        }
+
+        @media (max-width: 680px) {
+            .ctrl-btn span.btn-label {
+                display: none;
+            }
+
+            #volume-slider {
+                width: 50px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="stage-wrapper">
+        <div id="viewport">
+            <canvas id="film-canvas" width="1600" height="900"></canvas>
+
+            <!-- Top HUD: Cinema Camera Telemetry + Audio Cue Chips -->
+            <div id="hud-top">
+                <div id="camera-telemetry-badge">
+                    <div class="cam-cut-name" id="hud-cut-title">১ · কুয়াশাচ্ছন্ন টিলা (Misty Tillas)</div>
+                    <div class="cam-lens-meta" id="hud-cam-meta">24mm T1.5 ANAMORPHIC • FPV DRONE PUSH-IN • 5.0s CUT
+                    </div>
+                </div>
+                <div id="active-audio-tags"></div>
+            </div>
+
+            <!-- Start Screen Overlay (Required for Web Audio API Gesture) -->
+            <div id="start-overlay">
+                <div class="film-badge">Sylhet Tea Estate Cinema • 6 Fast-Paced 5s Cuts • 0:30 Reel</div>
+                <h1 class="film-title-bn">সবুজ টিলার কাব্য — দুটি পাতা একটি কুঁড়ি</h1>
+                <div class="film-title-en">Whispers of the Tea Tillas: A Sylhet &amp; Srimangal Cinematic Reel</div>
+                <p class="film-desc">
+                    A fast-paced 30-second, 6-cut travel-cinema reel (5.0s per cut) across the terraced <em>tillas</em>
+                    (টিলা) of
+                    Sylhet—where every individual <em>Camellia sinensis</em> tea bush is rendered with its gnarled woody
+                    stems,
+                    serrated emerald leaf canopy, and bright <em>duti pata ekti kuri</em> shoots, alongside
+                    <em>Tukri</em> tea
+                    pluckers, a crystal <em>jhiri</em> stream, a leaf-laden tractor, and a hilltop <em>Boro
+                        Bungalow</em>.
+                </p>
+                <button id="tap-start-btn" type="button">
+                    <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+                        <path d="M8 5v14l11-7z" />
+                    </svg>
+                    Tap to Begin Tea Garden Film
+                </button>
+                <div class="scene-pills-preview" id="overlay-scene-pills">
+                    <span class="scene-pill-tag" data-jump="0">১ • 0:00–0:05 Tilla Drone</span>
+                    <span class="scene-pill-tag" data-jump="5">২ • 0:05–0:10 Tea Pluckers</span>
+                    <span class="scene-pill-tag" data-jump="10">৩ • 0:10–0:15 Jhiri Stream</span>
+                    <span class="scene-pill-tag" data-jump="15">৪ • 0:15–0:20 Tea Tractor</span>
+                    <span class="scene-pill-tag" data-jump="20">৫ • 0:20–0:25 Hilltop Bungalow</span>
+                    <span class="scene-pill-tag" data-jump="25">৬ • 0:25–0:30 Golden Dusk</span>
+                </div>
+            </div>
+
+            <!-- Bottom Controls -->
+            <div id="controls-bar">
+                <div class="cut-jump-row" id="cut-jump-bar">
+                    <button type="button" class="cut-chip-btn active-cut" data-cut="1" data-jump="0">Cut 1 · Tilla
+                        Drone</button>
+                    <button type="button" class="cut-chip-btn" data-cut="2" data-jump="5">Cut 2 · Tea Pluckers</button>
+                    <button type="button" class="cut-chip-btn" data-cut="3" data-jump="10">Cut 3 · Jhiri Stream</button>
+                    <button type="button" class="cut-chip-btn" data-cut="4" data-jump="15">Cut 4 · Tea Tractor</button>
+                    <button type="button" class="cut-chip-btn" data-cut="5" data-jump="20">Cut 5 · Hilltop
+                        Bungalow</button>
+                    <button type="button" class="cut-chip-btn" data-cut="6" data-jump="25">Cut 6 · Golden Dusk</button>
+                </div>
+
+                <div class="timeline-container">
+                    <input type="range" id="timeline-slider" min="0" max="30" step="0.02" value="0"
+                        aria-label="Film Timeline">
+                </div>
+
+                <div class="controls-row">
+                    <div class="controls-group">
+                        <button type="button" class="ctrl-btn" id="play-pause-btn" aria-label="Play or Pause">
+                            <svg id="play-icon" viewBox="0 0 24 24">
+                                <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" />
+                            </svg>
+                            <span class="btn-label" id="play-label">Pause</span>
+                        </button>
+                        <button type="button" class="ctrl-btn" id="restart-btn" aria-label="Restart">
+                            <svg viewBox="0 0 24 24">
+                                <path
+                                    d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z" />
+                            </svg>
+                            <span class="btn-label">Restart</span>
+                        </button>
+                        <button type="button" class="ctrl-btn" id="film-look-btn"
+                            aria-label="Cycle Cinema Color Grade LUT">
+                            <svg viewBox="0 0 24 24">
+                                <path
+                                    d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9c.83 0 1.5-.67 1.5-1.5 0-.39-.15-.74-.39-1.01-.23-.26-.38-.61-.38-.99 0-.83.67-1.5 1.5-1.5H16c2.76 0 5-2.24 5-5 0-4.42-4.03-8-9-8z" />
+                            </svg>
+                            <span class="btn-label" id="film-look-label">LUT: Sylhet Emerald</span>
+                        </button>
+                        <button type="button" class="ctrl-btn" id="cam-guide-btn"
+                            aria-label="Toggle Cinema Viewfinder Guides">
+                            <svg viewBox="0 0 24 24">
+                                <path
+                                    d="M3 5v4h2V5h4V3H5c-1.1 0-2 .9-2 2zm2 10H3v4c0 1.1.9 2 2 2h4v-2H5v-4zm14 4h-4v2h4c1.1 0 2-.9 2-2v-4h-2v4zm0-16h-4v2h4v4h2V5c0-1.1-.9-2-2-2z" />
+                            </svg>
+                            <span class="btn-label" id="cam-guide-label">2.39:1 Frame</span>
+                        </button>
+                        <span class="time-readout" id="time-display">0:00 / 0:30</span>
+                    </div>
+
+                    <div class="controls-group">
+                        <button type="button" class="ctrl-btn" id="mute-btn" aria-label="Mute or Unmute">
+                            <svg id="vol-icon" viewBox="0 0 24 24">
+                                <path
+                                    d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z" />
+                            </svg>
+                            <span class="btn-label" id="mute-label">Audio</span>
+                        </button>
+                        <input type="range" id="volume-slider" min="0" max="1" step="0.01" value="0.85"
+                            aria-label="Master Volume">
+                        <button type="button" class="ctrl-btn" id="fullscreen-btn" aria-label="Fullscreen">
+                            <svg viewBox="0 0 24 24">
+                                <path
+                                    d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z" />
+                            </svg>
+                            <span class="btn-label">Fullscreen</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (() => {
+            "use strict";
+
+            // ============================================================================
+            // 0. CINEMATIC MASTER RULES CONTRACT (GOVERNANCE FOR ALL FUTURE MODIFICATIONS)
+            // ============================================================================
+            // Every scene cut, object renderer, camera trajectory, and color grade in this
+            // engine MUST strictly adhere to CINEMATIC_MASTER_RULES.
+            const CINEMATIC_MASTER_RULES = Object.freeze({
+                version: "3.0-SYLHET-INDIVIDUAL-TEA-BUSH-REALISM",
+                aspectRatio: "16:9 (1600x900 internal render buffer) with optional 2.39:1 Anamorphic mattes",
+                pacingStandard: "Fast-paced viral travel cinematography: 5.0 seconds per cut (30.0s total across 6 cuts) with brisk, continuous camera motion.",
+                botanicalRealism: {
+                    individualTeaBushes: "NEVER render Tillas as flat painted stripes. Every Tilla must be populated with hundreds of discrete, individually visible Camellia sinensis tea bushes.",
+                    teaPlantAnatomy: "Each individual tea bush must exhibit: (1) gnarled branched woody stems & root collar at the base, (2) deep under-bush shadow on red-laterite soil terraces, (3) 200+ individual pointed elliptical tea leaves with midrib veins across 5 depth tiers, and (4) a pruned flat/domed plucking-table crown studded with upright 'Duti Pata Ekti Kuri' lime shoots.",
+                    shadeTrees: "Tall silver-barked Koroi (Albizia) and Krishnachura shade trees tower above the tea bushes with feathery horizontal foliage tiers and dappled ground shadows."
+                },
+                culturalAuthenticity: {
+                    teaPluckers: "Female tea garden workers wear vibrant cotton saris/blouses with woven conical bamboo Tukri baskets suspended on their backs via a taut forehead strap (Mathar Fita).",
+                    jhiriStream: "Mountain Jhiri streams feature clear shallow water flowing over rounded sandstone pebbles, mossy boulders, bamboo footbridges (Shako), and lush taro/fern banks.",
+                    estateTractor: "Muddy red-laterite roads (Lal Matir Rasta) feature rutted wheel tracks, rainwater puddles, and a rugged estate tractor hauling a trailer piled high with bulging green tea leaf sacks.",
+                    boroBungalow: "Hilltop Assam-type planter's bungalows sit on brick/timber piers with whitewashed walls, dark timber framing, sloped red corrugated roofs, wide verandas, cane chairs, and bougainvillea."
+                },
+                colorGradingLUTs: ["Sylhet Emerald (Default)", "Golden Kodachrome 64", "Monsoon Moody Teal", "1955 Ray Silver B&W"]
+            });
+            window.CINEMATIC_MASTER_RULES = CINEMATIC_MASTER_RULES;
+
+            // ============================================================================
+            // 1. DETERMINISTIC PRNG, 2D PERLIN/FBM NOISE FIELD & COLOR GRADING UTILITIES
+            // ============================================================================
+            function mulberry32(seed = 19980412) {
+                let a = seed >>> 0;
+                return function () {
+                    a |= 0;
+                    a = (a + 0x6D2B79F5) | 0;
+                    let t = Math.imul(a ^ (a >>> 15), 1 | a);
+                    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+                    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+                };
+            }
+
+            const PERM = new Uint8Array(512);
+            const GRAD = new Float32Array(256);
+            {
+                const nRng = mulberry32(771995);
+                const p = new Uint8Array(256);
+                for (let i = 0; i < 256; i++) {
+                    p[i] = i;
+                    GRAD[i] = nRng() * 2 - 1;
+                }
+                for (let i = 255; i > 0; i--) {
+                    const j = Math.floor(nRng() * (i + 1));
+                    const tmp = p[i];
+                    p[i] = p[j];
+                    p[j] = tmp;
+                }
+                for (let i = 0; i < 512; i++) PERM[i] = p[i & 255];
+            }
+
+            const fade = (t) => t * t * t * (t * (t * 6 - 15) + 10);
+            const clamp = (v, lo, hi) => (v < lo ? lo : v > hi ? hi : v);
+            const lerp = (a, b, t) => a + (b - a) * clamp(t, 0, 1);
+            const smoothstep = (e0, e1, x) => {
+                const t = clamp((x - e0) / (e1 - e0), 0, 1);
+                return t * t * (3 - 2 * t);
+            };
+            const easeInOutCubic = (t) => {
+                t = clamp(t, 0, 1);
+                return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+            };
+
+            function noise2D(x, y) {
+                const xi = Math.floor(x) & 255;
+                const yi = Math.floor(y) & 255;
+                const xf = x - Math.floor(x);
+                const yf = y - Math.floor(y);
+                const u = fade(xf);
+                const v = fade(yf);
+                const aa = PERM[PERM[xi] + yi];
+                const ab = PERM[PERM[xi] + yi + 1];
+                const ba = PERM[PERM[xi + 1] + yi];
+                const bb = PERM[PERM[xi + 1] + yi + 1];
+                return lerp(lerp(GRAD[aa], GRAD[ba], u), lerp(GRAD[ab], GRAD[bb], u), v);
+            }
+
+            function lerpColor(c1, c2, t) {
+                const u = clamp(t, 0, 1);
+                const r = Math.round(lerp(c1[0], c2[0], u));
+                const g = Math.round(lerp(c1[1], c2[1], u));
+                const b = Math.round(lerp(c1[2], c2[2], u));
+                return `rgb(${r},${g},${b})`;
+            }
+
+            // ============================================================================
+            // 2. FAST-PACED 6-CUT STORYBOARD CONFIG (30.0s = 6 CUTS × 5.0s EACH)
+            // ============================================================================
+            const TOTAL_DURATION = 30.0;
+            const CW = 1600;
+            const CH = 900;
+
+            const SCENES = [
+                {
+                    id: 1,
+                    start: 0.0,
+                    end: 5.0,
+                    title: "১ · কুয়াশাচ্ছন্ন টিলা ও চা বাগান (Misty Tillas Drone Reveal)",
+                    lensMeta: "24mm T1.5 ANAMORPHIC • FPV DRONE PUSH-IN & BANK • 5.0s CUT"
+                },
+                {
+                    id: 2,
+                    start: 5.0,
+                    end: 10.0,
+                    title: "২ · দুটি পাতা একটি কুঁড়ি (Tea Pluckers & Individual Tea Bushes)",
+                    lensMeta: "85mm T1.4 TELEPHOTO • SHALLOW DOF LATERAL DOLLY • 5.0s CUT"
+                },
+                {
+                    id: 3,
+                    start: 10.0,
+                    end: 15.0,
+                    title: "৩ · পাহাড়ি ঝিরি ও বাঁশের সাঁকো (Mountain Jhiri Stream & Bridge)",
+                    lensMeta: "35mm T1.8 PRIME • CRANE JIB DOWN TO WATER LEVEL • 5.0s CUT"
+                },
+                {
+                    id: 4,
+                    start: 15.0,
+                    end: 20.0,
+                    title: "৪ · লাল মাটির পথ ও পাতা বোঝাই ট্রাক্টর (Muddy Tilla Trail & Tea Tractor)",
+                    lensMeta: "28mm T2.0 LOW-ANGLE • PUDDLE-LEVEL TRACKING RIG • 5.0s CUT"
+                },
+                {
+                    id: 5,
+                    start: 20.0,
+                    end: 25.0,
+                    title: "৫ · টিলার ওপর সাহেবি ডাকবাংলো (Hilltop Planter's Bango House)",
+                    lensMeta: "50mm T1.4 ANAMORPHIC • PARALLAX SLIDER REVEAL • 5.0s CUT"
+                },
+                {
+                    id: 6,
+                    start: 25.0,
+                    end: 30.0,
+                    title: "৬ · গোধূলির সোনালি আলো ও জোনাকি (Golden Dusk, Lanterns & Fireflies)",
+                    lensMeta: "18mm T1.8 WIDE CINEMA • CRANE PULL-BACK TO TWILIGHT • 5.0s CUT"
+                }
+            ];
+
+            function getCurrentScene(t) {
+                for (let i = 0; i < SCENES.length; i++) {
+                    if (t >= SCENES[i].start && t < SCENES[i].end) return SCENES[i];
+                }
+                return SCENES[SCENES.length - 1];
+            }
+
+            // ============================================================================
+            // 3. PROCEDURAL WEB AUDIO ENGINE (PAHARI BANSURI, DOTARA, JHIRI STREAM,
+            //    TEA LEAF PLUCKING SNAPS, BANGLES, HILL BIRDS & DIESEL TEA TRACTOR)
+            // ============================================================================
+            class TeaEstateSoundEngine {
+                constructor() {
+                    this.ctx = null;
+                    this.masterGain = null;
+                    this.compressor = null;
+                    this.isMuted = false;
+                    this.userVolume = 0.85;
+                    this.initialized = false;
+
+                    this.windGain = null;
+                    this.windFilter = null;
+                    this.leafRustleGain = null;
+                    this.jhiriGain = null;
+                    this.jhiriFilter = null;
+                    this.jhiriPan = null;
+                    this.cricketGain = null;
+                    this.tanpuraGain = null;
+                    this.musicGain = null;
+
+                    this.tractorPan = null;
+                    this.tractorGain = null;
+                    this.tractorOsc1 = null;
+                    this.tractorOsc2 = null;
+                    this.tractorLfo = null;
+                    this.mudSquelchGain = null;
+
+                    this.firedCues = new Set();
+                    this.nextBirdTime = 0.8;
+                    this.nextFluteTime = 0.4;
+                    this.nextDotaraTime = 0.3;
+                    this.nextPluckTime = 5.2;
+                    this.fluteNoteIdx = 0;
+                    this.dotaraIdx = 0;
+                }
+
+                init() {
+                    if (this.initialized) {
+                        if (this.ctx && this.ctx.state === "suspended") {
+                            this.ctx.resume();
+                        }
+                        return;
+                    }
+                    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+                    if (!AudioCtx) return;
+
+                    this.ctx = new AudioCtx();
+                    this.compressor = this.ctx.createDynamicsCompressor();
+                    this.compressor.threshold.setValueAtTime(-16, this.ctx.currentTime);
+                    this.compressor.knee.setValueAtTime(18, this.ctx.currentTime);
+                    this.compressor.ratio.setValueAtTime(5, this.ctx.currentTime);
+                    this.compressor.attack.setValueAtTime(0.005, this.ctx.currentTime);
+                    this.compressor.release.setValueAtTime(0.22, this.ctx.currentTime);
+
+                    this.masterGain = this.ctx.createGain();
+                    this.masterGain.gain.setValueAtTime(this.isMuted ? 0 : this.userVolume, this.ctx.currentTime);
+
+                    this.compressor.connect(this.masterGain);
+                    this.masterGain.connect(this.ctx.destination);
+
+                    const sr = this.ctx.sampleRate;
+                    const bufLen = sr * 2;
+                    this.whiteBuffer = this.ctx.createBuffer(1, bufLen, sr);
+                    this.pinkBuffer = this.ctx.createBuffer(1, bufLen, sr);
+                    const wData = this.whiteBuffer.getChannelData(0);
+                    const pData = this.pinkBuffer.getChannelData(0);
+                    let b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
+                    for (let i = 0; i < bufLen; i++) {
+                        const white = Math.random() * 2 - 1;
+                        wData[i] = white;
+                        b0 = 0.99886 * b0 + white * 0.0555179;
+                        b1 = 0.99332 * b1 + white * 0.0750759;
+                        b2 = 0.96900 * b2 + white * 0.1538520;
+                        b3 = 0.86650 * b3 + white * 0.3104856;
+                        b4 = 0.55000 * b4 + white * 0.5329522;
+                        b5 = -0.7616 * b5 - white * 0.0168980;
+                        pData[i] = (b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362) * 0.045;
+                        b6 = white * 0.115926;
+                    }
+
+                    this.setupAmbientBeds();
+                    this.initialized = true;
+                }
+
+                setupAmbientBeds() {
+                    const ac = this.ctx;
+                    const now = ac.currentTime;
+
+                    const windSrc = ac.createBufferSource();
+                    windSrc.buffer = this.pinkBuffer;
+                    windSrc.loop = true;
+                    this.windFilter = ac.createBiquadFilter();
+                    this.windFilter.type = "bandpass";
+                    this.windFilter.frequency.value = 320;
+                    this.windFilter.Q.value = 1.5;
+                    this.windGain = ac.createGain();
+                    this.windGain.gain.value = 0.14;
+                    windSrc.connect(this.windFilter);
+                    this.windFilter.connect(this.windGain);
+                    this.windGain.connect(this.compressor);
+                    windSrc.start(now);
+
+                    const leafSrc = ac.createBufferSource();
+                    leafSrc.buffer = this.whiteBuffer;
+                    leafSrc.loop = true;
+                    const leafFilter = ac.createBiquadFilter();
+                    leafFilter.type = "bandpass";
+                    leafFilter.frequency.value = 2300;
+                    leafFilter.Q.value = 2.8;
+                    this.leafRustleGain = ac.createGain();
+                    this.leafRustleGain.gain.value = 0.025;
+                    leafSrc.connect(leafFilter);
+                    leafFilter.connect(this.leafRustleGain);
+                    this.leafRustleGain.connect(this.compressor);
+                    leafSrc.start(now, 0.4);
+
+                    const jhiriSrc = ac.createBufferSource();
+                    jhiriSrc.buffer = this.pinkBuffer;
+                    jhiriSrc.loop = true;
+                    this.jhiriFilter = ac.createBiquadFilter();
+                    this.jhiriFilter.type = "bandpass";
+                    this.jhiriFilter.frequency.value = 780;
+                    this.jhiriFilter.Q.value = 2.6;
+                    this.jhiriGain = ac.createGain();
+                    this.jhiriGain.gain.value = 0.03;
+                    this.jhiriPan = ac.createStereoPanner();
+                    this.jhiriPan.pan.value = 0.15;
+
+                    const jLfo = ac.createOscillator();
+                    const jLfoG = ac.createGain();
+                    jLfo.frequency.value = 4.2;
+                    jLfoG.gain.value = 210;
+                    jLfo.connect(jLfoG);
+                    jLfoG.connect(this.jhiriFilter.frequency);
+                    jLfo.start(now);
+
+                    jhiriSrc.connect(this.jhiriFilter);
+                    this.jhiriFilter.connect(this.jhiriGain);
+                    this.jhiriGain.connect(this.jhiriPan);
+                    this.jhiriPan.connect(this.compressor);
+                    jhiriSrc.start(now, 0.9);
+
+                    const cOsc1 = ac.createOscillator();
+                    const cOsc2 = ac.createOscillator();
+                    const cLfo = ac.createOscillator();
+                    const cLfoGain = ac.createGain();
+                    this.cricketGain = ac.createGain();
+                    this.cricketGain.gain.value = 0.004;
+                    cOsc1.type = "sine";
+                    cOsc2.type = "sine";
+                    cOsc1.frequency.setValueAtTime(4420, now);
+                    cOsc2.frequency.setValueAtTime(4438, now);
+                    cLfo.frequency.setValueAtTime(17, now);
+                    cLfoGain.gain.value = 0.008;
+                    cLfo.connect(cLfoGain);
+                    cLfoGain.connect(this.cricketGain.gain);
+                    cOsc1.connect(this.cricketGain);
+                    cOsc2.connect(this.cricketGain);
+                    this.cricketGain.connect(this.compressor);
+                    cOsc1.start(now);
+                    cOsc2.start(now);
+                    cLfo.start(now);
+
+                    const tanSa = ac.createOscillator();
+                    const tanPa = ac.createOscillator();
+                    tanSa.type = "sawtooth";
+                    tanPa.type = "triangle";
+                    tanSa.frequency.setValueAtTime(155.56, now);
+                    tanPa.frequency.setValueAtTime(233.08, now);
+                    const tanFilter = ac.createBiquadFilter();
+                    tanFilter.type = "lowpass";
+                    tanFilter.frequency.value = 510;
+                    this.tanpuraGain = ac.createGain();
+                    this.tanpuraGain.gain.value = 0.024;
+                    tanSa.connect(tanFilter);
+                    tanPa.connect(tanFilter);
+                    tanFilter.connect(this.tanpuraGain);
+                    this.tanpuraGain.connect(this.compressor);
+                    tanSa.start(now);
+                    tanPa.start(now);
+
+                    this.tractorPan = ac.createStereoPanner();
+                    this.tractorPan.pan.value = -0.6;
+                    this.tractorGain = ac.createGain();
+                    this.tractorGain.gain.value = 0.0001;
+
+                    this.tractorOsc1 = ac.createOscillator();
+                    this.tractorOsc2 = ac.createOscillator();
+                    this.tractorLfo = ac.createOscillator();
+                    this.tractorOsc1.type = "sawtooth";
+                    this.tractorOsc2.type = "square";
+                    this.tractorOsc1.frequency.value = 46;
+                    this.tractorOsc2.frequency.value = 23;
+                    this.tractorLfo.frequency.value = 9.5;
+
+                    const trFilter = ac.createBiquadFilter();
+                    trFilter.type = "lowpass";
+                    trFilter.frequency.value = 260;
+
+                    const chugMod = ac.createGain();
+                    chugMod.gain.value = 0.55;
+                    const lfoDepth = ac.createGain();
+                    lfoDepth.gain.value = 0.42;
+                    this.tractorLfo.connect(lfoDepth);
+                    lfoDepth.connect(chugMod.gain);
+
+                    this.tractorOsc1.connect(trFilter);
+                    this.tractorOsc2.connect(trFilter);
+                    trFilter.connect(chugMod);
+                    chugMod.connect(this.tractorGain);
+
+                    const mudSrc = ac.createBufferSource();
+                    mudSrc.buffer = this.pinkBuffer;
+                    mudSrc.loop = true;
+                    const mudFilt = ac.createBiquadFilter();
+                    mudFilt.type = "bandpass";
+                    mudFilt.frequency.value = 420;
+                    mudFilt.Q.value = 1.8;
+                    this.mudSquelchGain = ac.createGain();
+                    this.mudSquelchGain.gain.value = 0.0001;
+                    mudSrc.connect(mudFilt);
+                    mudFilt.connect(this.mudSquelchGain);
+                    this.mudSquelchGain.connect(this.tractorPan);
+
+                    this.tractorGain.connect(this.tractorPan);
+                    this.tractorPan.connect(this.compressor);
+
+                    this.tractorOsc1.start(now);
+                    this.tractorOsc2.start(now);
+                    this.tractorLfo.start(now);
+                    mudSrc.start(now, 0.2);
+
+                    this.musicGain = ac.createGain();
+                    this.musicGain.gain.value = 0.28;
+                    this.musicGain.connect(this.compressor);
+                }
+
+                setVolume(val) {
+                    this.userVolume = clamp(val, 0, 1);
+                    if (this.masterGain && this.ctx) {
+                        this.masterGain.gain.setTargetAtTime(this.isMuted ? 0 : this.userVolume, this.ctx.currentTime, 0.04);
+                    }
+                }
+
+                toggleMute() {
+                    this.isMuted = !this.isMuted;
+                    this.setVolume(this.userVolume);
+                    return this.isMuted;
+                }
+
+                pause() {
+                    if (this.ctx && this.ctx.state === "running") {
+                        this.ctx.suspend();
+                    }
+                }
+
+                resume() {
+                    if (this.ctx && this.ctx.state === "suspended") {
+                        this.ctx.resume();
+                    }
+                }
+
+                resetCues(time) {
+                    this.firedCues.clear();
+                    for (const cue of TIMELINE_AUDIO_CUES) {
+                        if (cue.t < time - 0.08) {
+                            this.firedCues.add(cue.id);
+                        }
+                    }
+                    this.nextBirdTime = time + 0.4;
+                    this.nextFluteTime = time + 0.2;
+                    this.nextDotaraTime = time + 0.2;
+                    this.nextPluckTime = Math.max(5.1, time + 0.25);
+                }
+
+                showAudioTag(label) {
+                    const container = document.getElementById("active-audio-tags");
+                    if (!container) return;
+                    const chip = document.createElement("span");
+                    chip.className = "audio-cue-chip";
+                    chip.textContent = "♪ " + label;
+                    container.appendChild(chip);
+                    while (container.children.length > 3) {
+                        container.removeChild(container.firstChild);
+                    }
+                    setTimeout(() => {
+                        if (chip.parentNode) chip.parentNode.removeChild(chip);
+                    }, 1900);
+                }
+
+                playTeaPluckSnap(panVal = 0.0) {
+                    if (!this.initialized || this.ctx.state !== "running") return;
+                    const now = this.ctx.currentTime;
+                    const panner = this.ctx.createStereoPanner();
+                    panner.pan.setValueAtTime(clamp(panVal, -0.85, 0.85), now);
+                    panner.connect(this.compressor);
+
+                    const osc = this.ctx.createOscillator();
+                    const g = this.ctx.createGain();
+                    osc.type = "triangle";
+                    osc.frequency.setValueAtTime(1450, now);
+                    osc.frequency.exponentialRampToValueAtTime(420, now + 0.035);
+                    g.gain.setValueAtTime(0.001, now);
+                    g.gain.linearRampToValueAtTime(0.11, now + 0.004);
+                    g.gain.exponentialRampToValueAtTime(0.0001, now + 0.04);
+                    osc.connect(g);
+                    g.connect(panner);
+                    osc.start(now);
+                    osc.stop(now + 0.045);
+
+                    const src = this.ctx.createBufferSource();
+                    src.buffer = this.whiteBuffer;
+                    const filt = this.ctx.createBiquadFilter();
+                    filt.type = "bandpass";
+                    filt.frequency.setValueAtTime(2800, now + 0.10);
+                    filt.Q.setValueAtTime(2.4, now + 0.10);
+                    const ng = this.ctx.createGain();
+                    ng.gain.setValueAtTime(0.0001, now + 0.10);
+                    ng.gain.linearRampToValueAtTime(0.065, now + 0.13);
+                    ng.gain.exponentialRampToValueAtTime(0.0001, now + 0.24);
+                    src.connect(filt);
+                    filt.connect(ng);
+                    ng.connect(panner);
+                    src.start(now + 0.10, Math.random(), 0.18);
+                }
+
+                playGlassBangles(panVal = -0.2) {
+                    if (!this.initialized || this.ctx.state !== "running") return;
+                    const now = this.ctx.currentTime;
+                    const panner = this.ctx.createStereoPanner();
+                    panner.pan.setValueAtTime(panVal, now);
+                    panner.connect(this.compressor);
+
+                    [3650, 4280, 3920].forEach((freq, i) => {
+                        const t0 = now + i * 0.05;
+                        const o = this.ctx.createOscillator();
+                        const g = this.ctx.createGain();
+                        o.type = "sine";
+                        o.frequency.setValueAtTime(freq, t0);
+                        g.gain.setValueAtTime(0.0001, t0);
+                        g.gain.linearRampToValueAtTime(0.045, t0 + 0.005);
+                        g.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.13);
+                        o.connect(g);
+                        g.connect(panner);
+                        o.start(t0);
+                        o.stop(t0 + 0.14);
+                    });
+                    this.showAudioTag("চুড়ির রিনিঝিনি · Glass Bangles & Tukri");
+                }
+
+                playDotaraPluck(freq, panVal = -0.15) {
+                    if (!this.initialized || this.ctx.state !== "running") return;
+                    const now = this.ctx.currentTime;
+                    const panner = this.ctx.createStereoPanner();
+                    panner.pan.setValueAtTime(panVal, now);
+                    panner.connect(this.musicGain);
+
+                    const osc = this.ctx.createOscillator();
+                    const osc2 = this.ctx.createOscillator();
+                    const filt = this.ctx.createBiquadFilter();
+                    const g = this.ctx.createGain();
+
+                    osc.type = "sawtooth";
+                    osc2.type = "triangle";
+                    osc.frequency.setValueAtTime(freq * 0.98, now);
+                    osc.frequency.exponentialRampToValueAtTime(freq, now + 0.03);
+                    osc2.frequency.setValueAtTime(freq * 2, now);
+
+                    filt.type = "lowpass";
+                    filt.frequency.setValueAtTime(1850, now);
+                    filt.frequency.exponentialRampToValueAtTime(420, now + 0.40);
+
+                    g.gain.setValueAtTime(0.0001, now);
+                    g.gain.linearRampToValueAtTime(0.11, now + 0.01);
+                    g.gain.exponentialRampToValueAtTime(0.0001, now + 0.45);
+
+                    osc.connect(filt);
+                    osc2.connect(filt);
+                    filt.connect(g);
+                    g.connect(panner);
+
+                    osc.start(now);
+                    osc2.start(now);
+                    osc.stop(now + 0.48);
+                    osc2.stop(now + 0.48);
+                }
+
+                playBansuriNote(freq, prevFreq, dur = 1.65) {
+                    if (!this.initialized || this.ctx.state !== "running") return;
+                    const now = this.ctx.currentTime;
+
+                    const osc1 = this.ctx.createOscillator();
+                    const osc2 = this.ctx.createOscillator();
+                    const vibrato = this.ctx.createOscillator();
+                    const vibGain = this.ctx.createGain();
+
+                    osc1.type = "sine";
+                    osc2.type = "triangle";
+
+                    const startF = prevFreq ? lerp(prevFreq, freq, 0.38) : freq * 0.96;
+                    osc1.frequency.setValueAtTime(startF, now);
+                    osc1.frequency.exponentialRampToValueAtTime(freq, now + 0.16);
+                    osc2.frequency.setValueAtTime(startF * 2, now);
+                    osc2.frequency.exponentialRampToValueAtTime(freq * 2, now + 0.16);
+
+                    vibrato.frequency.setValueAtTime(5.4, now);
+                    vibGain.gain.setValueAtTime(0.01, now);
+                    vibGain.gain.linearRampToValueAtTime(freq * 0.013, now + dur * 0.42);
+                    vibrato.connect(vibGain);
+                    vibGain.connect(osc1.frequency);
+
+                    const g1 = this.ctx.createGain();
+                    const g2 = this.ctx.createGain();
+                    g1.gain.setValueAtTime(0.0001, now);
+                    g1.gain.linearRampToValueAtTime(0.22, now + 0.16);
+                    g1.gain.setValueAtTime(0.18, now + dur * 0.68);
+                    g1.gain.exponentialRampToValueAtTime(0.0001, now + dur);
+
+                    g2.gain.setValueAtTime(0.0001, now);
+                    g2.gain.linearRampToValueAtTime(0.045, now + 0.16);
+                    g2.gain.exponentialRampToValueAtTime(0.0001, now + dur);
+
+                    const breath = this.ctx.createBufferSource();
+                    breath.buffer = this.whiteBuffer;
+                    const bFilt = this.ctx.createBiquadFilter();
+                    bFilt.type = "bandpass";
+                    bFilt.frequency.setValueAtTime(freq * 3, now);
+                    bFilt.Q.setValueAtTime(4.2, now);
+                    const bGain = this.ctx.createGain();
+                    bGain.gain.setValueAtTime(0.0001, now);
+                    bGain.gain.linearRampToValueAtTime(0.018, now + 0.08);
+                    bGain.gain.exponentialRampToValueAtTime(0.0001, now + dur * 0.82);
+
+                    osc1.connect(g1);
+                    osc2.connect(g2);
+                    breath.connect(bFilt);
+                    bFilt.connect(bGain);
+
+                    g1.connect(this.musicGain);
+                    g2.connect(this.musicGain);
+                    bGain.connect(this.musicGain);
+
+                    osc1.start(now);
+                    osc2.start(now);
+                    vibrato.start(now);
+                    breath.start(now);
+                    osc1.stop(now + dur + 0.04);
+                    osc2.stop(now + dur + 0.04);
+                    vibrato.stop(now + dur + 0.04);
+                    breath.stop(now + dur + 0.04);
+                }
+
+                playBird(type = "doel", panVal = 0, distGain = 0.11) {
+                    if (!this.initialized || this.ctx.state !== "running") return;
+                    const now = this.ctx.currentTime;
+                    const panner = this.ctx.createStereoPanner();
+                    panner.pan.setValueAtTime(clamp(panVal, -0.9, 0.9), now);
+                    panner.connect(this.compressor);
+
+                    if (type === "koel") {
+                        const osc = this.ctx.createOscillator();
+                        const g = this.ctx.createGain();
+                        osc.type = "sine";
+                        osc.frequency.setValueAtTime(920, now);
+                        osc.frequency.exponentialRampToValueAtTime(1120, now + 0.16);
+                        osc.frequency.setValueAtTime(1020, now + 0.20);
+                        osc.frequency.exponentialRampToValueAtTime(1540, now + 0.54);
+                        g.gain.setValueAtTime(0.0001, now);
+                        g.gain.linearRampToValueAtTime(distGain * 0.7, now + 0.05);
+                        g.gain.setValueAtTime(0.01, now + 0.18);
+                        g.gain.linearRampToValueAtTime(distGain, now + 0.28);
+                        g.gain.exponentialRampToValueAtTime(0.0001, now + 0.65);
+                        osc.connect(g);
+                        g.connect(panner);
+                        osc.start(now);
+                        osc.stop(now + 0.68);
+                        this.showAudioTag("পাহাড়ি কোকিল · Hill Cuckoo");
+                    } else if (type === "kingfisher") {
+                        for (let i = 0; i < 4; i++) {
+                            const t0 = now + i * 0.065;
+                            const osc = this.ctx.createOscillator();
+                            const g = this.ctx.createGain();
+                            osc.type = "sine";
+                            osc.frequency.setValueAtTime(3400 + i * 180, t0);
+                            osc.frequency.exponentialRampToValueAtTime(4400, t0 + 0.03);
+                            osc.frequency.exponentialRampToValueAtTime(2800, t0 + 0.055);
+                            g.gain.setValueAtTime(0.0001, t0);
+                            g.gain.linearRampToValueAtTime(distGain * 0.5, t0 + 0.01);
+                            g.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.06);
+                            osc.connect(g);
+                            g.connect(panner);
+                            osc.start(t0);
+                            osc.stop(t0 + 0.065);
+                        }
+                        this.showAudioTag("মাছরাঙা · Jhiri Kingfisher");
+                    } else {
+                        const notes = [2040, 2560, 2180, 2840];
+                        notes.forEach((freq, idx) => {
+                            const t0 = now + idx * 0.09;
+                            const osc = this.ctx.createOscillator();
+                            const g = this.ctx.createGain();
+                            osc.type = "sine";
+                            osc.frequency.setValueAtTime(freq * 0.92, t0);
+                            osc.frequency.exponentialRampToValueAtTime(freq, t0 + 0.04);
+                            osc.frequency.exponentialRampToValueAtTime(freq * 0.95, t0 + 0.085);
+                            g.gain.setValueAtTime(0.0001, t0);
+                            g.gain.linearRampToValueAtTime(distGain * 0.55, t0 + 0.015);
+                            g.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.09);
+                            osc.connect(g);
+                            g.connect(panner);
+                            osc.start(t0);
+                            osc.stop(t0 + 0.095);
+                        });
+                    }
+                }
+
+                playTractorHorn(panVal = 0.0) {
+                    if (!this.initialized || this.ctx.state !== "running") return;
+                    const now = this.ctx.currentTime;
+                    const panner = this.ctx.createStereoPanner();
+                    panner.pan.setValueAtTime(panVal, now);
+                    panner.connect(this.compressor);
+
+                    [0, 0.28].forEach((offset, idx) => {
+                        const t0 = now + offset;
+                        const dur = idx === 0 ? 0.20 : 0.35;
+                        const o1 = this.ctx.createOscillator();
+                        const o2 = this.ctx.createOscillator();
+                        const filt = this.ctx.createBiquadFilter();
+                        const g = this.ctx.createGain();
+
+                        o1.type = "sawtooth";
+                        o2.type = "sawtooth";
+                        o1.frequency.setValueAtTime(315, t0);
+                        o2.frequency.setValueAtTime(395, t0);
+
+                        filt.type = "bandpass";
+                        filt.frequency.setValueAtTime(920, t0);
+                        filt.Q.setValueAtTime(2.5, t0);
+
+                        g.gain.setValueAtTime(0.0001, t0);
+                        g.gain.linearRampToValueAtTime(0.14, t0 + 0.02);
+                        g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+
+                        o1.connect(filt);
+                        o2.connect(filt);
+                        filt.connect(g);
+                        g.connect(panner);
+
+                        o1.start(t0);
+                        o2.start(t0);
+                        o1.stop(t0 + dur + 0.02);
+                        o2.stop(t0 + dur + 0.02);
+                    });
+                    this.showAudioTag("ট্রাক্টরের হর্ন · Estate Tractor Horn");
+                }
+
+                playEstateGong(panVal = 0.35) {
+                    if (!this.initialized || this.ctx.state !== "running") return;
+                    const now = this.ctx.currentTime;
+                    const panner = this.ctx.createStereoPanner();
+                    panner.pan.setValueAtTime(panVal, now);
+                    panner.connect(this.compressor);
+
+                    [440, 880, 1318.5].forEach((f, i) => {
+                        const o = this.ctx.createOscillator();
+                        const g = this.ctx.createGain();
+                        o.type = "sine";
+                        o.frequency.setValueAtTime(f, now);
+                        g.gain.setValueAtTime(0.0001, now);
+                        g.gain.linearRampToValueAtTime(0.09 / (i + 1), now + 0.02);
+                        g.gain.exponentialRampToValueAtTime(0.0001, now + 1.8 - i * 0.3);
+                        o.connect(g);
+                        g.connect(panner);
+                        o.start(now);
+                        o.stop(now + 1.9);
+                    });
+                    this.showAudioTag("চা কারখানার ঘণ্টা · Tea Factory Bell");
+                }
+
+                update(t, dt) {
+                    if (!this.initialized || this.ctx.state !== "running") return;
+                    const now = this.ctx.currentTime;
+
+                    for (const cue of TIMELINE_AUDIO_CUES) {
+                        if (t >= cue.t && !this.firedCues.has(cue.id)) {
+                            this.firedCues.add(cue.id);
+                            cue.action(this);
+                        }
+                    }
+
+                    if (t >= this.nextBirdTime && (t < 15.0 || t > 20.0)) {
+                        const types = ["doel", "koel", "kingfisher", "doel"];
+                        const choice = (t >= 10 && t < 15) ? "kingfisher" : types[Math.floor((t * 5.7) % types.length)];
+                        const pan = Math.sin(t * 1.4) * 0.65;
+                        this.playBird(choice, pan, t > 25 ? 0.08 : 0.11);
+                        this.nextBirdTime = t + 2.4 + (t % 1.2);
+                    }
+
+                    if (t >= 5.1 && t <= 9.8 && t >= this.nextPluckTime) {
+                        this.playTeaPluckSnap(Math.sin(t * 2.9) * 0.45);
+                        this.nextPluckTime = t + 0.75 + (t % 0.35);
+                    }
+
+                    const FLUTE_MELODY = [
+                        311.13, 349.23, 392.00, 466.16, 523.25, 466.16,
+                        392.00, 349.23, 311.13, 261.63, 311.13, 392.00
+                    ];
+                    if (t >= this.nextFluteTime) {
+                        const note = FLUTE_MELODY[this.fluteNoteIdx % FLUTE_MELODY.length];
+                        const prevNote = FLUTE_MELODY[(this.fluteNoteIdx - 1 + FLUTE_MELODY.length) % FLUTE_MELODY.length];
+                        this.fluteNoteIdx++;
+                        this.playBansuriNote(note, prevNote, 1.65);
+                        this.nextFluteTime = t + 1.72;
+                    }
+
+                    const DOTARA_NOTES = [155.56, 233.08, 311.13, 233.08, 196.00, 233.08];
+                    if (t >= this.nextDotaraTime && (t < 15.0 || t > 20.0)) {
+                        const dNote = DOTARA_NOTES[this.dotaraIdx % DOTARA_NOTES.length];
+                        this.dotaraIdx++;
+                        this.playDotaraPluck(dNote, -0.2);
+                        this.nextDotaraTime = t + 0.86;
+                    }
+
+                    const isJhiriCut = (t >= 10.0 && t < 15.0);
+                    const isTractorCut = (t >= 15.0 && t < 20.0);
+                    const isDuskCut = (t >= 25.0);
+
+                    const musicLvl = isTractorCut ? 0.14 : (isDuskCut ? 0.32 : 0.26);
+                    this.musicGain.gain.setTargetAtTime(musicLvl, now, 0.15);
+
+                    const jhiriTarget = isJhiriCut ? 0.24 : (t < 10.0 ? 0.025 : 0.04);
+                    this.jhiriGain.gain.setTargetAtTime(jhiriTarget, now, 0.15);
+                    this.jhiriPan.pan.setTargetAtTime(isJhiriCut ? Math.sin(t * 1.2) * 0.25 : 0.35, now, 0.15);
+
+                    const windTarget = (t < 5.0 || t >= 20.0) ? 0.16 : 0.10;
+                    this.windGain.gain.setTargetAtTime(windTarget, now, 0.12);
+                    this.leafRustleGain.gain.setTargetAtTime(t >= 5.0 && t < 10.0 ? 0.06 : 0.025, now, 0.12);
+
+                    this.cricketGain.gain.setTargetAtTime(isDuskCut ? 0.028 : 0.003, now, 0.2);
+
+                    if (isTractorCut) {
+                        const u = clamp((t - 15.0) / 5.0, 0, 1);
+                        const env = smoothstep(15.0, 15.6, t) * (1 - smoothstep(19.3, 20.0, t));
+                        const pan = lerp(-0.75, 0.78, u);
+                        const rpm = 1.0 + Math.sin(u * Math.PI) * 0.38 + Math.sin(t * 14) * 0.05;
+                        this.tractorPan.pan.setTargetAtTime(pan, now, 0.06);
+                        this.tractorGain.gain.setTargetAtTime(0.24 * env, now, 0.08);
+                        this.mudSquelchGain.gain.setTargetAtTime(0.085 * env, now, 0.08);
+                        this.tractorOsc1.frequency.setTargetAtTime(42 * rpm, now, 0.06);
+                        this.tractorOsc2.frequency.setTargetAtTime(21 * rpm, now, 0.06);
+                        this.tractorLfo.frequency.setTargetAtTime(9.2 * rpm, now, 0.06);
+                    } else {
+                        this.tractorGain.gain.setTargetAtTime(0.0001, now, 0.12);
+                        this.mudSquelchGain.gain.setTargetAtTime(0.0001, now, 0.12);
+                    }
+                }
+            }
+
+            const TIMELINE_AUDIO_CUES = [
+                { id: "c1_intro", t: 0.2, action: (s) => s.showAudioTag("পাহাড়ি বাঁশি ও দোতারা · Sylhet Tea Estate Motif") },
+                { id: "c1_koel", t: 1.8, action: (s) => s.playBird("koel", -0.35, 0.12) },
+                { id: "c1_breeze", t: 3.4, action: (s) => s.showAudioTag("টিলার বাতাস · Misty Tilla Breeze") },
+                { id: "c2_pluck", t: 5.1, action: (s) => s.showAudioTag("দুটি পাতা একটি কুঁড়ি · Plucking Tea Shoots") },
+                { id: "c2_bangles1", t: 6.4, action: (s) => s.playGlassBangles(-0.22) },
+                { id: "c2_doel", t: 7.5, action: (s) => s.playBird("doel", 0.35, 0.11) },
+                { id: "c2_bangles2", t: 8.6, action: (s) => s.playGlassBangles(0.18) },
+                { id: "c3_jhiri", t: 10.1, action: (s) => s.showAudioTag("পাহাড়ি ঝিরি · Crystal Mountain Jhiri Stream") },
+                { id: "c3_king1", t: 11.8, action: (s) => s.playBird("kingfisher", 0.28, 0.14) },
+                { id: "c3_bridge", t: 13.0, action: (s) => s.showAudioTag("বাঁশের সাঁকো · Workers Crossing Bamboo Shako") },
+                { id: "c3_king2", t: 14.1, action: (s) => s.playBird("kingfisher", -0.25, 0.13) },
+                { id: "c4_tractor", t: 15.1, action: (s) => s.showAudioTag("চা বাগানের ট্রাক্টর · Leaf-Laden Estate Tractor") },
+                { id: "c4_horn1", t: 16.3, action: (s) => s.playTractorHorn(-0.22) },
+                { id: "c4_mud", t: 17.4, action: (s) => s.showAudioTag("লাল মাটির পথ · Muddy Laterite Trail") },
+                { id: "c4_horn2", t: 18.5, action: (s) => s.playTractorHorn(0.30) },
+                { id: "c5_bungalow", t: 20.1, action: (s) => s.showAudioTag("সাহেবি ডাকবাংলো · Hilltop Planter's Bungalow") },
+                { id: "c5_gong", t: 21.8, action: (s) => s.playEstateGong(0.35) },
+                { id: "c5_koel2", t: 23.6, action: (s) => s.playBird("koel", -0.28, 0.11) },
+                { id: "c6_dusk", t: 25.1, action: (s) => s.showAudioTag("গোধূলির আলো ও জোনাকি · Golden Dusk & Fireflies") },
+                { id: "c6_gong2", t: 27.2, action: (s) => s.playEstateGong(-0.25) }
+            ];
+
+            // ============================================================================
+            // 4. HYPER-DETAILED INDIVIDUAL TEA PLANT (CAMELLIA SINENSIS) SPRITE ENGINE
+            //    & PRE-RENDERED MULTI-BUSH TILLA TERRAIN CACHES
+            // ============================================================================
+            function createOffscreen(w, h) {
+                const c = document.createElement("canvas");
+                c.width = w;
+                c.height = h;
+                return c;
+            }
+
+            // Helper: Draw a single pointed, serrated-illusion Camellia sinensis leaf with midrib vein
+            function drawSingleTeaLeaf(ctx, x, y, len, wid, angle, fillCol, veinCol) {
+                ctx.save();
+                ctx.translate(x, y);
+                ctx.rotate(angle);
+                ctx.fillStyle = fillCol;
+                ctx.beginPath();
+                ctx.moveTo(-len * 0.45, 0);
+                ctx.quadraticCurveTo(-len * 0.05, -wid, len * 0.55, 0);
+                ctx.quadraticCurveTo(-len * 0.05, wid, -len * 0.45, 0);
+                ctx.closePath();
+                ctx.fill();
+
+                if (veinCol) {
+                    ctx.strokeStyle = veinCol;
+                    ctx.lineWidth = Math.max(0.6, wid * 0.16);
+                    ctx.beginPath();
+                    ctx.moveTo(-len * 0.36, 0);
+                    ctx.lineTo(len * 0.44, 0);
+                    ctx.stroke();
+                }
+                ctx.restore();
+            }
+
+            // Generates an authentic, individually-foliated Tea Bush (Camellia sinensis) sprite
+            // with gnarled woody stems at the base, 220+ pointed tea leaves, a flat-domed
+            // pruned plucking table ("Chhat"), and upright "Duti Pata Ekti Kuri" top shoots!
+            function createDetailedTeaBushSprite(w, h, seed, isDusk = false) {
+                const c = createOffscreen(w, h);
+                const bctx = c.getContext("2d");
+                const rng = mulberry32(seed);
+
+                const cx = w * 0.5;
+                const baseY = h * 0.88;
+                const rx = w * 0.43;
+                const ry = h * 0.36;
+                const crownY = h * 0.48;
+
+                // 1. Deep Ground Occlusion Shadow on the Red-Laterite Soil Terrace
+                const shGrad = bctx.createRadialGradient(cx, baseY - 2, rx * 0.15, cx, baseY - 2, rx * 0.98);
+                shGrad.addColorStop(0, "rgba(6, 12, 8, 0.82)");
+                shGrad.addColorStop(0.65, "rgba(12, 18, 10, 0.48)");
+                shGrad.addColorStop(1, "rgba(12, 18, 10, 0)");
+                bctx.fillStyle = shGrad;
+                bctx.beginPath();
+                bctx.ellipse(cx, baseY - 2, rx * 0.96, h * 0.11, 0, 0, Math.PI * 2);
+                bctx.fill();
+
+                // 2. Gnarled Branched Woody Stems & Root Collar ("Cha Gacher Gora") Under the Bush Skirt
+                const stemOffsets = [-rx * 0.42, -rx * 0.20, 0, rx * 0.22, rx * 0.40];
+                stemOffsets.forEach((sox, idx) => {
+                    const baseSpread = sox * 0.55 + (rng() - 0.5) * 5;
+                    const topSpread = sox * 0.92 + (rng() - 0.5) * 6;
+                    bctx.strokeStyle = idx % 2 === 0 ? "#3d2719" : "#543824";
+                    bctx.lineWidth = 3.2 - Math.abs(sox / rx) * 1.2;
+                    bctx.lineCap = "round";
+                    bctx.beginPath();
+                    bctx.moveTo(cx + baseSpread, baseY - 1);
+                    bctx.quadraticCurveTo(cx + (baseSpread + topSpread) * 0.5, baseY - h * 0.14, cx + topSpread, crownY + ry * 0.35);
+                    bctx.stroke();
+
+                    // Highlight on woody bark
+                    bctx.strokeStyle = "rgba(148, 106, 72, 0.45)";
+                    bctx.lineWidth = 1.0;
+                    bctx.beginPath();
+                    bctx.moveTo(cx + baseSpread - 1, baseY - 2);
+                    bctx.lineTo(cx + topSpread - 1, crownY + ry * 0.45);
+                    bctx.stroke();
+                });
+
+                // 3. Interior Core Shadow Mass (Gives 3D spherical/table volume to the bush)
+                const coreGrad = bctx.createRadialGradient(cx, crownY + 6, rx * 0.1, cx, crownY + 4, rx * 0.92);
+                coreGrad.addColorStop(0, "#071a0b");
+                coreGrad.addColorStop(0.75, "#0d2913");
+                coreGrad.addColorStop(1, "rgba(10, 32, 15, 0)");
+                bctx.fillStyle = coreGrad;
+                bctx.beginPath();
+                bctx.ellipse(cx, crownY + 4, rx * 0.90, ry * 0.85, 0, 0, Math.PI * 2);
+                bctx.fill();
+
+                // 4. Five Botanical Depth Tiers of Pointed Camellia sinensis Leaves
+                const tiers = isDusk
+                    ? [
+                        { count: 55, fill: "#0a2112", vein: null, yMin: -0.15, yMax: 0.72, len: 12, wid: 4.5 },
+                        { count: 65, fill: "#13381f", vein: "#1f522d", yMin: -0.35, yMax: 0.55, len: 13, wid: 4.8 },
+                        { count: 70, fill: "#21592e", vein: "#367d42", yMin: -0.58, yMax: 0.32, len: 12.5, wid: 4.6 },
+                        { count: 65, fill: "#387d3b", vein: "#68b054", yMin: -0.78, yMax: 0.05, len: 11.5, wid: 4.2 },
+                        { count: 50, fill: "#78a842", vein: "#c9cf58", yMin: -0.92, yMax: -0.32, len: 10.5, wid: 3.8 }
+                    ]
+                    : [
+                        { count: 55, fill: "#092410", vein: null, yMin: -0.15, yMax: 0.72, len: 12, wid: 4.5 },
+                        { count: 65, fill: "#14421d", vein: "#23632e", yMin: -0.35, yMax: 0.55, len: 13, wid: 4.8 },
+                        { count: 70, fill: "#246b2e", vein: "#3e9146", yMin: -0.58, yMax: 0.32, len: 12.5, wid: 4.6 },
+                        { count: 65, fill: "#3b8f3b", vein: "#6bc254", yMin: -0.78, yMax: 0.05, len: 11.5, wid: 4.2 },
+                        { count: 55, fill: "#62b842", vein: "#a7e85c", yMin: -0.92, yMax: -0.32, len: 10.5, wid: 3.8 }
+                    ];
+
+                for (let tIdx = 0; tIdx < tiers.length; tIdx++) {
+                    const tier = tiers[tIdx];
+                    for (let i = 0; i < tier.count; i++) {
+                        // Distribute across the flat-topped / gently domed plucking table geometry
+                        const u = (rng() * 2 - 1); // -1 .. 1 horizontal spread
+                        const horizFactor = Math.pow(Math.abs(u), 0.75) * Math.sign(u);
+                        const lx = cx + horizFactor * rx * (0.94 - tIdx * 0.03) + (rng() - 0.5) * 6;
+
+                        // Pruned plucking-table top curve: flatter across the top, rounded at sides
+                        const tableArch = (1 - Math.pow(u, 2) * 0.65);
+                        const vFrac = lerp(tier.yMin, tier.yMax, rng());
+                        const ly = crownY + vFrac * ry * tableArch + (1 - tableArch) * ry * 0.28;
+
+                        const leafAngle = u * 0.65 + (rng() - 0.5) * 0.85;
+                        const lLen = tier.len * (0.82 + rng() * 0.36);
+                        const lWid = tier.wid * (0.82 + rng() * 0.36);
+                        drawSingleTeaLeaf(bctx, lx, ly, lLen, lWid, leafAngle, tier.fill, tier.vein);
+                    }
+                }
+
+                // 5. Upright "Duti Pata Ekti Kuri" (Two Leaves & A Bud) Flush Shoots Crowning the Plucking Table!
+                const shootCount = 24;
+                for (let s = 0; s < shootCount; s++) {
+                    const u = ((s / (shootCount - 1)) * 2 - 1) * 0.88 + (rng() - 0.5) * 0.08;
+                    const tableArch = 1 - Math.pow(u, 2) * 0.55;
+                    const sx = cx + u * rx * 0.92;
+                    const sy = crownY - ry * 0.68 * tableArch + (rng() - 0.5) * 5;
+
+                    const leafCol1 = isDusk ? "#d4b84a" : "#9be346";
+                    const leafCol2 = isDusk ? "#f0c85b" : "#bdf55c";
+                    const budCol = isDusk ? "#ffe48a" : "#e6fc9a";
+
+                    // Left & Right tender unfolded shoot leaves ("Duti Pata")
+                    drawSingleTeaLeaf(bctx, sx - 3.2, sy + 1.5, 7.5, 2.6, -0.55, leafCol1, budCol);
+                    drawSingleTeaLeaf(bctx, sx + 3.2, sy + 1.5, 7.5, 2.6, 0.55, leafCol2, budCol);
+
+                    // Central upright unopened bud ("Ekti Kuri")
+                    bctx.fillStyle = budCol;
+                    bctx.beginPath();
+                    bctx.ellipse(sx, sy - 3.2, 1.4, 4.6, (rng() - 0.5) * 0.15, 0, Math.PI * 2);
+                    bctx.fill();
+                }
+
+                return c;
+            }
+
+            const teaBushSpritesDay = [
+                createDetailedTeaBushSprite(156, 112, 1101, false),
+                createDetailedTeaBushSprite(156, 112, 2202, false),
+                createDetailedTeaBushSprite(156, 112, 3303, false),
+                createDetailedTeaBushSprite(156, 112, 4404, false)
+            ];
+            const teaBushSpritesDusk = [
+                createDetailedTeaBushSprite(156, 112, 1101, true),
+                createDetailedTeaBushSprite(156, 112, 2202, true),
+                createDetailedTeaBushSprite(156, 112, 3303, true),
+                createDetailedTeaBushSprite(156, 112, 4404, true)
+            ];
+
+            // Feathery horizontal-tiered Koroi (Albizia) & Krishnachura shade tree canopy sprites
+            function createShadeCanopySprite(w, h, seed, palette, isFeathery = true) {
+                const c = createOffscreen(w, h);
+                const lctx = c.getContext("2d");
+                const rng = mulberry32(seed);
+                const cx = w * 0.5;
+                const cy = h * 0.54;
+                const rx = w * 0.45;
+                const ry = h * 0.36;
+
+                const tiers = isFeathery
+                    ? [
+                        { ox: -rx * 0.45, oy: ry * 0.16, sx: 0.55, sy: 0.32 },
+                        { ox: rx * 0.45, oy: ry * 0.14, sx: 0.55, sy: 0.32 },
+                        { ox: -rx * 0.25, oy: -ry * 0.16, sx: 0.62, sy: 0.34 },
+                        { ox: rx * 0.24, oy: -ry * 0.18, sx: 0.60, sy: 0.34 },
+                        { ox: 0, oy: -ry * 0.38, sx: 0.66, sy: 0.32 },
+                        { ox: 0, oy: ry * 0.08, sx: 0.72, sy: 0.35 }
+                    ]
+                    : [
+                        { ox: -rx * 0.38, oy: ry * 0.12, sx: 0.52, sy: 0.48 },
+                        { ox: rx * 0.38, oy: ry * 0.14, sx: 0.50, sy: 0.48 },
+                        { ox: 0, oy: -ry * 0.26, sx: 0.62, sy: 0.52 }
+                    ];
+
+                for (let tIdx = 0; tIdx < palette.length; tIdx++) {
+                    lctx.fillStyle = palette[tIdx];
+                    const lift = tIdx / (palette.length - 1);
+                    const count = isFeathery ? 170 : 140;
+                    for (let i = 0; i < count; i++) {
+                        const lobe = tiers[(i + tIdx) % tiers.length];
+                        const ang = rng() * Math.PI * 2;
+                        const d = Math.pow(rng(), 0.62) * (1 - lift * 0.16);
+                        const lx = cx + lobe.ox - lift * 10 + Math.cos(ang) * rx * lobe.sx * d + (rng() - 0.5) * 9;
+                        const ly = cy + lobe.oy - lift * 12 + Math.sin(ang) * ry * lobe.sy * d + (rng() - 0.5) * 6;
+
+                        lctx.save();
+                        lctx.translate(lx, ly);
+                        lctx.rotate((rng() - 0.5) * 0.35);
+                        const lw = (isFeathery ? 13 : 9) + rng() * 9;
+                        const lh = (isFeathery ? 3.2 : 4.8) + rng() * 2.5;
+                        lctx.beginPath();
+                        lctx.ellipse(0, 0, lw, lh, 0, 0, Math.PI * 2);
+                        lctx.fill();
+                        lctx.restore();
+                    }
+                }
+                return c;
+            }
+
+            const koroiCanopyA = createShadeCanopySprite(310, 180, 101, ["#0b2218", "#133826", "#1d5434", "#2e7842", "#52a34c", "#8fd45e"], true);
+            const koroiCanopyB = createShadeCanopySprite(290, 170, 202, ["#0d261b", "#16402b", "#225e3a", "#368448", "#5eb054", "#9ce066"], true);
+            const krishnachuraCanopy = createShadeCanopySprite(270, 175, 303, ["#162916", "#2a4a20", "#822416", "#bf341b", "#eb4d22", "#ff7b33"], false);
+
+            const grainCanvas = createOffscreen(180, 180);
+            function renderGrainTexture() {
+                const gctx = grainCanvas.getContext("2d");
+                const img = gctx.createImageData(180, 180);
+                const d = img.data;
+                const rng = mulberry32(4049);
+                for (let i = 0; i < d.length; i += 4) {
+                    const v = (rng() * 255) | 0;
+                    d[i] = v;
+                    d[i + 1] = Math.max(0, v - 5);
+                    d[i + 2] = Math.max(0, v - 14);
+                    d[i + 3] = 11;
+                }
+                gctx.putImageData(img, 0, 0);
+            }
+
+            // ============================================================================
+            // 4B. REALISTIC MULTI-BUSH TILLA HILLOCK BUILDER (INDIVIDUAL TEA PLANTS!)
+            // ============================================================================
+            // Stamps hundreds of discrete, individually visible Camellia sinensis bushes
+            // onto stepped red-laterite contour terraces over a 3D Tilla hillock.
+            function drawRealisticTeaTilla(ctx, opts) {
+                const {
+                    cx, baseY, rx, ry, rowCount = 9, seed = 1,
+                    isDusk = false, hasFootpath = true, pathOffset = 0,
+                    minBushScale = 0.28, maxBushScale = 0.72
+                } = opts;
+
+                const rng = mulberry32(seed * 919);
+                const sprites = isDusk ? teaBushSpritesDusk : teaBushSpritesDay;
+
+                ctx.save();
+
+                // 1. Underlying Red-Laterite Earth Hillock ("Lal Matir Tilla") & Deep Crevice Base
+                const earthGrad = ctx.createLinearGradient(cx, baseY - ry, cx, baseY + 30);
+                if (isDusk) {
+                    earthGrad.addColorStop(0, "#4a2515");
+                    earthGrad.addColorStop(0.5, "#33180d");
+                    earthGrad.addColorStop(1, "#140905");
+                } else {
+                    earthGrad.addColorStop(0, "#8f4928");
+                    earthGrad.addColorStop(0.55, "#6b3319");
+                    earthGrad.addColorStop(1, "#2d1409");
+                }
+                ctx.fillStyle = earthGrad;
+                ctx.beginPath();
+                ctx.moveTo(cx - rx * 1.05, baseY + 40);
+                for (let x = -rx; x <= rx; x += 16) {
+                    const u = x / rx;
+                    const dome = Math.cos(u * Math.PI * 0.5);
+                    const n = noise2D((cx + x) * 0.005, seed * 3.7) * 14;
+                    ctx.lineTo(cx + x, baseY - dome * ry + n);
+                }
+                ctx.lineTo(cx + rx * 1.05, baseY + 40);
+                ctx.closePath();
+                ctx.fill();
+
+                // Clip to a generous padded silhouette above the Tilla so top-crest tea bushes aren't sliced flat!
+                ctx.beginPath();
+                ctx.moveTo(cx - rx * 1.08, baseY + 50);
+                for (let x = -rx * 1.05; x <= rx * 1.05; x += 18) {
+                    const u = clamp(x / rx, -1, 1);
+                    const dome = Math.cos(u * Math.PI * 0.5);
+                    const n = noise2D((cx + x) * 0.005, seed * 3.7) * 14;
+                    ctx.lineTo(cx + x, baseY - dome * ry + n - 48);
+                }
+                ctx.lineTo(cx + rx * 1.08, baseY + 50);
+                ctx.closePath();
+                ctx.clip();
+
+                // Helper for the S-curve red-earth footpath X position at a given row fraction
+                function getPathX(frac) {
+                    return cx + pathOffset + Math.sin(frac * Math.PI * 1.65 + seed) * 52;
+                }
+
+                // 2. Render Stepped Contour Terraces & Individual Tea Plants Row by Row (Top Crest -> Bottom Base)
+                for (let r = 0; r < rowCount; r++) {
+                    const frac = r / Math.max(1, rowCount - 1);
+                    // Perspective vertical distribution (denser near top crest, wider steps near base)
+                    const perspFrac = Math.pow(frac, 1.12);
+                    const rowYOffset = perspFrac * (ry * 0.96);
+                    const bScale = lerp(minBushScale, maxBushScale, perspFrac);
+                    const bushW = 138 * bScale;
+                    const bushH = 98 * bScale;
+                    const stepX = bushW * 0.68; // Slight natural overlap between adjacent bushes in the same row
+
+                    // A. Exposed Red-Laterite Soil Terrace Ledge & Dark Inter-Row Plucking Alley
+                    ctx.strokeStyle = isDusk ? "#592b18" : "#a65832";
+                    ctx.lineWidth = Math.max(2.5, 8 * bScale);
+                    ctx.beginPath();
+                    for (let x = -rx; x <= rx; x += 20) {
+                        const u = x / rx;
+                        const dome = Math.cos(u * Math.PI * 0.5);
+                        const wave = Math.sin(u * 4.2 + r * 0.45 + seed) * 5;
+                        const py = baseY - dome * ry + rowYOffset + wave + bushH * 0.28;
+                        if (x === -rx) ctx.moveTo(cx + x, py);
+                        else ctx.lineTo(cx + x, py);
+                    }
+                    ctx.stroke();
+
+                    // Dark shaded soil crevice right under the terrace ledge
+                    ctx.strokeStyle = "rgba(12, 8, 5, 0.72)";
+                    ctx.lineWidth = Math.max(1.8, 5 * bScale);
+                    ctx.stroke();
+
+                    // B. Stamp Individual Tea Plants (Camellia sinensis) Along This Contour Row!
+                    const pathCenterX = getPathX(perspFrac);
+                    const pathGapHalf = hasFootpath ? lerp(12, 26, perspFrac) : -1;
+
+                    for (let x = -rx + (r % 2) * (stepX * 0.45); x <= rx; x += stepX) {
+                        const worldX = cx + x + (rng() - 0.5) * (stepX * 0.18);
+                        const u = clamp((worldX - cx) / rx, -1, 1);
+
+                        // Leave an organic gap where the red-laterite footpath climbs the Tilla!
+                        if (hasFootpath && Math.abs(worldX - pathCenterX) < pathGapHalf) {
+                            // Draw a small red-earth log/brick step in the footpath gap
+                            ctx.fillStyle = isDusk ? "#6e3820" : "#c47247";
+                            ctx.fillRect(pathCenterX - pathGapHalf * 0.7, baseY - Math.cos(u * Math.PI * 0.5) * ry + rowYOffset, pathGapHalf * 1.4, Math.max(2, 4.5 * bScale));
+                            continue;
+                        }
+
+                        const dome = Math.cos(u * Math.PI * 0.5);
+                        const wave = Math.sin(u * 4.2 + r * 0.45 + seed) * 5;
+                        const worldY = baseY - dome * ry + rowYOffset + wave + (rng() - 0.5) * 3;
+
+                        // Subtle slope tilt so bushes on the left/right flanks follow the hillock contour
+                        const slopeTilt = u * 0.18 + (rng() - 0.5) * 0.05;
+                        const spr = sprites[(r * 7 + Math.abs(Math.floor(x))) % sprites.length];
+                        const scVar = bScale * (0.92 + rng() * 0.16);
+
+                        ctx.save();
+                        ctx.translate(worldX, worldY);
+                        ctx.rotate(slopeTilt);
+                        ctx.drawImage(
+                            spr,
+                            -spr.width * 0.5 * scVar,
+                            -spr.height * 0.78 * scVar,
+                            spr.width * scVar,
+                            spr.height * scVar
+                        );
+                        ctx.restore();
+                    }
+                }
+
+                ctx.restore();
+            }
+
+            // Helper: Draw a tall, slender silver-barked Koroi (Albizia) shade tree
+            function drawKoroiShadeTree(ctx, x, y, scale, sway = 0, variant = 0) {
+                ctx.save();
+                ctx.translate(x, y);
+                ctx.scale(scale, scale);
+
+                const shGrad = ctx.createRadialGradient(0, 6, 8, 0, 6, 95);
+                shGrad.addColorStop(0, "rgba(8, 22, 12, 0.44)");
+                shGrad.addColorStop(0.65, "rgba(8, 22, 12, 0.18)");
+                shGrad.addColorStop(1, "rgba(8, 22, 12, 0)");
+                ctx.fillStyle = shGrad;
+                ctx.beginPath();
+                ctx.ellipse(0, 6, 95, 22, 0, 0, Math.PI * 2);
+                ctx.fill();
+
+                const trunkH = 148;
+                const trunkW = 8.5;
+                const barkGrad = ctx.createLinearGradient(-trunkW, 0, trunkW, 0);
+                barkGrad.addColorStop(0, "#3b3731");
+                barkGrad.addColorStop(0.42, "#7c7569");
+                barkGrad.addColorStop(0.78, "#9e9689");
+                barkGrad.addColorStop(1, "#2e2a25");
+                ctx.fillStyle = barkGrad;
+
+                ctx.beginPath();
+                ctx.moveTo(-trunkW, 2);
+                ctx.quadraticCurveTo(-trunkW * 0.65, -trunkH * 0.5, -trunkW * 0.45 + sway * 0.35, -trunkH);
+                ctx.lineTo(trunkW * 0.45 + sway * 0.35, -trunkH);
+                ctx.quadraticCurveTo(trunkW * 0.65, -trunkH * 0.5, trunkW, 2);
+                ctx.closePath();
+                ctx.fill();
+
+                ctx.strokeStyle = "#5c5549";
+                ctx.lineCap = "round";
+                const topX = sway * 0.35;
+                const topY = -trunkH;
+                [
+                    [-78, -42], [-42, -56], [46, -54], [82, -38]
+                ].forEach(([bx, by], idx) => {
+                    ctx.lineWidth = idx === 0 || idx === 3 ? 3.4 : 4.2;
+                    ctx.beginPath();
+                    ctx.moveTo(topX, topY + 12);
+                    ctx.quadraticCurveTo(topX + bx * 0.45, topY + by * 0.35, topX + bx + sway * 0.4, topY + by);
+                    ctx.stroke();
+                });
+
+                const sprite = variant === 2 ? krishnachuraCanopy : (variant % 2 === 0 ? koroiCanopyA : koroiCanopyB);
+                ctx.drawImage(sprite, topX - sprite.width * 0.5 + sway * 0.45, topY - sprite.height * 0.66);
+                ctx.restore();
+            }
+
+            // Pre-rendered Parallax Tilla Layers (So hundreds of individual tea bushes render at 60fps!)
+            const cut1BackTillasCanvas = createOffscreen(CW + 240, CH);
+            const cut1MidTillasCanvas = createOffscreen(CW + 240, CH);
+            const cut1ForeTillasCanvas = createOffscreen(CW + 240, CH);
+
+            const cut6BackTillasCanvas = createOffscreen(CW + 240, CH);
+            const cut6MidTillasCanvas = createOffscreen(CW + 240, CH);
+            const cut6ForeTillasCanvas = createOffscreen(CW + 240, CH);
+
+            const cut2BgTillasCanvas = createOffscreen(CW + 200, 520);
+            const cut3RavineTillasCanvas = createOffscreen(CW + 200, 620);
+            const cut4RoadTillasCanvas = createOffscreen(CW + 200, 620);
+            const cut5BungalowTillasCanvas = createOffscreen(CW + 240, CH);
+
+            function preRenderAllTillaLayers() {
+                renderGrainTexture();
+
+                // --- 1. Cut 1 (Daylight) & Cut 6 (Golden Dusk) 3-Plane Parallax Tilla Layers ---
+                [
+                    { back: cut1BackTillasCanvas, mid: cut1MidTillasCanvas, fore: cut1ForeTillasCanvas, dusk: false },
+                    { back: cut6BackTillasCanvas, mid: cut6MidTillasCanvas, fore: cut6ForeTillasCanvas, dusk: true }
+                ].forEach(({ back, mid, fore, dusk }) => {
+                    const bCtx = back.getContext("2d");
+                    bCtx.save();
+                    bCtx.translate(120, 0);
+                    drawRealisticTeaTilla(bCtx, {
+                        cx: 280, baseY: 525, rx: 470, ry: 215, rowCount: 9, seed: 11,
+                        isDusk: dusk, hasFootpath: true, pathOffset: -30, minBushScale: 0.22, maxBushScale: 0.46
+                    });
+                    drawRealisticTeaTilla(bCtx, {
+                        cx: 1250, baseY: 515, rx: 520, ry: 225, rowCount: 9, seed: 22,
+                        isDusk: dusk, hasFootpath: true, pathOffset: 40, minBushScale: 0.22, maxBushScale: 0.46
+                    });
+                    drawRealisticTeaTilla(bCtx, {
+                        cx: 775, baseY: 550, rx: 520, ry: 220, rowCount: 9, seed: 33,
+                        isDusk: dusk, hasFootpath: true, pathOffset: 10, minBushScale: 0.24, maxBushScale: 0.50
+                    });
+                    bCtx.restore();
+
+                    const mCtx = mid.getContext("2d");
+                    mCtx.save();
+                    mCtx.translate(120, 0);
+                    drawRealisticTeaTilla(mCtx, {
+                        cx: 380, baseY: 745, rx: 600, ry: 265, rowCount: 9, seed: 44,
+                        isDusk: dusk, hasFootpath: true, pathOffset: 25, minBushScale: 0.34, maxBushScale: 0.72
+                    });
+                    drawRealisticTeaTilla(mCtx, {
+                        cx: 1230, baseY: 755, rx: 610, ry: 270, rowCount: 9, seed: 55,
+                        isDusk: dusk, hasFootpath: true, pathOffset: -35, minBushScale: 0.34, maxBushScale: 0.72
+                    });
+                    mCtx.restore();
+
+                    const fCtx = fore.getContext("2d");
+                    fCtx.save();
+                    fCtx.translate(120, 0);
+                    drawRealisticTeaTilla(fCtx, {
+                        cx: 140, baseY: 975, rx: 520, ry: 255, rowCount: 7, seed: 66,
+                        isDusk: dusk, hasFootpath: false, minBushScale: 0.56, maxBushScale: 0.98
+                    });
+                    drawRealisticTeaTilla(fCtx, {
+                        cx: 1470, baseY: 985, rx: 520, ry: 260, rowCount: 7, seed: 77,
+                        isDusk: dusk, hasFootpath: false, minBushScale: 0.56, maxBushScale: 0.98
+                    });
+                    fCtx.restore();
+                });
+
+                // --- 2. Cut 2 Background Tillas ---
+                {
+                    const c2 = cut2BgTillasCanvas.getContext("2d");
+                    c2.save();
+                    c2.translate(100, 0);
+                    drawRealisticTeaTilla(c2, {
+                        cx: 460, baseY: 465, rx: 680, ry: 245, rowCount: 8, seed: 88,
+                        isDusk: false, hasFootpath: true, pathOffset: 55, minBushScale: 0.25, maxBushScale: 0.54
+                    });
+                    drawRealisticTeaTilla(c2, {
+                        cx: 1260, baseY: 475, rx: 640, ry: 235, rowCount: 8, seed: 99,
+                        isDusk: false, hasFootpath: false, minBushScale: 0.25, maxBushScale: 0.54
+                    });
+                    c2.restore();
+                }
+
+                // --- 3. Cut 3 Jhiri Ravine Flanking Tillas ---
+                {
+                    const c3 = cut3RavineTillasCanvas.getContext("2d");
+                    c3.save();
+                    c3.translate(100, 0);
+                    drawRealisticTeaTilla(c3, {
+                        cx: 190, baseY: 545, rx: 560, ry: 310, rowCount: 9, seed: 31,
+                        isDusk: false, hasFootpath: true, pathOffset: 85, minBushScale: 0.30, maxBushScale: 0.72
+                    });
+                    drawRealisticTeaTilla(c3, {
+                        cx: 1410, baseY: 550, rx: 560, ry: 315, rowCount: 9, seed: 32,
+                        isDusk: false, hasFootpath: true, pathOffset: -85, minBushScale: 0.30, maxBushScale: 0.72
+                    });
+                    c3.restore();
+                }
+
+                // --- 4. Cut 4 Muddy Tractor Road Flanking Tillas ---
+                {
+                    const c4 = cut4RoadTillasCanvas.getContext("2d");
+                    c4.save();
+                    c4.translate(100, 0);
+                    drawRealisticTeaTilla(c4, {
+                        cx: 250, baseY: 565, rx: 640, ry: 320, rowCount: 9, seed: 41,
+                        isDusk: false, hasFootpath: false, minBushScale: 0.30, maxBushScale: 0.76
+                    });
+                    drawRealisticTeaTilla(c4, {
+                        cx: 1350, baseY: 555, rx: 660, ry: 325, rowCount: 9, seed: 42,
+                        isDusk: false, hasFootpath: false, minBushScale: 0.30, maxBushScale: 0.76
+                    });
+                    c4.restore();
+                }
+
+                // --- 5. Cut 5 Hilltop Bungalow Terraced Tea Slope ---
+                {
+                    const c5 = cut5BungalowTillasCanvas.getContext("2d");
+                    c5.save();
+                    c5.translate(120, 0);
+                    drawRealisticTeaTilla(c5, {
+                        cx: 800, baseY: 945, rx: 980, ry: 385, rowCount: 8, seed: 53,
+                        isDusk: false, hasFootpath: false, minBushScale: 0.42, maxBushScale: 0.88
+                    });
+                    c5.restore();
+                }
+            }
+
+            // ============================================================================
+            // 5. ANATOMICAL TEA ESTATE WORKER (CHA SRAMIK) WITH FOREHEAD-STRAPPED TUKRI
+            // ============================================================================
+            function drawTeaWorker(ctx, opts) {
+                const {
+                    x, y, scale = 1.0, dir = 1, t = 0, phase = 0,
+                    sariColor = "#c0392b", borderColor = "#f5d061", blouseColor = "#8e241b",
+                    mode = "plucking",
+                    hasTukri = true, hasUmbrellaHat = false
+                } = opts;
+
+                ctx.save();
+                ctx.translate(x, y);
+                ctx.scale(scale * dir, scale);
+
+                const isWalking = mode === "walking";
+                const isPlucking = mode === "plucking";
+                const walkCycle = t * 7.2 + phase;
+                const pluckCycle = (t * 2.4 + phase) % 1;
+                const bob = isWalking ? Math.abs(Math.cos(walkCycle)) * 2.5 : Math.sin(t * 2.8 + phase) * 0.9;
+
+                if (isWalking || mode === "standing") {
+                    ctx.fillStyle = "rgba(10, 18, 12, 0.34)";
+                    ctx.beginPath();
+                    ctx.ellipse(0, 2, 16, 4.8, 0, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    const stride = isWalking ? Math.sin(walkCycle) * 7.5 : 0;
+                    ctx.strokeStyle = "#6e4228";
+                    ctx.lineWidth = 4.2;
+                    ctx.lineCap = "round";
+                    ctx.beginPath();
+                    ctx.moveTo(-2, -24 - bob);
+                    ctx.lineTo(-2 - stride, 0);
+                    ctx.moveTo(2, -24 - bob);
+                    ctx.lineTo(2 + stride, 0);
+                    ctx.stroke();
+                }
+
+                if (hasTukri) {
+                    ctx.save();
+                    ctx.translate(-15, -42 - bob);
+                    ctx.rotate(-0.22 + (isWalking ? Math.sin(walkCycle) * 0.04 : 0));
+
+                    const leafMoundGrad = ctx.createLinearGradient(0, -24, 0, -8);
+                    leafMoundGrad.addColorStop(0, "#b8f252");
+                    leafMoundGrad.addColorStop(0.6, "#6ebd32");
+                    leafMoundGrad.addColorStop(1, "#39731e");
+                    ctx.fillStyle = leafMoundGrad;
+                    ctx.beginPath();
+                    ctx.arc(0, -14, 14.5, Math.PI, 0);
+                    ctx.fill();
+
+                    ctx.fillStyle = "#c8f764";
+                    [-9, -4, 1, 6, 10].forEach((lx, idx) => {
+                        ctx.beginPath();
+                        ctx.ellipse(lx, -19 - (idx % 2) * 2.5, 4.2, 2.0, (idx - 2) * 0.3, 0, Math.PI * 2);
+                        ctx.fill();
+                    });
+
+                    const tukriGrad = ctx.createLinearGradient(-16, -15, 16, 20);
+                    tukriGrad.addColorStop(0, "#d9ae66");
+                    tukriGrad.addColorStop(0.5, "#b5853b");
+                    tukriGrad.addColorStop(1, "#78531e");
+                    ctx.fillStyle = tukriGrad;
+                    ctx.beginPath();
+                    ctx.moveTo(-15.5, -14);
+                    ctx.lineTo(15.5, -14);
+                    ctx.quadraticCurveTo(13, 6, 7.5, 20);
+                    ctx.lineTo(-7.5, 20);
+                    ctx.quadraticCurveTo(-13, 6, -15.5, -14);
+                    ctx.closePath();
+                    ctx.fill();
+
+                    ctx.strokeStyle = "#5c3d12";
+                    ctx.lineWidth = 2.2;
+                    ctx.beginPath();
+                    ctx.moveTo(-16, -14);
+                    ctx.lineTo(16, -14);
+                    ctx.stroke();
+
+                    ctx.strokeStyle = "rgba(82, 52, 16, 0.48)";
+                    ctx.lineWidth = 1.1;
+                    for (let wy = -8; wy <= 15; wy += 5.5) {
+                        const wHalf = lerp(14.5, 7.5, (wy + 14) / 34);
+                        ctx.beginPath();
+                        ctx.moveTo(-wHalf, wy);
+                        ctx.lineTo(wHalf, wy);
+                        ctx.stroke();
+                    }
+                    for (let wx = -10; wx <= 10; wx += 5) {
+                        ctx.beginPath();
+                        ctx.moveTo(wx, -14);
+                        ctx.lineTo(wx * 0.5, 19);
+                        ctx.stroke();
+                    }
+                    ctx.restore();
+                }
+
+                const hipY = -22 - bob;
+                const shY = -48 - bob;
+
+                ctx.fillStyle = sariColor;
+                ctx.beginPath();
+                ctx.moveTo(-9, hipY);
+                ctx.lineTo(9, hipY);
+                ctx.lineTo(11, -3 - bob * 0.3);
+                ctx.lineTo(-10, -3 - bob * 0.3);
+                ctx.closePath();
+                ctx.fill();
+
+                ctx.fillStyle = borderColor;
+                ctx.fillRect(-10, -6.5 - bob * 0.3, 21, 3.5);
+
+                ctx.fillStyle = blouseColor;
+                ctx.beginPath();
+                ctx.roundRect(-8.5, shY, 17, hipY - shY + 3, 4);
+                ctx.fill();
+
+                ctx.fillStyle = sariColor;
+                ctx.beginPath();
+                ctx.moveTo(-8.5, shY + 1);
+                ctx.lineTo(4, shY + 1);
+                ctx.lineTo(8.5, hipY);
+                ctx.lineTo(-6, hipY);
+                ctx.closePath();
+                ctx.fill();
+
+                ctx.strokeStyle = borderColor;
+                ctx.lineWidth = 2.2;
+                ctx.beginPath();
+                ctx.moveTo(-7.5, shY + 1);
+                ctx.lineTo(7.5, hipY);
+                ctx.stroke();
+
+                const headY = shY - 12;
+                ctx.fillStyle = "#6e4228";
+                ctx.fillRect(-2.5, shY - 5, 5, 6);
+
+                ctx.fillStyle = "#161210";
+                ctx.beginPath();
+                ctx.arc(-8.5, headY + 1, 5.5, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.fillStyle = "#f59e0b";
+                ctx.beginPath();
+                ctx.arc(-6.5, headY - 2, 2.0, 0, Math.PI * 2);
+                ctx.arc(-6.0, headY + 2, 2.0, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.fillStyle = "#7c4b2e";
+                ctx.beginPath();
+                ctx.arc(0, headY, 7.2, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.fillStyle = "#161210";
+                ctx.beginPath();
+                ctx.arc(-1, headY - 1.5, 7.4, Math.PI * 0.75, Math.PI * 2.05);
+                ctx.fill();
+
+                ctx.fillStyle = "#d9261c";
+                ctx.beginPath();
+                ctx.arc(6.5, headY - 2.4, 1.1, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.fillStyle = "#120e0c";
+                ctx.beginPath();
+                ctx.arc(4.5, headY - 0.8, 1.1, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.fillStyle = "#fde047";
+                ctx.beginPath();
+                ctx.arc(6.8, headY + 1.5, 0.85, 0, Math.PI * 2);
+                ctx.fill();
+
+                if (hasTukri) {
+                    ctx.strokeStyle = "#d4a85c";
+                    ctx.lineWidth = 2.6;
+                    ctx.beginPath();
+                    ctx.moveTo(5.2, headY - 5.2);
+                    ctx.quadraticCurveTo(-5, headY + 2, -16, shY + 6);
+                    ctx.stroke();
+                }
+
+                if (hasUmbrellaHat) {
+                    ctx.fillStyle = "#d4ad60";
+                    ctx.beginPath();
+                    ctx.moveTo(-18, headY - 5);
+                    ctx.quadraticCurveTo(0, headY - 19, 18, headY - 5);
+                    ctx.closePath();
+                    ctx.fill();
+                    ctx.strokeStyle = "#78531e";
+                    ctx.lineWidth = 1.4;
+                    ctx.stroke();
+                }
+
+                let elX, elY, handX, handY;
+                if (isPlucking) {
+                    if (pluckCycle < 0.68) {
+                        const p = pluckCycle / 0.68;
+                        const reachWave = Math.sin(p * Math.PI * 2);
+                        elX = 7 + reachWave * 3;
+                        elY = shY + 11;
+                        handX = 19 + reachWave * 6;
+                        handY = shY + 12 + Math.cos(p * Math.PI * 2) * 3;
+                    } else {
+                        const u = (pluckCycle - 0.68) / 0.32;
+                        const tossArc = Math.sin(u * Math.PI);
+                        elX = lerp(8, -2, tossArc);
+                        elY = lerp(shY + 10, shY - 8, tossArc);
+                        handX = lerp(20, -11, tossArc);
+                        handY = lerp(shY + 11, shY - 16, tossArc);
+
+                        if (u > 0.32 && u < 0.92) {
+                            const lu = (u - 0.32) / 0.6;
+                            const lx = lerp(-6, -16, lu);
+                            const ly = lerp(shY - 16, shY + 2, lu) - Math.sin(lu * Math.PI) * 10;
+                            ctx.fillStyle = "#b8f252";
+                            ctx.beginPath();
+                            ctx.ellipse(lx, ly, 4.2, 2.0, lu * 2.5, 0, Math.PI * 2);
+                            ctx.ellipse(lx + 3, ly - 2, 3.5, 1.6, -lu * 2, 0, Math.PI * 2);
+                            ctx.fill();
+                        }
+                    }
+                } else {
+                    const swing = isWalking ? Math.sin(walkCycle) * 5 : 0;
+                    elX = 4 + swing * 0.5;
+                    elY = shY + 10;
+                    handX = 6 + swing;
+                    handY = headY - 2;
+                }
+
+                ctx.strokeStyle = blouseColor;
+                ctx.lineWidth = 5.2;
+                ctx.lineCap = "round";
+                ctx.beginPath();
+                ctx.moveTo(1, shY + 3);
+                ctx.lineTo(lerp(1, elX, 0.72), lerp(shY + 3, elY, 0.72));
+                ctx.stroke();
+
+                ctx.strokeStyle = "#7c4b2e";
+                ctx.lineWidth = 3.6;
+                ctx.beginPath();
+                ctx.moveTo(lerp(1, elX, 0.68), lerp(shY + 3, elY, 0.68));
+                ctx.lineTo(elX, elY);
+                ctx.lineTo(handX, handY);
+                ctx.stroke();
+
+                const wrX = lerp(elX, handX, 0.78);
+                const wrY = lerp(elY, handY, 0.78);
+                ctx.strokeStyle = "#ef4444";
+                ctx.lineWidth = 2.0;
+                ctx.beginPath();
+                ctx.moveTo(wrX - 1, wrY - 2);
+                ctx.lineTo(wrX + 1, wrY + 2);
+                ctx.stroke();
+                ctx.strokeStyle = "#fde047";
+                ctx.lineWidth = 1.4;
+                ctx.beginPath();
+                ctx.moveTo(wrX + 0.5, wrY - 2);
+                ctx.lineTo(wrX + 2.2, wrY + 2);
+                ctx.stroke();
+
+                ctx.fillStyle = "#7c4b2e";
+                ctx.beginPath();
+                ctx.arc(handX, handY, 2.4, 0, Math.PI * 2);
+                ctx.fill();
+                if (isPlucking && pluckCycle < 0.75) {
+                    ctx.fillStyle = "#c8f764";
+                    ctx.beginPath();
+                    ctx.ellipse(handX + 3.5, handY - 2, 4.0, 1.8, -0.4, 0, Math.PI * 2);
+                    ctx.ellipse(handX + 1.5, handY - 4, 3.2, 1.5, 0.5, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+
+                ctx.restore();
+            }
+
+            // ============================================================================
+            // 6. CUT 1 (0:00–0:05) & CUT 6 (0:25–0:30): MULTI-PLANE TILLA PANORAMA
+            //    (FPV Drone Push-In over Individual-Bush Tea Tillas / Golden Dusk Pull-Back)
+            // ============================================================================
+            const TILLA_FIREFLIES = Array.from({ length: 75 }, (_, i) => ({
+                x: 80 + ((i * 193) % 1440),
+                y: 340 + ((i * 107) % 520),
+                phase: i * 0.65,
+                r: 2.0 + (i % 3) * 0.9
+            }));
+
+            function renderCut1And6TillaPanorama(ctx, t, isCut6 = false) {
+                const localU = isCut6 ? clamp((t - 25.0) / 5.0, 0, 1) : clamp(t / 5.0, 0, 1);
+                const duskAmt = isCut6 ? smoothstep(0.0, 0.72, localU) : 0;
+                const nightAmt = isCut6 ? smoothstep(0.35, 0.92, localU) : 0;
+
+                // Brisk, gratifying 5-second camera movement with true multi-plane parallax
+                const zoom = isCut6 ? lerp(1.24, 1.01, easeInOutCubic(localU)) : lerp(1.01, 1.25, easeInOutCubic(localU));
+                const panX = isCut6 ? lerp(42, -32, easeInOutCubic(localU)) : lerp(-38, 42, easeInOutCubic(localU));
+                const panY = isCut6 ? lerp(24, -12, easeInOutCubic(localU)) : lerp(-18, 26, easeInOutCubic(localU));
+                const bankAngle = isCut6
+                    ? Math.sin(localU * Math.PI) * -0.010
+                    : Math.sin(localU * Math.PI) * 0.016;
+
+                ctx.save();
+                ctx.translate(CW * 0.5, CH * 0.5);
+                ctx.rotate(bankAngle);
+                ctx.scale(zoom, zoom);
+                ctx.translate(-CW * 0.5 - panX * 0.5, -CH * 0.5 - panY * 0.5);
+
+                // 1. Sky Gradient
+                const skyGrad = ctx.createLinearGradient(0, -60, 0, 410);
+                if (isCut6) {
+                    skyGrad.addColorStop(0, lerpColor([38, 54, 108], [12, 18, 42], nightAmt));
+                    skyGrad.addColorStop(0.48, lerpColor([218, 96, 72], [68, 42, 78], nightAmt));
+                    skyGrad.addColorStop(1, lerpColor([255, 196, 92], [188, 92, 58], nightAmt));
+                } else {
+                    skyGrad.addColorStop(0, "#1d5c78");
+                    skyGrad.addColorStop(0.45, "#5eb0ba");
+                    skyGrad.addColorStop(0.82, "#cbead2");
+                    skyGrad.addColorStop(1, "#fff2c2");
+                }
+                ctx.fillStyle = skyGrad;
+                ctx.fillRect(-140, -80, CW + 280, 500);
+
+                // Glowing Sun Orb
+                const sunX = isCut6 ? lerp(1160, 1240, localU) : lerp(410, 520, localU);
+                const sunY = isCut6 ? lerp(165, 290, localU) : lerp(195, 130, localU);
+                const sunHalo = ctx.createRadialGradient(sunX, sunY, 10, sunX, sunY, 320);
+                if (isCut6) {
+                    sunHalo.addColorStop(0, `rgba(255, 235, 170, ${0.95 - nightAmt * 0.45})`);
+                    sunHalo.addColorStop(0.28, `rgba(255, 148, 68, ${0.65 - nightAmt * 0.35})`);
+                    sunHalo.addColorStop(1, "rgba(180, 60, 50, 0)");
+                } else {
+                    sunHalo.addColorStop(0, "rgba(255, 252, 225, 0.95)");
+                    sunHalo.addColorStop(0.25, "rgba(235, 248, 195, 0.58)");
+                    sunHalo.addColorStop(1, "rgba(180, 230, 175, 0)");
+                }
+                ctx.fillStyle = sunHalo;
+                ctx.beginPath();
+                ctx.arc(sunX, sunY, 320, 0, Math.PI * 2);
+                ctx.fill();
+
+                // 2. Distant Meghalaya / Sylhet Blue-Green Mountain Ridge (Parallax 0.15x)
+                ctx.save();
+                ctx.translate(-panX * 0.15, 0);
+                ctx.fillStyle = isCut6 ? lerpColor([58, 72, 102], [22, 28, 52], nightAmt) : "#4d7c7d";
+                ctx.beginPath();
+                ctx.moveTo(-120, 390);
+                for (let x = -120; x <= CW + 120; x += 25) {
+                    const h = Math.sin(x * 0.0045) * 45 + Math.cos(x * 0.011) * 22 + noise2D(x * 0.008, 1.2) * 25;
+                    ctx.lineTo(x, 295 - h);
+                }
+                ctx.lineTo(CW + 120, 410);
+                ctx.closePath();
+                ctx.fill();
+                ctx.restore();
+
+                // 3. Back-Row Tea Tillas Plane (Parallax 0.35x — Hundreds of Individual Tea Bushes!)
+                ctx.save();
+                ctx.translate(-panX * 0.35, -panY * 0.25);
+                ctx.drawImage(isCut6 ? cut6BackTillasCanvas : cut1BackTillasCanvas, -120, 0);
+
+                // Distant Hilltop Planter's Bango House on the Right Tilla Crown (cx: 1235, y: 285)
+                ctx.save();
+                ctx.translate(1235, 285);
+                ctx.scale(0.58, 0.58);
+                ctx.fillStyle = isCut6 ? "#d8cbb8" : "#f7f4eb";
+                ctx.fillRect(-52, -22, 104, 30);
+                ctx.fillStyle = isCut6 ? "#78231c" : "#b83227";
+                ctx.beginPath();
+                ctx.moveTo(-64, -20);
+                ctx.lineTo(0, -48);
+                ctx.lineTo(64, -20);
+                ctx.closePath();
+                ctx.fill();
+                ctx.fillStyle = isCut6 ? "#ffbe42" : "#2c3e50";
+                [-32, -10, 12, 34].forEach(wx => {
+                    ctx.fillRect(wx - 5, -14, 10, 12);
+                });
+                if (isCut6 && duskAmt > 0.15) {
+                    const bGlow = ctx.createRadialGradient(0, -8, 4, 0, -8, 95);
+                    bGlow.addColorStop(0, `rgba(255, 195, 75, ${duskAmt * 0.90})`);
+                    bGlow.addColorStop(1, "rgba(255, 150, 40, 0)");
+                    ctx.fillStyle = bGlow;
+                    ctx.beginPath();
+                    ctx.arc(0, -8, 95, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+                ctx.restore();
+
+                // Back Tilla Koroi Shade Trees
+                [
+                    { x: 240, y: 385, sc: 0.56, v: 0 },
+                    { x: 480, y: 410, sc: 0.62, v: 1 },
+                    { x: 740, y: 375, sc: 0.58, v: 2 },
+                    { x: 980, y: 420, sc: 0.64, v: 0 }
+                ].forEach((tr, idx) => {
+                    drawKoroiShadeTree(ctx, tr.x, tr.y, tr.sc, Math.sin(t * 2.2 + idx) * 6, tr.v);
+                });
+                ctx.restore();
+
+                // Drifting Valley Mist Layer between Back & Mid Tillas
+                for (let m = 0; m < 6; m++) {
+                    const mx = ((m * 340 + t * (32 + m * 5)) % (CW + 500)) - 250;
+                    const my = 445 + (m % 2) * 32;
+                    const mGrad = ctx.createRadialGradient(mx, my, 20, mx, my, 290);
+                    const mCol = isCut6 ? `rgba(215, 165, 145, ${0.24 * (1 - nightAmt * 0.4)})` : "rgba(238, 250, 235, 0.36)";
+                    mGrad.addColorStop(0, mCol);
+                    mGrad.addColorStop(1, "rgba(238, 250, 235, 0)");
+                    ctx.fillStyle = mGrad;
+                    ctx.beginPath();
+                    ctx.ellipse(mx, my, 290, 48, 0, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+
+                // 4. Midground Tea Tillas Plane (Parallax 0.72x — Large Individual Tea Bushes + Pluckers!)
+                ctx.save();
+                ctx.translate(-panX * 0.72, -panY * 0.65);
+                ctx.drawImage(isCut6 ? cut6MidTillasCanvas : cut1MidTillasCanvas, -120, 0);
+
+                [
+                    { x: 210, y: 545, sc: 0.80, v: 1 },
+                    { x: 560, y: 530, sc: 0.86, v: 0 },
+                    { x: 1060, y: 550, sc: 0.84, v: 2 },
+                    { x: 1390, y: 535, sc: 0.78, v: 1 }
+                ].forEach((tr, idx) => {
+                    drawKoroiShadeTree(ctx, tr.x, tr.y, tr.sc, Math.cos(t * 2.0 + idx) * 7, tr.v);
+                });
+
+                if (!isCut6) {
+                    [
+                        { x: 345, y: 565, col: "#e74c3c" },
+                        { x: 390, y: 575, col: "#f39c12" },
+                        { x: 435, y: 562, col: "#8e44ad" },
+                        { x: 1135, y: 585, col: "#c0392b" },
+                        { x: 1185, y: 595, col: "#0d9488" }
+                    ].forEach((pw, i) => {
+                        drawTeaWorker(ctx, {
+                            x: pw.x + Math.sin(t * 1.2 + i) * 4,
+                            y: pw.y,
+                            scale: 0.46,
+                            dir: i % 2 === 0 ? 1 : -1,
+                            t,
+                            phase: i * 1.3,
+                            sariColor: pw.col,
+                            mode: "plucking",
+                            hasTukri: true
+                        });
+                    });
+                }
+
+                // Shimmering Jhiri Stream Winding Through the Valley Ravine (Center-Bottom)
+                ctx.save();
+                ctx.beginPath();
+                ctx.moveTo(680, 545);
+                ctx.bezierCurveTo(610, 635, 860, 735, 740, 930);
+                ctx.lineTo(895, 930);
+                ctx.bezierCurveTo(965, 735, 705, 635, 745, 545);
+                ctx.closePath();
+                const jGrad = ctx.createLinearGradient(680, 545, 840, 930);
+                if (isCut6) {
+                    jGrad.addColorStop(0, lerpColor([225, 135, 82], [45, 62, 95], nightAmt));
+                    jGrad.addColorStop(1, lerpColor([65, 95, 88], [18, 28, 48], nightAmt));
+                } else {
+                    jGrad.addColorStop(0, "#8ce0d4");
+                    jGrad.addColorStop(0.5, "#3b9c8e");
+                    jGrad.addColorStop(1, "#1b5e54");
+                }
+                ctx.fillStyle = jGrad;
+                ctx.fill();
+
+                ctx.strokeStyle = "rgba(255, 255, 240, 0.48)";
+                ctx.lineWidth = 1.6;
+                for (let wy = 565; wy < 900; wy += 24) {
+                    const wx = 755 + Math.sin(wy * 0.025) * 45 + Math.sin(t * 4.5 + wy) * 6;
+                    ctx.beginPath();
+                    ctx.moveTo(wx - 12, wy);
+                    ctx.lineTo(wx + 12, wy);
+                    ctx.stroke();
+                }
+                ctx.restore();
+                ctx.restore();
+
+                // 5. Foreground Framing Tilla Slopes Plane (Parallax 1.25x — Close-Up Individual Tea Plants!)
+                ctx.save();
+                ctx.translate(-panX * 1.25, -panY * 1.15);
+                ctx.drawImage(isCut6 ? cut6ForeTillasCanvas : cut1ForeTillasCanvas, -120, 0);
+                drawKoroiShadeTree(ctx, 135, 790, 1.18, Math.sin(t * 2.1) * 10, 0);
+                drawKoroiShadeTree(ctx, 1465, 805, 1.15, Math.cos(t * 2.0) * 10, 1);
+                ctx.restore();
+
+                // 6. Flock of White Egrets Banking Across the Valley
+                const flockX = lerp(240, 1280, localU);
+                const flockY = 235 + Math.sin(t * 1.8) * 28;
+                for (let b = 0; b < 7; b++) {
+                    const bx = flockX - b * 24 + (b % 2) * 12;
+                    const by = flockY + Math.abs(b - 3) * 11 + Math.sin(t * 7 + b) * 3;
+                    const wing = Math.sin(t * 14 + b * 0.8) * 7.5;
+                    ctx.strokeStyle = isCut6 ? "#ffe8c2" : "#ffffff";
+                    ctx.lineWidth = 2.0;
+                    ctx.beginPath();
+                    ctx.moveTo(bx - 8, by + wing);
+                    ctx.quadraticCurveTo(bx - 3, by - 3, bx, by);
+                    ctx.quadraticCurveTo(bx + 3, by - 3, bx + 8, by + wing);
+                    ctx.stroke();
+                }
+
+                // 7. Volumetric Tyndall God-Rays & Bioluminescent Fireflies (Cut 6)
+                ctx.save();
+                ctx.globalCompositeOperation = "screen";
+                for (let r = 0; r < 5; r++) {
+                    const rayX = sunX + (r - 2) * 145;
+                    const rayGrad = ctx.createLinearGradient(sunX, sunY, rayX, CH);
+                    const alpha = isCut6 ? 0.15 * (1 - nightAmt * 0.7) : 0.13;
+                    rayGrad.addColorStop(0, `rgba(255, 242, 185, ${alpha})`);
+                    rayGrad.addColorStop(1, "rgba(255, 242, 185, 0)");
+                    ctx.fillStyle = rayGrad;
+                    ctx.beginPath();
+                    ctx.moveTo(sunX - 20, sunY);
+                    ctx.lineTo(sunX + 20, sunY);
+                    ctx.lineTo(rayX + 110, CH);
+                    ctx.lineTo(rayX - 110, CH);
+                    ctx.closePath();
+                    ctx.fill();
+                }
+
+                if (isCut6 && duskAmt > 0.15) {
+                    const ffAlpha = smoothstep(0.15, 0.65, duskAmt);
+                    for (const ff of TILLA_FIREFLIES) {
+                        const fx = ff.x + Math.sin(t * 2.2 + ff.phase) * 28;
+                        const fy = ff.y + Math.cos(t * 2.6 + ff.phase) * 18;
+                        const pulse = Math.pow(0.5 + 0.5 * Math.sin(t * 6.5 + ff.phase), 2) * ffAlpha;
+                        if (pulse < 0.05) continue;
+                        const fg = ctx.createRadialGradient(fx, fy, 0.5, fx, fy, 16);
+                        fg.addColorStop(0, `rgba(235, 255, 130, ${pulse * 0.95})`);
+                        fg.addColorStop(0.4, `rgba(165, 235, 65, ${pulse * 0.45})`);
+                        fg.addColorStop(1, "rgba(120, 200, 40, 0)");
+                        ctx.fillStyle = fg;
+                        ctx.beginPath();
+                        ctx.arc(fx, fy, 16, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
+                }
+                ctx.restore();
+
+                ctx.restore();
+            }
+
+            // ============================================================================
+            // 7. CUT 2 (0:05–0:10): SHALLOW-DOF TRACKING SHOT — TEA PLUCKERS & TUKRI
+            //    (Individual Tea Bushes with Visible Woody Stems, Leaves & Dewy Macro Bokeh)
+            // ============================================================================
+            function renderCut2TeaPluckers(ctx, t) {
+                const localU = clamp((t - 5.0) / 5.0, 0, 1);
+                const dollyX = lerp(-68, 68, easeInOutCubic(localU));
+
+                ctx.save();
+
+                // 1. Soft Bokeh Misty Tea Valley Sky & Distant Multi-Bush Tilla Backdrop
+                const skyGrad = ctx.createLinearGradient(0, 0, 0, 360);
+                skyGrad.addColorStop(0, "#3a8c96");
+                skyGrad.addColorStop(0.55, "#8fd1c8");
+                skyGrad.addColorStop(1, "#e6f5d8");
+                ctx.fillStyle = skyGrad;
+                ctx.fillRect(0, 0, CW, 360);
+
+                // Background Tilla Slope (Parallax 0.28x — Individual Tea Bushes)
+                ctx.save();
+                ctx.translate(-dollyX * 0.28, 0);
+                ctx.drawImage(cut2BgTillasCanvas, -100, 0);
+                drawKoroiShadeTree(ctx, 360, 310, 0.72, Math.sin(t * 2.0) * 6, 0);
+                drawKoroiShadeTree(ctx, 980, 295, 0.78, Math.cos(t * 2.1) * 6, 1);
+                drawKoroiShadeTree(ctx, 1380, 325, 0.68, Math.sin(t * 1.9) * 6, 2);
+                ctx.restore();
+
+                const mistGrad = ctx.createLinearGradient(0, 250, 0, 440);
+                mistGrad.addColorStop(0, "rgba(240, 252, 225, 0)");
+                mistGrad.addColorStop(0.5, "rgba(240, 252, 225, 0.36)");
+                mistGrad.addColorStop(1, "rgba(240, 252, 225, 0)");
+                ctx.fillStyle = mistGrad;
+                ctx.fillRect(0, 250, CW, 190);
+
+                // 2. Midground Terraced Rows of Discrete Individual Tea Bushes (Parallax 0.78x)
+                ctx.save();
+                ctx.translate(-dollyX * 0.78, 0);
+
+                // Red-laterite soil base of the terraced slope
+                const slopeSoil = ctx.createLinearGradient(0, 415, 0, CH);
+                slopeSoil.addColorStop(0, "#8f4928");
+                slopeSoil.addColorStop(0.5, "#6b3319");
+                slopeSoil.addColorStop(1, "#2d1409");
+                ctx.fillStyle = slopeSoil;
+                ctx.fillRect(-140, 415, CW + 280, CH - 415);
+
+                // Helper: Stamp a row of large, discrete, individually detailed Camellia sinensis bushes
+                // with visible red-earth terrace ledges & gnarled woody stems at the base of every plant!
+                function drawCloseUpTeaBushRow(yRow, bushScale, rowSeed) {
+                    const bushW = 148 * bushScale;
+                    const stepX = bushW * 0.74;
+                    const swayX = Math.sin(t * 2.8 + rowSeed) * (3.5 * bushScale);
+
+                    // Red-laterite soil terrace ledge under this row of bushes
+                    ctx.fillStyle = "#a65832";
+                    ctx.fillRect(-140, yRow - 8 * bushScale, CW + 280, 14 * bushScale);
+                    ctx.fillStyle = "rgba(14, 9, 5, 0.68)";
+                    ctx.fillRect(-140, yRow + 3 * bushScale, CW + 280, 10 * bushScale);
+
+                    let idx = 0;
+                    for (let bx = -120; bx <= CW + 120; bx += stepX) {
+                        const spr = teaBushSpritesDay[(idx + rowSeed) % teaBushSpritesDay.length];
+                        const wobY = Math.sin(idx * 1.9 + rowSeed) * (5 * bushScale);
+                        const sc = bushScale * (0.95 + (idx % 3) * 0.04);
+                        ctx.drawImage(
+                            spr,
+                            bx + swayX - spr.width * 0.5 * sc,
+                            yRow + wobY - spr.height * 0.84 * sc,
+                            spr.width * sc,
+                            spr.height * sc
+                        );
+                        idx++;
+                    }
+                }
+
+                // Back two rows of individual tea bushes behind the pluckers
+                drawCloseUpTeaBushRow(468, 0.78, 1);
+                drawCloseUpTeaBushRow(548, 0.92, 2);
+
+                // 3. Hero Plane: 4 Tea Pluckers (Cha Sramik) with Forehead-Strapped Bamboo Tukri Baskets
+                const workers = [
+                    {
+                        x: 335, y: 642, scale: 2.38, dir: 1, phase: 0.2,
+                        sari: "#d93829", border: "#fde047", blouse: "#7f1d1d", hat: false
+                    },
+                    {
+                        x: 690, y: 660, scale: 2.68, dir: 1, phase: 1.7,
+                        sari: "#e67e22", border: "#fffbeb", blouse: "#7c2d12", hat: true
+                    },
+                    {
+                        x: 1045, y: 648, scale: 2.50, dir: -1, phase: 3.1,
+                        sari: "#8e44ad", border: "#facc15", blouse: "#4c1d95", hat: false
+                    },
+                    {
+                        x: 1335, y: 624, scale: 2.18, dir: -1, phase: 4.5,
+                        sari: "#0d9488", border: "#fde047", blouse: "#115e59", hat: true
+                    }
+                ];
+
+                workers.forEach(w => {
+                    drawTeaWorker(ctx, {
+                        x: w.x, y: w.y, scale: w.scale, dir: w.dir, t, phase: w.phase,
+                        sariColor: w.sari, borderColor: w.border, blouseColor: w.blouse,
+                        mode: "plucking", hasTukri: true, hasUmbrellaHat: w.hat
+                    });
+                });
+
+                // Front two rows of large, close-up individual tea bushes in front of the workers!
+                drawCloseUpTeaBushRow(690, 1.18, 3);
+                drawCloseUpTeaBushRow(825, 1.42, 4);
+                ctx.restore();
+
+                // 4. Foreground Macro Plane (Parallax 1.48x): Detailed "Duti Pata Ekti Kuri" Shoots & Morning Dew Bokeh
+                ctx.save();
+                ctx.translate(-dollyX * 1.48, 0);
+
+                const macroShoots = [
+                    { x: 160, y: 885, sc: 1.35, phase: 0.3 },
+                    { x: 460, y: 905, sc: 1.55, phase: 1.4 },
+                    { x: 840, y: 890, sc: 1.48, phase: 2.5 },
+                    { x: 1190, y: 900, sc: 1.52, phase: 3.8 },
+                    { x: 1490, y: 880, sc: 1.38, phase: 4.9 }
+                ];
+
+                macroShoots.forEach(ms => {
+                    const sway = Math.sin(t * 3.4 + ms.phase) * 9;
+                    ctx.save();
+                    ctx.translate(ms.x + sway, ms.y);
+                    ctx.scale(ms.sc, ms.sc);
+
+                    ctx.strokeStyle = "#4d8c2a";
+                    ctx.lineWidth = 4.5;
+                    ctx.beginPath();
+                    ctx.moveTo(0, 25);
+                    ctx.quadraticCurveTo(2, -15, 0, -52);
+                    ctx.stroke();
+
+                    [
+                        { ox: -4, oy: -22, ang: -0.68, w: 34, h: 14 },
+                        { ox: 4, oy: -28, ang: 0.65, w: 32, h: 13 }
+                    ].forEach(lf => {
+                        ctx.save();
+                        ctx.translate(lf.ox, lf.oy);
+                        ctx.rotate(lf.ang);
+                        const lGrad = ctx.createLinearGradient(0, -lf.h, 0, lf.h);
+                        lGrad.addColorStop(0, "#c8f764");
+                        lGrad.addColorStop(0.5, "#82cf3a");
+                        lGrad.addColorStop(1, "#3b7a22");
+                        ctx.fillStyle = lGrad;
+                        ctx.beginPath();
+                        ctx.moveTo(0, 0);
+                        ctx.quadraticCurveTo(lf.w * 0.55 * (lf.ang > 0 ? 1 : -1), -lf.h * 1.35, lf.w * 1.15 * (lf.ang > 0 ? 1 : -1), 0);
+                        ctx.quadraticCurveTo(lf.w * 0.55 * (lf.ang > 0 ? 1 : -1), lf.h * 1.35, 0, 0);
+                        ctx.fill();
+
+                        ctx.strokeStyle = "#e6fa9e";
+                        ctx.lineWidth = 1.4;
+                        ctx.beginPath();
+                        ctx.moveTo(0, 0);
+                        ctx.lineTo(lf.w * 1.05 * (lf.ang > 0 ? 1 : -1), 0);
+                        ctx.stroke();
+                        ctx.restore();
+                    });
+
+                    const budGrad = ctx.createLinearGradient(-4, -85, 4, -45);
+                    budGrad.addColorStop(0, "#ecfccb");
+                    budGrad.addColorStop(1, "#84cc16");
+                    ctx.fillStyle = budGrad;
+                    ctx.beginPath();
+                    ctx.moveTo(0, -88);
+                    ctx.quadraticCurveTo(8, -66, 2, -46);
+                    ctx.quadraticCurveTo(-8, -66, 0, -88);
+                    ctx.fill();
+
+                    const dewTwinkle = 0.5 + 0.5 * Math.sin(t * 5.5 + ms.phase);
+                    ctx.fillStyle = `rgba(240, 253, 255, ${0.75 + dewTwinkle * 0.25})`;
+                    ctx.beginPath();
+                    ctx.arc(28, -32, 3.8, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.fillStyle = "#ffffff";
+                    ctx.beginPath();
+                    ctx.arc(27, -33, 1.4, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    ctx.restore();
+                });
+
+                ctx.save();
+                ctx.globalCompositeOperation = "screen";
+                for (let b = 0; b < 18; b++) {
+                    const bx = (b * 113 + Math.sin(t * 1.4 + b) * 20) % (CW + 120);
+                    const by = 680 + (b % 4) * 58;
+                    const br = 18 + (b % 3) * 14;
+                    const bGrad = ctx.createRadialGradient(bx, by, br * 0.2, bx, by, br);
+                    bGrad.addColorStop(0, "rgba(220, 255, 165, 0.14)");
+                    bGrad.addColorStop(0.8, "rgba(220, 255, 165, 0.22)");
+                    bGrad.addColorStop(1, "rgba(220, 255, 165, 0)");
+                    ctx.fillStyle = bGrad;
+                    ctx.beginPath();
+                    ctx.arc(bx, by, br, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+                ctx.restore();
+
+                ctx.restore();
+                ctx.restore();
+            }
+
+            // ============================================================================
+            // 8. CUT 3 (0:10–0:15): MOUNTAIN JHIRI STREAM, MOSSY BOULDERS & BAMBOO SHAKO
+            //    (Crane Jib Down to Crystal-Clear Jhiri Stream Between Two Tea Tillas)
+            // ============================================================================
+            const JHIRI_PEBBLES = Array.from({ length: 130 }, (_, i) => {
+                const rng = mulberry32(9001 + i);
+                return {
+                    x: 240 + rng() * 1120,
+                    y: 520 + Math.pow(rng(), 0.85) * 370,
+                    rx: 6 + rng() * 14,
+                    ry: 3.5 + rng() * 7.5,
+                    ang: (rng() - 0.5) * 0.6,
+                    col: ["#b88b58", "#8c6d4e", "#64748b", "#a3704c", "#576554"][i % 5]
+                };
+            });
+
+            function renderCut3JhiriStream(ctx, t) {
+                const localU = clamp((t - 10.0) / 5.0, 0, 1);
+                const craneY = lerp(-44, 24, easeInOutCubic(localU));
+                const zoom = lerp(1.02, 1.14, easeInOutCubic(localU));
+
+                ctx.save();
+                ctx.translate(CW * 0.5, CH * 0.5);
+                ctx.scale(zoom, zoom);
+                ctx.translate(-CW * 0.5, -CH * 0.5 - craneY);
+
+                // 1. Misty Ravine Sky & Sunlit Canopy Opening
+                const skyGrad = ctx.createLinearGradient(0, -60, 0, 380);
+                skyGrad.addColorStop(0, "#24696e");
+                skyGrad.addColorStop(0.55, "#74c2b8");
+                skyGrad.addColorStop(1, "#e2f5dc");
+                ctx.fillStyle = skyGrad;
+                ctx.fillRect(-100, -80, CW + 200, 460);
+
+                // 2. Left & Right Steep Tea Tillas Flanking the Jhiri Ravine (Individual Tea Bushes!)
+                ctx.drawImage(cut3RavineTillasCanvas, -100, 0);
+
+                drawKoroiShadeTree(ctx, 260, 290, 0.85, Math.sin(t * 2.1) * 7, 0);
+                drawKoroiShadeTree(ctx, 1340, 285, 0.88, Math.cos(t * 2.0) * 7, 1);
+
+                // 3. Red-Laterite & Mossy Ravine Banks Converging Toward the Jhiri Stream
+                ctx.fillStyle = "#5c341d";
+                ctx.beginPath();
+                ctx.moveTo(-80, 460);
+                ctx.quadraticCurveTo(380, 470, 560, 430);
+                ctx.lineTo(1040, 430);
+                ctx.quadraticCurveTo(1220, 470, CW + 80, 460);
+                ctx.lineTo(CW + 80, CH + 80);
+                ctx.lineTo(-80, CH + 80);
+                ctx.closePath();
+                ctx.fill();
+
+                // Close-up Individual Tea Bushes Crowning the Left & Right Jhiri Ravine Banks!
+                [
+                    { x: 95, y: 540, sc: 0.82 }, { x: 205, y: 555, sc: 0.88 }, { x: 315, y: 535, sc: 0.78 },
+                    { x: 1285, y: 535, sc: 0.78 }, { x: 1395, y: 555, sc: 0.88 }, { x: 1505, y: 540, sc: 0.82 }
+                ].forEach((b, idx) => {
+                    const spr = teaBushSpritesDay[idx % teaBushSpritesDay.length];
+                    ctx.drawImage(spr, b.x - spr.width * 0.5 * b.sc, b.y - spr.height * 0.8 * b.sc, spr.width * b.sc, spr.height * b.sc);
+                });
+
+                // 4. Crystal-Clear Mountain Jhiri Stream Bed & Transparent Flowing Water
+                ctx.save();
+                ctx.beginPath();
+                ctx.moveTo(570, 425);
+                ctx.bezierCurveTo(470, 540, 260, 680, 80, CH + 60);
+                ctx.lineTo(CW - 80, CH + 60);
+                ctx.bezierCurveTo(1340, 680, 1130, 540, 1030, 425);
+                ctx.closePath();
+
+                const streamGrad = ctx.createLinearGradient(0, 425, 0, CH + 40);
+                streamGrad.addColorStop(0, "#75cfc2");
+                streamGrad.addColorStop(0.38, "#3da194");
+                streamGrad.addColorStop(0.72, "#297a6b");
+                streamGrad.addColorStop(1, "#1e5245");
+                ctx.fillStyle = streamGrad;
+                ctx.fill();
+                ctx.clip();
+
+                for (const pb of JHIRI_PEBBLES) {
+                    const refractX = Math.sin(t * 4.2 + pb.x * 0.05) * 1.6;
+                    ctx.fillStyle = pb.col;
+                    ctx.globalAlpha = 0.44;
+                    ctx.beginPath();
+                    ctx.ellipse(pb.x + refractX, pb.y, pb.rx, pb.ry, pb.ang, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+                ctx.globalAlpha = 1.0;
+
+                // Shimmering Inverted Reflection of the Bamboo Bridge & Crossing Tea Workers
+                const workerWalkU = ((t - 10.0) * 0.11) % 1;
+                ctx.save();
+                ctx.globalAlpha = 0.26;
+                for (let w = 0; w < 3; w++) {
+                    const wu = (workerWalkU + w * 0.24) % 1;
+                    const wx = lerp(390, 1210, wu) + Math.sin(t * 6 + w) * 3;
+                    const wy = 525;
+                    ctx.fillStyle = ["#e74c3c", "#f39c12", "#8e44ad"][w];
+                    ctx.fillRect(wx - 9, wy, 18, 38);
+                }
+                ctx.restore();
+
+                ctx.strokeStyle = "rgba(235, 255, 250, 0.45)";
+                ctx.lineWidth = 1.8;
+                for (let i = 0; i < 65; i++) {
+                    const flowU = ((i / 65) + t * 0.22) % 1;
+                    const wy = lerp(435, CH + 20, flowU);
+                    const streamHalfW = lerp(210, 650, flowU);
+                    const wx = CW * 0.5 + Math.sin(i * 7.3) * streamHalfW * 0.78;
+                    const rw = 14 + flowU * 26 + Math.sin(t * 5 + i) * 6;
+                    ctx.beginPath();
+                    ctx.moveTo(wx - rw, wy);
+                    ctx.quadraticCurveTo(wx, wy - 2.5, wx + rw, wy);
+                    ctx.stroke();
+                }
+
+                const boulders = [
+                    { x: 520, y: 635, rx: 46, ry: 28 },
+                    { x: 1040, y: 615, rx: 52, ry: 30 },
+                    { x: 760, y: 745, rx: 64, ry: 36 },
+                    { x: 410, y: 810, rx: 58, ry: 32 },
+                    { x: 1160, y: 790, rx: 62, ry: 35 }
+                ];
+                boulders.forEach((bd, idx) => {
+                    const foamPulse = Math.sin(t * 7 + idx) * 4;
+                    ctx.strokeStyle = "rgba(255, 255, 255, 0.70)";
+                    ctx.lineWidth = 3.2;
+                    ctx.beginPath();
+                    ctx.ellipse(bd.x, bd.y + 5, bd.rx + 8 + foamPulse, bd.ry * 0.65 + 4, 0, 0, Math.PI);
+                    ctx.stroke();
+
+                    const rGrad = ctx.createLinearGradient(bd.x, bd.y - bd.ry, bd.x, bd.y + bd.ry);
+                    rGrad.addColorStop(0, "#64748b");
+                    rGrad.addColorStop(0.55, "#334155");
+                    rGrad.addColorStop(1, "#1e293b");
+                    ctx.fillStyle = rGrad;
+                    ctx.beginPath();
+                    ctx.ellipse(bd.x, bd.y, bd.rx, bd.ry, 0, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    ctx.fillStyle = "#3f7d28";
+                    ctx.beginPath();
+                    ctx.ellipse(bd.x - 4, bd.y - bd.ry * 0.38, bd.rx * 0.76, bd.ry * 0.48, -0.08, 0, Math.PI * 2);
+                    ctx.fill();
+                });
+
+                [
+                    { x: 640, y: 680, p: 0.2 },
+                    { x: 920, y: 710, p: 1.5 },
+                    { x: 610, y: 830, p: 2.8 },
+                    { x: 960, y: 845, p: 4.1 }
+                ].forEach(st => {
+                    const rp = ((t * 1.8 + st.p) % 1);
+                    ctx.strokeStyle = `rgba(255, 255, 255, ${(1 - rp) * 0.58})`;
+                    ctx.lineWidth = 1.2;
+                    ctx.beginPath();
+                    ctx.ellipse(st.x, st.y, 6 + rp * 32, 3 + rp * 14, 0, 0, Math.PI * 2);
+                    ctx.stroke();
+                });
+
+                ctx.restore();
+
+                // 5. Rustic Woven Bamboo & Timber Footbridge ("Basher Shako") Spanning the Jhiri
+                ctx.save();
+                const bridgeY = 475;
+                ctx.strokeStyle = "#5c4224";
+                ctx.lineWidth = 6.5;
+                [430, 620, 800, 980, 1170].forEach(px => {
+                    ctx.beginPath();
+                    ctx.moveTo(px - 8, bridgeY);
+                    ctx.lineTo(px - 14, bridgeY + 82);
+                    ctx.moveTo(px + 8, bridgeY);
+                    ctx.lineTo(px + 14, bridgeY + 82);
+                    ctx.stroke();
+                });
+
+                ctx.fillStyle = "#b58d4b";
+                ctx.fillRect(340, bridgeY - 5, 920, 10);
+                ctx.strokeStyle = "#6e4e23";
+                ctx.lineWidth = 2.0;
+                for (let sx = 350; sx <= 1250; sx += 14) {
+                    ctx.beginPath();
+                    ctx.moveTo(sx, bridgeY - 6);
+                    ctx.lineTo(sx, bridgeY + 6);
+                    ctx.stroke();
+                }
+
+                const bridgeWorkers = [
+                    { offset: 0.15, sari: "#d93829", border: "#fde047", blouse: "#7f1d1d" },
+                    { offset: 0.39, sari: "#e67e22", border: "#fffbeb", blouse: "#7c2d12" },
+                    { offset: 0.63, sari: "#8e44ad", border: "#facc15", blouse: "#4c1d95" }
+                ];
+                bridgeWorkers.forEach((bw, idx) => {
+                    const u = ((t - 10.0) * 0.11 + bw.offset) % 1;
+                    const wx = lerp(390, 1210, u);
+                    const archY = -Math.sin(u * Math.PI) * 10;
+                    drawTeaWorker(ctx, {
+                        x: wx, y: bridgeY - 4 + archY, scale: 1.05, dir: 1, t, phase: idx * 1.7,
+                        sariColor: bw.sari, borderColor: bw.border, blouseColor: bw.blouse,
+                        mode: "walking", hasTukri: true
+                    });
+                });
+
+                ctx.strokeStyle = "#c9a259";
+                ctx.lineWidth = 3.8;
+                ctx.beginPath();
+                ctx.moveTo(340, bridgeY - 42);
+                ctx.quadraticCurveTo(800, bridgeY - 52, 1260, bridgeY - 42);
+                ctx.stroke();
+                [430, 620, 800, 980, 1170].forEach(px => {
+                    ctx.beginPath();
+                    ctx.moveTo(px, bridgeY + 2);
+                    ctx.lineTo(px, bridgeY - 46);
+                    ctx.stroke();
+                });
+                ctx.restore();
+
+                // 6. Turquoise & Orange Kingfisher ("Machranga") Perched on Boulder
+                ctx.save();
+                ctx.translate(765, 712);
+                ctx.fillStyle = "#e67e22";
+                ctx.beginPath();
+                ctx.ellipse(0, 2, 7.5, 4.5, -0.2, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.fillStyle = "#0ea5e9";
+                ctx.beginPath();
+                ctx.ellipse(-2, -1, 8.2, 3.8, -0.2, 0, Math.PI * 2);
+                ctx.arc(5, -5, 4.5, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.fillStyle = "#1e293b";
+                ctx.beginPath();
+                ctx.moveTo(9, -6);
+                ctx.lineTo(18, -4);
+                ctx.lineTo(9, -3);
+                ctx.closePath();
+                ctx.fill();
+                ctx.restore();
+
+                // 7. Foreground Framing Wild Ferns & Elephant-Ear Taro Leaves ("Kochu Pata")
+                ctx.save();
+                const fernSway = Math.sin(t * 2.8) * 9;
+                [
+                    { x: 60, y: 920, dir: 1, sc: 1.4 },
+                    { x: 210, y: 940, dir: 1, sc: 1.2 },
+                    { x: 1540, y: 920, dir: -1, sc: 1.4 },
+                    { x: 1390, y: 940, dir: -1, sc: 1.2 }
+                ].forEach(taro => {
+                    ctx.save();
+                    ctx.translate(taro.x + fernSway * taro.dir, taro.y);
+                    ctx.scale(taro.sc * taro.dir, taro.sc);
+                    ctx.strokeStyle = "#3b6e22";
+                    ctx.lineWidth = 5;
+                    ctx.beginPath();
+                    ctx.moveTo(0, 0);
+                    ctx.quadraticCurveTo(35, -75, 65, -125);
+                    ctx.stroke();
+
+                    const tGrad = ctx.createLinearGradient(30, -155, 95, -95);
+                    tGrad.addColorStop(0, "#76c442");
+                    tGrad.addColorStop(1, "#275918");
+                    ctx.fillStyle = tGrad;
+                    ctx.beginPath();
+                    ctx.ellipse(68, -125, 42, 26, 0.35, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.restore();
+                });
+                ctx.restore();
+
+                ctx.restore();
+            }
+
+            // ============================================================================
+            // 9. CUT 4 (0:15–0:20): MUDDY RED-EARTH TILLA ROAD & LEAF-LADEN TEA TRACTOR
+            //    (Low-Angle Puddle-Level Tracking Shot as the Estate Tractor Rumbles Past)
+            // ============================================================================
+            function renderCut4MuddyRoadAndTractor(ctx, t) {
+                const tractorU = clamp((t - 15.0) / 5.0, 0, 1);
+                const proximity = Math.exp(-Math.pow((tractorU - 0.65) * 3.8, 2));
+                const shakeX = Math.sin(t * 62) * 2.5 * proximity;
+                const shakeY = Math.cos(t * 49) * 1.9 * proximity;
+
+                ctx.save();
+                ctx.translate(shakeX, shakeY);
+
+                // 1. Sky & Terraced Tea Tillas Flanking the Winding Muddy Road (Individual Tea Bushes!)
+                const skyGrad = ctx.createLinearGradient(0, 0, 0, 340);
+                skyGrad.addColorStop(0, "#296d78");
+                skyGrad.addColorStop(0.55, "#7fc4be");
+                skyGrad.addColorStop(1, "#e8f2d5");
+                ctx.fillStyle = skyGrad;
+                ctx.fillRect(0, 0, CW, 340);
+
+                ctx.drawImage(cut4RoadTillasCanvas, -100, 0);
+
+                drawKoroiShadeTree(ctx, 210, 295, 0.86, Math.sin(t * 2.0) * 6, 0);
+                drawKoroiShadeTree(ctx, 640, 275, 0.72, Math.cos(t * 1.9) * 5, 1);
+                drawKoroiShadeTree(ctx, 1290, 280, 0.88, Math.sin(t * 2.1) * 6, 2);
+
+                // 2. Steep Cut Red-Laterite Earth Banks & Grassy Shoulders
+                ctx.fillStyle = "#5c3018";
+                ctx.fillRect(0, 445, CW, CH - 445);
+
+                // Close-up Individual Tea Bushes Crowning the Left & Right Cut Laterite Road Banks!
+                [
+                    { x: 75, y: 555, sc: 0.92 }, { x: 185, y: 535, sc: 0.84 }, { x: 295, y: 515, sc: 0.76 },
+                    { x: 960, y: 505, sc: 0.74 }, { x: 1085, y: 525, sc: 0.82 }, { x: 1215, y: 545, sc: 0.90 },
+                    { x: 1355, y: 565, sc: 0.98 }, { x: 1495, y: 585, sc: 1.05 }
+                ].forEach((b, idx) => {
+                    const spr = teaBushSpritesDay[idx % teaBushSpritesDay.length];
+                    ctx.drawImage(spr, b.x - spr.width * 0.5 * b.sc, b.y - spr.height * 0.82 * b.sc, spr.width * b.sc, spr.height * b.sc);
+                });
+
+                // Winding Perspective Muddy Red-Earth Road ("Lal Matir Rasta")
+                ctx.save();
+                ctx.beginPath();
+                ctx.moveTo(490, 445);
+                ctx.bezierCurveTo(460, 560, 220, 710, -60, CH + 20);
+                ctx.lineTo(CW + 60, CH + 20);
+                ctx.bezierCurveTo(1380, 710, 920, 560, 740, 445);
+                ctx.closePath();
+
+                const mudGrad = ctx.createLinearGradient(0, 445, 0, CH);
+                mudGrad.addColorStop(0, "#b86b43");
+                mudGrad.addColorStop(0.45, "#9c522d");
+                mudGrad.addColorStop(0.85, "#783a1d");
+                mudGrad.addColorStop(1, "#592812");
+                ctx.fillStyle = mudGrad;
+                ctx.fill();
+
+                for (const side of [-1, 1]) {
+                    ctx.strokeStyle = "rgba(58, 24, 10, 0.65)";
+                    ctx.lineWidth = 18;
+                    ctx.beginPath();
+                    ctx.moveTo(615 + side * 48, 448);
+                    ctx.bezierCurveTo(
+                        590 + side * 110, 575,
+                        540 + side * 235, 730,
+                        680 + side * 390, CH + 20
+                    );
+                    ctx.stroke();
+
+                    ctx.strokeStyle = "rgba(195, 225, 230, 0.35)";
+                    ctx.lineWidth = 5;
+                    ctx.stroke();
+                }
+
+                const puddles = [
+                    { x: 485, y: 745, rx: 95, ry: 22 },
+                    { x: 960, y: 795, rx: 115, ry: 26 },
+                    { x: 675, y: 635, rx: 68, ry: 15 }
+                ];
+                puddles.forEach((pd, idx) => {
+                    const pGrad = ctx.createLinearGradient(pd.x, pd.y - pd.ry, pd.x, pd.y + pd.ry);
+                    pGrad.addColorStop(0, "rgba(135, 198, 204, 0.72)");
+                    pGrad.addColorStop(0.6, "rgba(45, 95, 88, 0.68)");
+                    pGrad.addColorStop(1, "rgba(78, 42, 24, 0.75)");
+                    ctx.fillStyle = pGrad;
+                    ctx.beginPath();
+                    ctx.ellipse(pd.x, pd.y, pd.rx, pd.ry, 0.04, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    if (proximity > 0.15) {
+                        const rp = (t * 4.2 + idx * 0.4) % 1;
+                        ctx.strokeStyle = `rgba(255, 255, 255, ${(1 - rp) * proximity * 0.75})`;
+                        ctx.lineWidth = 1.5;
+                        ctx.beginPath();
+                        ctx.ellipse(pd.x, pd.y, pd.rx * rp * 0.85, pd.ry * rp * 0.85, 0, 0, Math.PI * 2);
+                        ctx.stroke();
+                    }
+                });
+                ctx.restore();
+
+                // 3. Tea Workers with Tukri Baskets Stepping Aside on the Right Road Shoulder
+                const roadWorkers = [
+                    { x: 1185, y: 645, sc: 1.52, sari: "#d93829", border: "#fde047", blouse: "#7f1d1d" },
+                    { x: 1285, y: 695, sc: 1.78, sari: "#0d9488", border: "#fde047", blouse: "#115e59" },
+                    { x: 1395, y: 755, sc: 2.05, sari: "#e67e22", border: "#fffbeb", blouse: "#7c2d12" }
+                ];
+                roadWorkers.forEach((rw, idx) => {
+                    drawTeaWorker(ctx, {
+                        x: rw.x, y: rw.y, scale: rw.sc, dir: -1, t, phase: idx * 1.4,
+                        sariColor: rw.sari, borderColor: rw.border, blouseColor: rw.blouse,
+                        mode: "standing", hasTukri: true, hasUmbrellaHat: idx === 1
+                    });
+                });
+
+                // 4. Hero Tea Estate Tractor + Overflowing Green Tea Leaf Trailer!
+                const trX = lerp(230, 1240, tractorU);
+                const trY = lerp(555, 795, tractorU);
+                const trScale = lerp(0.66, 1.48, tractorU);
+                const wheelRot = t * 14.0;
+                const engineJolt = Math.sin(t * 48) * 1.5;
+
+                ctx.save();
+                ctx.translate(trX, trY);
+                ctx.scale(trScale, trScale);
+
+                ctx.fillStyle = "rgba(18, 10, 6, 0.45)";
+                ctx.beginPath();
+                ctx.ellipse(-95, 10, 215, 22, 0.08, 0, Math.PI * 2);
+                ctx.fill();
+
+                // --- A. 4-WHEEL TIMBER & STEEL TRAILER PILED HIGH WITH FRESH GREEN TEA SACKS ---
+                ctx.save();
+                ctx.translate(-185, -4 + engineJolt * 0.6);
+
+                const sacks = [
+                    { x: -68, y: -62, w: 54, h: 44, col: "#b5925c" },
+                    { x: -18, y: -66, w: 56, h: 48, col: "#a37e49" },
+                    { x: 32, y: -64, w: 54, h: 46, col: "#bfa06b" },
+                    { x: -45, y: -92, w: 52, h: 38, col: "#c7a873" },
+                    { x: 8, y: -94, w: 54, h: 40, col: "#ab8752" }
+                ];
+                sacks.forEach(sk => {
+                    ctx.fillStyle = sk.col;
+                    ctx.beginPath();
+                    ctx.roundRect(sk.x, sk.y, sk.w, sk.h, 10);
+                    ctx.fill();
+                    ctx.strokeStyle = "rgba(72, 48, 22, 0.45)";
+                    ctx.lineWidth = 1.5;
+                    ctx.strokeRect(sk.x + 3, sk.y + 3, sk.w - 6, sk.h - 6);
+
+                    const lGrad = ctx.createLinearGradient(sk.x, sk.y - 16, sk.x, sk.y + 6);
+                    lGrad.addColorStop(0, "#b8f252");
+                    lGrad.addColorStop(0.55, "#64b52d");
+                    lGrad.addColorStop(1, "#2b6918");
+                    ctx.fillStyle = lGrad;
+                    ctx.beginPath();
+                    ctx.ellipse(sk.x + sk.w * 0.5, sk.y + 2, sk.w * 0.48, 13, 0, Math.PI, 0);
+                    ctx.fill();
+                });
+
+                ctx.fillStyle = "#f5f0e6";
+                ctx.fillRect(-8, -118, 16, 22);
+                ctx.fillStyle = "#c0392b";
+                ctx.fillRect(-9, -118, 18, 5);
+                ctx.fillStyle = "#7c4b2e";
+                ctx.beginPath();
+                ctx.arc(0, -126, 6.5, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.strokeStyle = "#7c4b2e";
+                ctx.lineWidth = 3.5;
+                ctx.beginPath();
+                ctx.moveTo(6, -115);
+                ctx.lineTo(16, -132 + Math.sin(t * 10) * 5);
+                ctx.stroke();
+
+                const trBedGrad = ctx.createLinearGradient(0, -56, 0, -16);
+                trBedGrad.addColorStop(0, "#7c2d12");
+                trBedGrad.addColorStop(1, "#451a03");
+                ctx.fillStyle = trBedGrad;
+                ctx.beginPath();
+                ctx.roundRect(-82, -54, 174, 38, 3);
+                ctx.fill();
+
+                ctx.fillStyle = "#9a3412";
+                for (let sx = -72; sx <= 82; sx += 22) {
+                    ctx.fillRect(sx, -56, 5, 38);
+                }
+                ctx.fillStyle = "#fde68a";
+                ctx.font = "bold 9px sans-serif";
+                ctx.fillText("SYLHET TEA ESTATE • LEAF TRANSPORT", -64, -31);
+
+                ctx.strokeStyle = "#1e293b";
+                ctx.lineWidth = 6;
+                ctx.beginPath();
+                ctx.moveTo(92, -20);
+                ctx.lineTo(132, -18);
+                ctx.stroke();
+
+                [-48, 52].forEach(wx => {
+                    ctx.save();
+                    ctx.translate(wx, -12);
+                    ctx.fillStyle = "#1c1917";
+                    ctx.beginPath(); ctx.arc(0, 0, 20, 0, Math.PI * 2); ctx.fill();
+                    ctx.strokeStyle = "#783a1d";
+                    ctx.lineWidth = 3;
+                    ctx.stroke();
+                    ctx.fillStyle = "#b45309";
+                    ctx.beginPath(); ctx.arc(0, 0, 10, 0, Math.PI * 2); ctx.fill();
+                    ctx.rotate(wheelRot);
+                    ctx.strokeStyle = "#fde047";
+                    ctx.lineWidth = 2;
+                    for (let k = 0; k < 5; k++) {
+                        const a = (k / 5) * Math.PI * 2;
+                        ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(Math.cos(a) * 9, Math.sin(a) * 9); ctx.stroke();
+                    }
+                    ctx.restore();
+                });
+                ctx.restore();
+
+                // --- B. VINTAGE BLUE & IRON DIESEL TEA ESTATE TRACTOR ---
+                ctx.save();
+                ctx.translate(0, engineJolt);
+
+                ctx.fillStyle = "#1e293b";
+                ctx.fillRect(-26, -68, 16, 24);
+                ctx.fillStyle = "#f8fafc";
+                ctx.fillRect(-25, -88, 15, 22);
+                ctx.fillStyle = "#7c4b2e";
+                ctx.beginPath(); ctx.arc(-17, -96, 6.8, 0, Math.PI * 2); ctx.fill();
+                ctx.fillStyle = "#dc2626";
+                ctx.beginPath(); ctx.arc(-18, -98, 7.0, Math.PI, 0); ctx.fill();
+                ctx.strokeStyle = "#0f172a";
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.moveTo(-8, -82); ctx.lineTo(8, -62);
+                ctx.moveTo(-14, -86); ctx.lineTo(-2, -78);
+                ctx.stroke();
+
+                ctx.strokeStyle = "#334155";
+                ctx.lineWidth = 3.2;
+                ctx.beginPath();
+                ctx.moveTo(-34, -58); ctx.lineTo(-34, -114);
+                ctx.moveTo(2, -58); ctx.lineTo(2, -114);
+                ctx.stroke();
+                ctx.fillStyle = "#b45309";
+                ctx.beginPath();
+                ctx.roundRect(-40, -118, 48, 7, 3);
+                ctx.fill();
+
+                const hoodGrad = ctx.createLinearGradient(0, -76, 0, -28);
+                hoodGrad.addColorStop(0, "#2563eb");
+                hoodGrad.addColorStop(0.55, "#1d4ed8");
+                hoodGrad.addColorStop(1, "#1e3a8a");
+                ctx.fillStyle = hoodGrad;
+                ctx.beginPath();
+                ctx.roundRect(-12, -74, 86, 42, 6);
+                ctx.fill();
+
+                ctx.fillStyle = "#1e293b";
+                ctx.fillRect(-4, -52, 56, 22);
+                ctx.strokeStyle = "#93c5fd";
+                ctx.lineWidth = 1.5;
+                ctx.beginPath();
+                ctx.moveTo(-8, -64); ctx.lineTo(68, -64);
+                ctx.stroke();
+
+                ctx.fillStyle = "#1d4ed8";
+                ctx.beginPath();
+                ctx.arc(-22, -26, 38, Math.PI * 1.05, Math.PI * 1.88);
+                ctx.lineTo(-22, -26);
+                ctx.closePath();
+                ctx.fill();
+
+                ctx.fillStyle = "#1e293b";
+                ctx.fillRect(44, -110, 5.5, 38);
+                ctx.fillStyle = "#334155";
+                ctx.fillRect(42.5, -113, 8.5, 4);
+
+                ctx.fillStyle = "#d97706";
+                ctx.fillRect(70, -70, 5, 34);
+                ctx.fillStyle = "#fef08a";
+                ctx.beginPath();
+                ctx.arc(76, -62, 5.5, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.save();
+                ctx.globalCompositeOperation = "screen";
+                const hBeam = ctx.createLinearGradient(76, -62, 220, -20);
+                hBeam.addColorStop(0, "rgba(255, 248, 190, 0.65)");
+                hBeam.addColorStop(1, "rgba(255, 248, 190, 0)");
+                ctx.fillStyle = hBeam;
+                ctx.beginPath();
+                ctx.moveTo(76, -66);
+                ctx.lineTo(220, -88);
+                ctx.lineTo(220, 10);
+                ctx.lineTo(76, -58);
+                ctx.closePath();
+                ctx.fill();
+                ctx.restore();
+
+                ctx.save();
+                ctx.translate(-22, -24);
+                ctx.fillStyle = "#171717";
+                ctx.beginPath(); ctx.arc(0, 0, 33, 0, Math.PI * 2); ctx.fill();
+                ctx.rotate(wheelRot * 0.7);
+                ctx.fillStyle = "#262626";
+                for (let lg = 0; lg < 14; lg++) {
+                    const a = (lg / 14) * Math.PI * 2;
+                    ctx.save();
+                    ctx.rotate(a);
+                    ctx.fillRect(28, -3, 6.5, 6);
+                    ctx.restore();
+                }
+                ctx.strokeStyle = "#854221";
+                ctx.lineWidth = 4;
+                ctx.beginPath(); ctx.arc(0, 0, 26, 0, Math.PI * 2); ctx.stroke();
+                ctx.fillStyle = "#eab308";
+                ctx.beginPath(); ctx.arc(0, 0, 20, 0, Math.PI * 2); ctx.fill();
+                ctx.fillStyle = "#1e3a8a";
+                ctx.beginPath(); ctx.arc(0, 0, 6.5, 0, Math.PI * 2); ctx.fill();
+                for (let b = 0; b < 6; b++) {
+                    const a = (b / 6) * Math.PI * 2;
+                    ctx.fillRect(Math.cos(a) * 13 - 1.5, Math.sin(a) * 13 - 1.5, 3, 3);
+                }
+                ctx.restore();
+
+                ctx.save();
+                ctx.translate(58, -14);
+                ctx.fillStyle = "#171717";
+                ctx.beginPath(); ctx.arc(0, 0, 19, 0, Math.PI * 2); ctx.fill();
+                ctx.strokeStyle = "#854221";
+                ctx.lineWidth = 3;
+                ctx.stroke();
+                ctx.rotate(wheelRot * 1.25);
+                ctx.fillStyle = "#eab308";
+                ctx.beginPath(); ctx.arc(0, 0, 11, 0, Math.PI * 2); ctx.fill();
+                ctx.fillStyle = "#1e3a8a";
+                ctx.beginPath(); ctx.arc(0, 0, 4, 0, Math.PI * 2); ctx.fill();
+                ctx.restore();
+
+                for (let m = 0; m < 6; m++) {
+                    const mp = ((t * 5.5 + m / 6) % 1);
+                    const mx = -52 - mp * 38;
+                    const my = -8 - Math.sin(mp * Math.PI) * 26;
+                    ctx.fillStyle = "#783a1d";
+                    ctx.beginPath();
+                    ctx.arc(mx, my, (1 - mp) * 4.2, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+
+                for (let s = 0; s < 10; s++) {
+                    const sp = ((t * 1.6 + s / 10) % 1);
+                    const sx = 46 - sp * 95 + Math.sin(t * 4 + s) * 8;
+                    const sy = -115 - sp * 85;
+                    const sr = 7 + sp * 28;
+                    const sAlpha = Math.sin(sp * Math.PI) * 0.42 * (1 - sp * 0.3);
+                    const sGrad = ctx.createRadialGradient(sx, sy, 2, sx, sy, sr);
+                    sGrad.addColorStop(0, `rgba(95, 105, 115, ${sAlpha})`);
+                    sGrad.addColorStop(1, "rgba(95, 105, 115, 0)");
+                    ctx.fillStyle = sGrad;
+                    ctx.beginPath();
+                    ctx.arc(sx, sy, sr, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+
+                ctx.restore();
+                ctx.restore();
+
+                ctx.restore();
+            }
+
+            // ============================================================================
+            // 10. CUT 5 (0:20–0:25): HILLTOP COLONIAL PLANTER'S BANGO HOUSE (DAKBUNGALOW)
+            //     (50mm Anamorphic Parallax Slider Reveal Above Individual Tea Bushes)
+            // ============================================================================
+            function renderCut5HilltopBungalow(ctx, t) {
+                const localU = clamp((t - 20.0) / 5.0, 0, 1);
+                const slideX = lerp(-62, 62, easeInOutCubic(localU));
+                const pushZoom = lerp(1.01, 1.11, easeInOutCubic(localU));
+
+                ctx.save();
+                ctx.translate(CW * 0.5, CH * 0.5);
+                ctx.scale(pushZoom, pushZoom);
+                ctx.translate(-CW * 0.5, -CH * 0.5);
+
+                // 1. Warm Late-Afternoon Sky Over the Tea Valley
+                const skyGrad = ctx.createLinearGradient(0, 0, 0, 410);
+                skyGrad.addColorStop(0, "#245473");
+                skyGrad.addColorStop(0.45, "#6aa8b8");
+                skyGrad.addColorStop(0.82, "#f0ddb8");
+                skyGrad.addColorStop(1, "#ffdfa0");
+                ctx.fillStyle = skyGrad;
+                ctx.fillRect(0, 0, CW, 410);
+
+                // 2. Background Panorama of Misty Tea Tillas Below the Bungalow Hill (Parallax 0.25x)
+                ctx.save();
+                ctx.translate(-slideX * 0.25, 0);
+                ctx.drawImage(cut1BackTillasCanvas, -120, 40);
+                const mistGrad = ctx.createLinearGradient(0, 360, 0, 520);
+                mistGrad.addColorStop(0, "rgba(255, 244, 215, 0)");
+                mistGrad.addColorStop(0.5, "rgba(255, 244, 215, 0.45)");
+                mistGrad.addColorStop(1, "rgba(255, 244, 215, 0)");
+                ctx.fillStyle = mistGrad;
+                ctx.fillRect(-100, 360, CW + 200, 160);
+                ctx.restore();
+
+                // 3. Hero Plane (Parallax 0.78x): Hilltop Tilla Crown of Individual Tea Bushes & Boro Bungalow
+                ctx.save();
+                ctx.translate(-slideX * 0.78, 0);
+
+                // Manicured Emerald Bungalow Lawn Crown & Red-Gravel Driveway
+                const lawnGrad = ctx.createLinearGradient(0, 495, 0, 680);
+                lawnGrad.addColorStop(0, "#5eb53e");
+                lawnGrad.addColorStop(0.6, "#3f8c2b");
+                lawnGrad.addColorStop(1, "#275e1b");
+                ctx.fillStyle = lawnGrad;
+                ctx.beginPath();
+                ctx.ellipse(800, 575, 640, 88, 0, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Terraced Individual Tea Bushes Carpeting the Lower Bungalow Hillock Slope!
+                ctx.drawImage(cut5BungalowTillasCanvas, -120, 45);
+
+                ctx.fillStyle = "#b86b43";
+                ctx.beginPath();
+                ctx.moveTo(740, 535);
+                ctx.lineTo(860, 535);
+                ctx.quadraticCurveTo(960, 650, 1140, 720);
+                ctx.lineTo(890, 720);
+                ctx.quadraticCurveTo(820, 635, 740, 535);
+                ctx.closePath();
+                ctx.fill();
+
+                drawKoroiShadeTree(ctx, 355, 515, 1.08, Math.sin(t * 2.0) * 6, 0);
+                drawKoroiShadeTree(ctx, 1245, 510, 1.12, Math.cos(t * 2.1) * 6, 2);
+
+                // --- THE HILLTOP ASSAM-TYPE BORO BUNGALOW ---
+                ctx.save();
+                ctx.translate(790, 495);
+
+                ctx.fillStyle = "rgba(12, 24, 14, 0.38)";
+                ctx.beginPath();
+                ctx.ellipse(0, 36, 330, 26, 0, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.fillStyle = "#7c2d12";
+                ctx.fillRect(-265, 6, 530, 28);
+                ctx.fillStyle = "#9a3412";
+                for (let px = -255; px <= 245; px += 42) {
+                    ctx.fillRect(px, 4, 16, 30);
+                }
+                ctx.fillStyle = "#b45309";
+                ctx.fillRect(-48, 12, 96, 8);
+                ctx.fillStyle = "#9a3412";
+                ctx.fillRect(-56, 20, 112, 8);
+                ctx.fillStyle = "#7c2d12";
+                ctx.fillRect(-64, 28, 128, 8);
+
+                ctx.fillStyle = "#f8f5ec";
+                ctx.fillRect(-250, -98, 500, 104);
+
+                ctx.fillStyle = "rgba(28, 22, 18, 0.25)";
+                ctx.fillRect(-250, -98, 500, 20);
+
+                ctx.strokeStyle = "#3b2618";
+                ctx.lineWidth = 3.5;
+                for (let tx = -245; tx <= 245; tx += 49) {
+                    ctx.beginPath();
+                    ctx.moveTo(tx, -98);
+                    ctx.lineTo(tx, 6);
+                    ctx.stroke();
+                }
+                ctx.beginPath();
+                ctx.moveTo(-250, -48);
+                ctx.lineTo(250, -48);
+                ctx.stroke();
+
+                [-195, -120, 120, 195].forEach(wx => {
+                    ctx.fillStyle = "#1b4332";
+                    ctx.fillRect(wx - 22, -78, 44, 52);
+                    const wGrad = ctx.createLinearGradient(wx, -74, wx, -30);
+                    wGrad.addColorStop(0, "#fde68a");
+                    wGrad.addColorStop(1, "#f59e0b");
+                    ctx.fillStyle = wGrad;
+                    ctx.fillRect(wx - 13, -74, 26, 44);
+                    ctx.strokeStyle = "#3b2618";
+                    ctx.lineWidth = 2;
+                    ctx.strokeRect(wx - 13, -74, 26, 44);
+                    ctx.beginPath();
+                    ctx.moveTo(wx, -74); ctx.lineTo(wx, -30);
+                    ctx.moveTo(wx - 13, -52); ctx.lineTo(wx + 13, -52);
+                    ctx.stroke();
+                });
+
+                ctx.fillStyle = "#451a03";
+                ctx.beginPath();
+                ctx.roundRect(-24, -82, 48, 88, [18, 18, 0, 0]);
+                ctx.fill();
+                ctx.fillStyle = "#fbbf24";
+                ctx.beginPath();
+                ctx.roundRect(-16, -74, 32, 42, [12, 12, 0, 0]);
+                ctx.fill();
+
+                [-75, 75].forEach(cx => {
+                    ctx.fillStyle = "#b5853b";
+                    ctx.beginPath();
+                    ctx.roundRect(cx - 12, -26, 24, 26, 5);
+                    ctx.fill();
+                    ctx.fillStyle = "#fde68a";
+                    ctx.fillRect(cx - 9, -14, 18, 5);
+                });
+                ctx.fillStyle = "#78531e";
+                ctx.fillRect(98, -14, 24, 18);
+                ctx.fillStyle = "#ffffff";
+                ctx.beginPath();
+                ctx.arc(110, -18, 4.5, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.fillStyle = "#f1ede4";
+                ctx.fillRect(-260, -22, 205, 4);
+                ctx.fillRect(55, -22, 205, 4);
+                for (let rx = -255; rx <= 255; rx += 12) {
+                    if (rx > -52 && rx < 52) continue;
+                    ctx.fillRect(rx - 1.5, -22, 3, 28);
+                }
+
+                ctx.fillStyle = "#3b2618";
+                [-255, -155, -55, 55, 155, 255].forEach(px => {
+                    ctx.fillRect(px - 4, -102, 8, 108);
+                    if (Math.abs(px) === 155) {
+                        ctx.fillStyle = "#854d0e";
+                        ctx.beginPath(); ctx.arc(px + 50, -76, 8, 0, Math.PI); ctx.fill();
+                        ctx.fillStyle = "#2e7d32";
+                        ctx.beginPath(); ctx.ellipse(px + 50, -78, 14, 7, 0, 0, Math.PI * 2); ctx.fill();
+                        ctx.fillStyle = "#3b2618";
+                    }
+                });
+
+                ctx.fillStyle = "#7c2d12";
+                ctx.fillRect(145, -195, 24, 55);
+                ctx.fillStyle = "#451a03";
+                ctx.fillRect(142, -198, 30, 5);
+                for (let sm = 0; sm < 8; sm++) {
+                    const sp = ((t * 0.55 + sm / 8) % 1);
+                    const sx = 157 + sp * 45 + Math.sin(t * 3 + sm) * 6;
+                    const sy = -202 - sp * 65;
+                    const sr = 6 + sp * 18;
+                    ctx.fillStyle = `rgba(245, 240, 230, ${Math.sin(sp * Math.PI) * 0.32})`;
+                    ctx.beginPath(); ctx.arc(sx, sy, sr, 0, Math.PI * 2); ctx.fill();
+                }
+
+                const roofGrad = ctx.createLinearGradient(0, -182, 0, -96);
+                roofGrad.addColorStop(0, "#991b1b");
+                roofGrad.addColorStop(0.55, "#b91c1c");
+                roofGrad.addColorStop(1, "#7f1d1d");
+                ctx.fillStyle = roofGrad;
+                ctx.beginPath();
+                ctx.moveTo(-290, -96);
+                ctx.lineTo(-210, -178);
+                ctx.lineTo(210, -178);
+                ctx.lineTo(290, -96);
+                ctx.closePath();
+                ctx.fill();
+
+                ctx.strokeStyle = "rgba(60, 10, 10, 0.32)";
+                ctx.lineWidth = 1.4;
+                for (let i = -18; i <= 18; i++) {
+                    ctx.beginPath();
+                    ctx.moveTo(i * 11, -178);
+                    ctx.lineTo(i * 15.5, -96);
+                    ctx.stroke();
+                }
+
+                ctx.fillStyle = "#b91c1c";
+                ctx.beginPath();
+                ctx.moveTo(-88, -96);
+                ctx.lineTo(0, -162);
+                ctx.lineTo(88, -96);
+                ctx.closePath();
+                ctx.fill();
+                ctx.fillStyle = "#f8f5ec";
+                ctx.beginPath();
+                ctx.moveTo(-72, -98);
+                ctx.lineTo(0, -150);
+                ctx.lineTo(72, -98);
+                ctx.closePath();
+                ctx.fill();
+                ctx.fillStyle = "#3b2618";
+                ctx.beginPath(); ctx.arc(0, -118, 12, 0, Math.PI * 2); ctx.fill();
+
+                [-55, 55].forEach(lx => {
+                    const lGlow = ctx.createRadialGradient(lx, -68, 2, lx, -68, 42);
+                    lGlow.addColorStop(0, "rgba(255, 230, 130, 0.85)");
+                    lGlow.addColorStop(1, "rgba(255, 180, 60, 0)");
+                    ctx.fillStyle = lGlow;
+                    ctx.beginPath(); ctx.arc(lx, -68, 42, 0, Math.PI * 2); ctx.fill();
+                });
+
+                ctx.restore();
+
+                // Vintage Land Rover Defender Parked Beside Bungalow
+                ctx.save();
+                ctx.translate(415, 542);
+                ctx.scale(0.88, 0.88);
+                ctx.fillStyle = "rgba(10, 20, 12, 0.38)";
+                ctx.beginPath(); ctx.ellipse(0, 18, 72, 11, 0, 0, Math.PI * 2); ctx.fill();
+                ctx.fillStyle = "#f5f0e1";
+                ctx.beginPath(); ctx.roundRect(-52, -46, 76, 22, 3); ctx.fill();
+                ctx.fillStyle = "#1b4332";
+                ctx.beginPath(); ctx.roundRect(-56, -26, 114, 30, 3); ctx.fill();
+                ctx.fillStyle = "#7dd3fc";
+                ctx.fillRect(-46, -42, 24, 14);
+                ctx.fillRect(-16, -42, 22, 14);
+                ctx.fillRect(10, -42, 12, 14);
+                ctx.fillStyle = "#171717";
+                ctx.fillRect(-62, -32, 6, 22);
+                [-34, 34].forEach(wx => {
+                    ctx.fillStyle = "#171717";
+                    ctx.beginPath(); ctx.arc(wx, 6, 15, 0, Math.PI * 2); ctx.fill();
+                    ctx.fillStyle = "#d6d3d1";
+                    ctx.beginPath(); ctx.arc(wx, 6, 7, 0, Math.PI * 2); ctx.fill();
+                });
+                ctx.restore();
+
+                ctx.fillStyle = "#f1ede4";
+                ctx.fillRect(240, 588, 480, 3.5);
+                ctx.fillRect(240, 604, 480, 3.5);
+                ctx.fillRect(920, 588, 440, 3.5);
+                ctx.fillRect(920, 604, 440, 3.5);
+                for (let fx = 245; fx <= 1355; fx += 18) {
+                    if (fx > 720 && fx < 920) continue;
+                    ctx.fillRect(fx - 2.5, 578, 5, 36);
+                }
+
+                ctx.restore();
+
+                // 4. Foreground Frame (Parallax 1.42x): Cascading Magenta Bougainvillea ("Baganbilash") Branches
+                ctx.save();
+                ctx.translate(-slideX * 1.42, 0);
+                const bSway = Math.sin(t * 2.6) * 9;
+
+                [
+                    { ox: -30, oy: 40, dir: 1 },
+                    { ox: CW + 30, oy: 30, dir: -1 }
+                ].forEach(br => {
+                    ctx.save();
+                    ctx.translate(br.ox + bSway * br.dir, br.oy);
+                    ctx.scale(br.dir, 1);
+
+                    ctx.strokeStyle = "#3b2818";
+                    ctx.lineWidth = 7;
+                    ctx.beginPath();
+                    ctx.moveTo(0, 0);
+                    ctx.quadraticCurveTo(140, 55, 290, 145);
+                    ctx.moveTo(90, 35);
+                    ctx.quadraticCurveTo(165, 130, 210, 225);
+                    ctx.stroke();
+
+                    const clusters = [
+                        [85, 35], [135, 65], [190, 95], [245, 125], [285, 145],
+                        [130, 95], [170, 155], [205, 215], [60, 80]
+                    ];
+                    clusters.forEach(([cx, cy], idx) => {
+                        ctx.fillStyle = "#2d6a32";
+                        ctx.beginPath();
+                        ctx.ellipse(cx - 8, cy + 4, 14, 7, 0.3, 0, Math.PI * 2);
+                        ctx.fill();
+
+                        const cols = ["#db2777", "#ec4899", "#be185d", "#f43f5e"];
+                        for (let p = 0; p < 6; p++) {
+                            const ang = (p / 6) * Math.PI * 2 + idx;
+                            ctx.fillStyle = cols[(p + idx) % cols.length];
+                            ctx.beginPath();
+                            ctx.ellipse(cx + Math.cos(ang) * 11, cy + Math.sin(ang) * 9, 9.5, 5.5, ang, 0, Math.PI * 2);
+                            ctx.fill();
+                        }
+                        ctx.fillStyle = "#fef08a";
+                        ctx.beginPath(); ctx.arc(cx, cy, 2.2, 0, Math.PI * 2); ctx.fill();
+                    });
+                    ctx.restore();
+                });
+                ctx.restore();
+
+                ctx.restore();
+            }
+
+            // ============================================================================
+            // 11. POST-PROCESSING: 4 INSTAGRAM/YOUTUBE LUTS, ANAMORPHIC FLARE, GUIDES & TITLES
+            // ============================================================================
+            const LUT_MODES = [
+                { name: "Sylhet Emerald", id: "emerald" },
+                { name: "Golden Kodachrome", id: "kodachrome" },
+                { name: "Monsoon Moody Teal", id: "monsoon" },
+                { name: "1955 Ray Silver", id: "silver" }
+            ];
+
+            function renderPostProcessingAndHUD(ctx, t, appState) {
+                const lut = LUT_MODES[appState.lutIdx].id;
+                ctx.save();
+
+                if (lut === "emerald") {
+                    ctx.save();
+                    ctx.globalCompositeOperation = "soft-light";
+                    const g = ctx.createLinearGradient(0, 0, 0, CH);
+                    g.addColorStop(0, "rgba(255, 232, 175, 0.16)");
+                    g.addColorStop(0.5, "rgba(42, 165, 95, 0.14)");
+                    g.addColorStop(1, "rgba(12, 48, 32, 0.24)");
+                    ctx.fillStyle = g;
+                    ctx.fillRect(0, 0, CW, CH);
+                    ctx.restore();
+                } else if (lut === "kodachrome") {
+                    ctx.save();
+                    ctx.globalCompositeOperation = "soft-light";
+                    ctx.fillStyle = "rgba(255, 182, 85, 0.28)";
+                    ctx.fillRect(0, 0, CW, CH);
+                    ctx.globalCompositeOperation = "multiply";
+                    ctx.fillStyle = "rgba(255, 242, 220, 0.94)";
+                    ctx.fillRect(0, 0, CW, CH);
+                    ctx.restore();
+                } else if (lut === "monsoon") {
+                    ctx.save();
+                    ctx.globalCompositeOperation = "soft-light";
+                    const g = ctx.createLinearGradient(0, 0, 0, CH);
+                    g.addColorStop(0, "rgba(38, 128, 168, 0.28)");
+                    g.addColorStop(1, "rgba(14, 58, 68, 0.34)");
+                    ctx.fillStyle = g;
+                    ctx.fillRect(0, 0, CW, CH);
+                    ctx.restore();
+                } else if (lut === "silver") {
+                    ctx.save();
+                    ctx.globalCompositeOperation = "saturation";
+                    ctx.fillStyle = "hsl(0, 0%, 50%)";
+                    ctx.fillRect(0, 0, CW, CH);
+                    ctx.globalCompositeOperation = "soft-light";
+                    ctx.fillStyle = "rgba(235, 224, 202, 0.26)";
+                    ctx.fillRect(0, 0, CW, CH);
+                    ctx.restore();
+                }
+
+                ctx.save();
+                ctx.globalCompositeOperation = "screen";
+                const streakY = t < 5.0 ? 155 : t >= 25.0 ? 235 : 120;
+                const streakGrad = ctx.createLinearGradient(0, streakY, CW, streakY);
+                streakGrad.addColorStop(0, "rgba(140, 225, 255, 0)");
+                streakGrad.addColorStop(0.35, "rgba(180, 240, 255, 0.08)");
+                streakGrad.addColorStop(0.5, "rgba(255, 248, 210, 0.14)");
+                streakGrad.addColorStop(0.65, "rgba(180, 240, 255, 0.08)");
+                streakGrad.addColorStop(1, "rgba(140, 225, 255, 0)");
+                ctx.fillStyle = streakGrad;
+                ctx.fillRect(0, streakY - 3, CW, 6);
+                ctx.restore();
+
+                const vig = ctx.createRadialGradient(CW * 0.5, CH * 0.5, CW * 0.40, CW * 0.5, CH * 0.5, CW * 0.78);
+                vig.addColorStop(0, "rgba(8, 14, 10, 0)");
+                vig.addColorStop(0.75, "rgba(8, 14, 10, 0.08)");
+                vig.addColorStop(1, "rgba(4, 8, 6, 0.36)");
+                ctx.fillStyle = vig;
+                ctx.fillRect(0, 0, CW, CH);
+
+                const ox = Math.floor((t * 24) % 9) * 19;
+                const oy = Math.floor((t * 17) % 9) * 23;
+                const pat = ctx.createPattern(grainCanvas, "repeat");
+                if (pat) {
+                    ctx.save();
+                    ctx.translate(ox, oy);
+                    ctx.fillStyle = pat;
+                    ctx.fillRect(-ox, -oy, CW + 180, CH + 180);
+                    ctx.restore();
+                }
+
+                // Crisp Cinema Cut Transitions at 5.0s, 10.0s, 15.0s, 20.0s, 25.0s
+                const cutBoundaries = [5.0, 10.0, 15.0, 20.0, 25.0];
+                for (const cb of cutBoundaries) {
+                    if (Math.abs(t - cb) < 0.18) {
+                        const fadeAmt = 1 - Math.abs(t - cb) / 0.18;
+                        ctx.fillStyle = `rgba(6, 10, 8, ${fadeAmt * 0.85})`;
+                        ctx.fillRect(0, 0, CW, CH);
+                    }
+                }
+
+                if (appState.showCinemaGuides) {
+                    const barH = 64;
+                    ctx.fillStyle = "#050806";
+                    ctx.fillRect(0, 0, CW, barH);
+                    ctx.fillRect(0, CH - barH, CW, barH);
+
+                    ctx.strokeStyle = "rgba(216, 248, 160, 0.16)";
+                    ctx.lineWidth = 1;
+                    ctx.beginPath();
+                    ctx.moveTo(CW / 3, barH); ctx.lineTo(CW / 3, CH - barH);
+                    ctx.moveTo((CW * 2) / 3, barH); ctx.lineTo((CW * 2) / 3, CH - barH);
+                    ctx.moveTo(0, barH + (CH - 2 * barH) / 3); ctx.lineTo(CW, barH + (CH - 2 * barH) / 3);
+                    ctx.moveTo(0, barH + ((CH - 2 * barH) * 2) / 3); ctx.lineTo(CW, barH + ((CH - 2 * barH) * 2) / 3);
+                    ctx.moveTo(CW * 0.5 - 12, CH * 0.5); ctx.lineTo(CW * 0.5 + 12, CH * 0.5);
+                    ctx.moveTo(CW * 0.5, CH * 0.5 - 12); ctx.lineTo(CW * 0.5, CH * 0.5 + 12);
+                    ctx.stroke();
+                }
+
+                if (t >= 27.8) {
+                    const alpha = smoothstep(27.8, 28.8, t);
+                    ctx.save();
+                    ctx.globalAlpha = alpha;
+                    ctx.textAlign = "center";
+                    ctx.textBaseline = "middle";
+                    const cx = CW * 0.5;
+                    const cy = CH * 0.47;
+
+                    ctx.shadowColor = "rgba(8, 14, 10, 0.88)";
+                    ctx.shadowBlur = 22;
+                    ctx.fillStyle = "#f6faef";
+                    ctx.font = '600 56px "Noto Serif Bengali", "SolaimanLipi", Georgia, serif';
+                    ctx.fillText("সমাপ্ত", cx, cy);
+
+                    ctx.font = 'italic 20px Georgia, serif';
+                    ctx.fillStyle = "#f0b85c";
+                    ctx.fillText("Sylhet Tea Estate — A 6-Cut Cinematic Tribute", cx, cy + 46);
+
+                    ctx.strokeStyle = "rgba(216, 248, 160, 0.82)";
+                    ctx.lineWidth = 2;
+                    ctx.beginPath();
+                    ctx.moveTo(cx - 140, cy + 72);
+                    ctx.quadraticCurveTo(cx, cy + 80, cx + 140, cy + 72);
+                    ctx.stroke();
+                    ctx.restore();
+                }
+
+                ctx.restore();
+            }
+
+            // ============================================================================
+            // 12. MASTER RENDER DISPATCHER & INTERACTIVE UI CONTROLLER
+            // ============================================================================
+            const canvas = document.getElementById("film-canvas");
+            const ctx = canvas.getContext("2d");
+            const startOverlay = document.getElementById("start-overlay");
+            const tapStartBtn = document.getElementById("tap-start-btn");
+            const playPauseBtn = document.getElementById("play-pause-btn");
+            const playIcon = document.getElementById("play-icon");
+            const playLabel = document.getElementById("play-label");
+            const restartBtn = document.getElementById("restart-btn");
+            const filmLookBtn = document.getElementById("film-look-btn");
+            const filmLookLabel = document.getElementById("film-look-label");
+            const camGuideBtn = document.getElementById("cam-guide-btn");
+            const muteBtn = document.getElementById("mute-btn");
+            const muteLabel = document.getElementById("mute-label");
+            const volumeSlider = document.getElementById("volume-slider");
+            const timelineSlider = document.getElementById("timeline-slider");
+            const timeDisplay = document.getElementById("time-display");
+            const fullscreenBtn = document.getElementById("fullscreen-btn");
+            const viewport = document.getElementById("viewport");
+            const hudCutTitle = document.getElementById("hud-cut-title");
+            const hudCamMeta = document.getElementById("hud-cam-meta");
+            const cutChipBtns = Array.from(document.querySelectorAll(".cut-chip-btn"));
+            const overlayScenePills = Array.from(document.querySelectorAll(".scene-pill-tag"));
+
+            const sound = new TeaEstateSoundEngine();
+            const appState = {
+                started: false,
+                playing: false,
+                currentTime: 0.0,
+                lastFrameTs: 0,
+                isScrubbing: false,
+                lutIdx: 0,
+                showCinemaGuides: false
+            };
+
+            function formatMMSS(sec) {
+                const s = Math.floor(clamp(sec, 0, TOTAL_DURATION));
+                const m = Math.floor(s / 60);
+                const rem = s % 60;
+                return `${m}:${rem < 10 ? "0" + rem : rem}`;
+            }
+
+            function updateUIControls() {
+                const t = appState.currentTime;
+                if (!appState.isScrubbing) {
+                    timelineSlider.value = t.toFixed(2);
+                }
+                timeDisplay.textContent = `${formatMMSS(t)} / 0:30`;
+
+                const activeScene = getCurrentScene(t);
+                hudCutTitle.textContent = activeScene.title;
+                hudCamMeta.textContent = `${activeScene.lensMeta} • ${LUT_MODES[appState.lutIdx].name.toUpperCase()}`;
+
+                cutChipBtns.forEach(btn => {
+                    const cid = parseInt(btn.getAttribute("data-cut"), 10);
+                    btn.classList.toggle("active-cut", cid === activeScene.id);
+                });
+
+                if (appState.playing) {
+                    playIcon.innerHTML = '<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>';
+                    playLabel.textContent = "Pause";
+                } else {
+                    playIcon.innerHTML = '<path d="M8 5v14l11-7z"/>';
+                    playLabel.textContent = "Play";
+                }
+            }
+
+            function renderFrame(t) {
+                ctx.clearRect(0, 0, CW, CH);
+                if (t < 5.0) {
+                    renderCut1And6TillaPanorama(ctx, t, false);
+                } else if (t < 10.0) {
+                    renderCut2TeaPluckers(ctx, t);
+                } else if (t < 15.0) {
+                    renderCut3JhiriStream(ctx, t);
+                } else if (t < 20.0) {
+                    renderCut4MuddyRoadAndTractor(ctx, t);
+                } else if (t < 25.0) {
+                    renderCut5HilltopBungalow(ctx, t);
+                } else {
+                    renderCut1And6TillaPanorama(ctx, t, true);
+                }
+                renderPostProcessingAndHUD(ctx, t, appState);
+            }
+
+            function tick(ts) {
+                if (!appState.lastFrameTs) appState.lastFrameTs = ts;
+                const rawDt = (ts - appState.lastFrameTs) / 1000;
+                appState.lastFrameTs = ts;
+                const dt = clamp(rawDt, 0.001, 0.1);
+
+                if (appState.playing && !appState.isScrubbing) {
+                    appState.currentTime += dt;
+                    if (appState.currentTime >= TOTAL_DURATION) {
+                        appState.currentTime = TOTAL_DURATION;
+                        appState.playing = false;
+                        sound.pause();
+                    }
+                    sound.update(appState.currentTime, dt);
+                }
+
+                renderFrame(appState.currentTime);
+                updateUIControls();
+                requestAnimationFrame(tick);
+            }
+
+            function startExperience(jumpTime = null) {
+                sound.init();
+                sound.resume();
+                appState.started = true;
+                if (jumpTime !== null) {
+                    appState.currentTime = clamp(jumpTime, 0, TOTAL_DURATION);
+                    sound.resetCues(appState.currentTime);
+                } else if (appState.currentTime >= TOTAL_DURATION - 0.15) {
+                    appState.currentTime = 0;
+                    sound.resetCues(0);
+                }
+                appState.playing = true;
+                startOverlay.classList.add("hidden");
+                updateUIControls();
+            }
+
+            function togglePlayPause() {
+                if (!appState.started) {
+                    startExperience();
+                    return;
+                }
+                if (appState.playing) {
+                    appState.playing = false;
+                    sound.pause();
+                } else {
+                    if (appState.currentTime >= TOTAL_DURATION - 0.1) {
+                        appState.currentTime = 0;
+                        sound.resetCues(0);
+                    }
+                    appState.playing = true;
+                    sound.init();
+                    sound.resume();
+                }
+                updateUIControls();
+            }
+
+            function seekTo(newTime) {
+                appState.currentTime = clamp(newTime, 0, TOTAL_DURATION);
+                sound.resetCues(appState.currentTime);
+                renderFrame(appState.currentTime);
+                updateUIControls();
+            }
+
+            tapStartBtn.addEventListener("click", () => startExperience(null));
+            canvas.addEventListener("click", togglePlayPause);
+            playPauseBtn.addEventListener("click", togglePlayPause);
+
+            cutChipBtns.forEach(btn => {
+                btn.addEventListener("click", () => {
+                    const jt = parseFloat(btn.getAttribute("data-jump"));
+                    if (!appState.started) {
+                        startExperience(jt);
+                    } else {
+                        seekTo(jt);
+                    }
+                });
+            });
+
+            overlayScenePills.forEach(pill => {
+                pill.addEventListener("click", () => {
+                    const jt = parseFloat(pill.getAttribute("data-jump"));
+                    startExperience(jt);
+                });
+            });
+
+            restartBtn.addEventListener("click", () => {
+                sound.init();
+                seekTo(0);
+                appState.playing = true;
+                appState.started = true;
+                startOverlay.classList.add("hidden");
+                sound.resume();
+                updateUIControls();
+            });
+
+            filmLookBtn.addEventListener("click", () => {
+                appState.lutIdx = (appState.lutIdx + 1) % LUT_MODES.length;
+                filmLookBtn.classList.toggle("active-mode", appState.lutIdx !== 0);
+                filmLookLabel.textContent = `LUT: ${LUT_MODES[appState.lutIdx].name}`;
+                renderFrame(appState.currentTime);
+                updateUIControls();
+            });
+
+            camGuideBtn.addEventListener("click", () => {
+                appState.showCinemaGuides = !appState.showCinemaGuides;
+                camGuideBtn.classList.toggle("active-mode", appState.showCinemaGuides);
+                renderFrame(appState.currentTime);
+            });
+
+            muteBtn.addEventListener("click", () => {
+                const muted = sound.toggleMute();
+                muteLabel.textContent = muted ? "Muted" : "Audio";
+                document.getElementById("vol-icon").innerHTML = muted
+                    ? '<path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/>'
+                    : '<path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>';
+            });
+
+            volumeSlider.addEventListener("input", (e) => {
+                const val = parseFloat(e.target.value);
+                if (sound.isMuted && val > 0) {
+                    sound.toggleMute();
+                    muteLabel.textContent = "Audio";
+                }
+                sound.setVolume(val);
+            });
+
+            timelineSlider.addEventListener("mousedown", () => { appState.isScrubbing = true; });
+            timelineSlider.addEventListener("touchstart", () => { appState.isScrubbing = true; }, { passive: true });
+            timelineSlider.addEventListener("input", (e) => {
+                seekTo(parseFloat(e.target.value));
+            });
+            timelineSlider.addEventListener("change", (e) => {
+                appState.isScrubbing = false;
+                seekTo(parseFloat(e.target.value));
+            });
+            window.addEventListener("mouseup", () => { appState.isScrubbing = false; });
+            window.addEventListener("touchend", () => { appState.isScrubbing = false; });
+
+            fullscreenBtn.addEventListener("click", () => {
+                const elem = document.getElementById("stage-wrapper");
+                if (!document.fullscreenElement) {
+                    if (elem.requestFullscreen) elem.requestFullscreen().catch(() => { });
+                } else {
+                    if (document.exitFullscreen) document.exitFullscreen().catch(() => { });
+                }
+            });
+
+            window.addEventListener("keydown", (e) => {
+                if (e.code === "Space") {
+                    e.preventDefault();
+                    togglePlayPause();
+                } else if (e.code === "KeyM") {
+                    muteBtn.click();
+                } else if (e.code === "KeyF") {
+                    fullscreenBtn.click();
+                } else if (e.code === "KeyL") {
+                    filmLookBtn.click();
+                } else if (e.code === "KeyC") {
+                    camGuideBtn.click();
+                } else if (e.code === "Digit1") {
+                    seekTo(0);
+                } else if (e.code === "Digit2") {
+                    seekTo(5);
+                } else if (e.code === "Digit3") {
+                    seekTo(10);
+                } else if (e.code === "Digit4") {
+                    seekTo(15);
+                } else if (e.code === "Digit5") {
+                    seekTo(20);
+                } else if (e.code === "Digit6") {
+                    seekTo(25);
+                } else if (e.code === "ArrowRight") {
+                    seekTo(appState.currentTime + 2.5);
+                } else if (e.code === "ArrowLeft") {
+                    seekTo(appState.currentTime - 2.5);
+                }
+            });
+
+            let idleTimer = null;
+            function resetIdleTimer() {
+                viewport.classList.remove("idle-cursor");
+                if (idleTimer) clearTimeout(idleTimer);
+                idleTimer = setTimeout(() => {
+                    if (appState.playing) viewport.classList.add("idle-cursor");
+                }, 3200);
+            }
+            viewport.addEventListener("mousemove", resetIdleTimer);
+            viewport.addEventListener("touchstart", resetIdleTimer, { passive: true });
+
+            window.addEventListener("load", () => {
+                preRenderAllTillaLayers();
+                renderFrame(0);
+                updateUIControls();
+                requestAnimationFrame(tick);
+            });
+        })();
+    </script>
+</body>
+
+</html>
