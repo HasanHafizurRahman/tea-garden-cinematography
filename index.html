@@ -71,17 +71,15 @@
         #start-overlay {
             position: absolute;
             inset: 0;
-            background: linear-gradient(180deg, rgba(8, 16, 12, 0.52) 0%, rgba(5, 10, 8, 0.92) 100%);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
+            background: radial-gradient(circle at center, rgba(6, 14, 10, 0.42) 0%, rgba(4, 9, 6, 0.88) 100%);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
             display: flex;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
             z-index: 35;
             padding: 24px;
-            text-align: center;
-            transition: opacity 0.55s ease, visibility 0.55s ease;
+            transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.6s ease;
         }
 
         #start-overlay.hidden {
@@ -90,94 +88,167 @@
             pointer-events: none;
         }
 
-        .film-badge {
-            font-size: 11px;
-            letter-spacing: 0.22em;
+        .start-card {
+            position: relative;
+            max-width: 520px;
+            width: 100%;
+            background: rgba(10, 18, 13, 0.68);
+            border: 1px solid rgba(167, 225, 99, 0.2);
+            border-radius: 24px;
+            padding: clamp(32px, 5vw, 44px) clamp(24px, 5vw, 40px);
+            box-shadow: 0 36px 90px rgba(0, 0, 0, 0.72), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            animation: startCardFade 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes startCardFade {
+            from {
+                opacity: 0;
+                transform: translateY(14px) scale(0.98);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .film-kicker {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 10.5px;
+            font-weight: 600;
+            letter-spacing: 0.28em;
             text-transform: uppercase;
-            color: #c8f58e;
-            background: rgba(167, 225, 99, 0.14);
-            border: 1px solid rgba(167, 225, 99, 0.42);
-            padding: 5px 16px;
+            color: #bbf477;
+            background: rgba(167, 225, 99, 0.1);
+            border: 1px solid rgba(167, 225, 99, 0.28);
+            padding: 5px 14px;
             border-radius: 999px;
-            margin-bottom: 12px;
+            margin-bottom: 16px;
+        }
+
+        .film-kicker-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #a7e163;
+            box-shadow: 0 0 8px #a7e163;
+            animation: pulseDot 2s infinite ease-in-out;
+        }
+
+        @keyframes pulseDot {
+            0%, 100% { opacity: 0.6; transform: scale(0.9); }
+            50% { opacity: 1; transform: scale(1.15); box-shadow: 0 0 12px #a7e163; }
         }
 
         .film-title-bn {
-            font-size: clamp(24px, 4.2vw, 46px);
+            font-size: clamp(26px, 4.4vw, 42px);
             font-weight: 700;
             font-family: "Noto Serif Bengali", "SolaimanLipi", Georgia, serif;
-            color: #f6faef;
-            text-shadow: 0 4px 24px rgba(0, 0, 0, 0.85);
+            color: #f7fbf2;
+            background: linear-gradient(180deg, #ffffff 30%, #e2f4cd 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 4px 24px rgba(0, 0, 0, 0.55);
             margin-bottom: 4px;
             letter-spacing: 0.02em;
+            line-height: 1.25;
         }
 
         .film-title-en {
-            font-size: clamp(15px, 2.1vw, 23px);
+            font-size: clamp(14px, 1.8vw, 17px);
             font-weight: 400;
             font-family: Georgia, "Times New Roman", serif;
             font-style: italic;
             color: #f0b85c;
-            margin-bottom: 12px;
+            letter-spacing: 0.05em;
+            margin-bottom: 14px;
+        }
+
+        .film-divider {
+            width: 44px;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(240, 184, 92, 0.65), transparent);
+            margin-bottom: 14px;
         }
 
         .film-desc {
-            max-width: 660px;
-            font-size: clamp(12px, 1.3vw, 14px);
-            line-height: 1.62;
-            color: rgba(243, 247, 238, 0.88);
-            margin-bottom: 22px;
+            max-width: 420px;
+            font-size: clamp(12.5px, 1.3vw, 14px);
+            line-height: 1.6;
+            color: rgba(228, 238, 220, 0.82);
+            margin-bottom: 26px;
+            font-weight: 300;
         }
 
         #tap-start-btn {
             display: inline-flex;
             align-items: center;
-            gap: 12px;
-            padding: 13px 34px;
-            font-size: clamp(14px, 1.6vw, 16.5px);
-            font-weight: 600;
-            color: #0b170e;
-            background: linear-gradient(135deg, #d8f8a0 0%, #8cd147 55%, #f0b85c 100%);
-            border: none;
+            gap: 13px;
+            padding: 6px 20px 6px 8px;
+            color: #f4fbf0;
+            background: rgba(167, 225, 99, 0.12);
+            border: 1px solid rgba(167, 225, 99, 0.38);
             border-radius: 999px;
             cursor: pointer;
-            box-shadow: 0 12px 34px rgba(140, 209, 71, 0.38), inset 0 1px 0 rgba(255, 255, 255, 0.72);
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            box-shadow: 0 10px 28px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.18);
+            transition: all 0.24s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        #tap-start-btn .btn-play-circle {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #d8f8a0 0%, #8cd147 65%, #5ea425 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #07130a;
+            box-shadow: 0 4px 16px rgba(140, 209, 71, 0.45);
+            transition: transform 0.24s ease, box-shadow 0.24s ease;
+        }
+
+        #tap-start-btn .btn-play-circle svg {
+            margin-left: 2px;
+        }
+
+        #tap-start-btn .btn-play-text {
+            font-size: 14.5px;
+            font-weight: 600;
+            letter-spacing: 0.03em;
+        }
+
+        #tap-start-btn .btn-runtime-badge {
+            font-size: 10.5px;
+            font-weight: 500;
+            color: rgba(216, 248, 160, 0.9);
+            background: rgba(6, 14, 9, 0.55);
+            border: 1px solid rgba(167, 225, 99, 0.22);
+            padding: 3px 8px;
+            border-radius: 999px;
+            margin-left: 2px;
         }
 
         #tap-start-btn:hover {
-            transform: translateY(-2px) scale(1.03);
-            box-shadow: 0 16px 40px rgba(140, 209, 71, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+            transform: translateY(-2px) scale(1.02);
+            background: rgba(167, 225, 99, 0.22);
+            border-color: rgba(167, 225, 99, 0.65);
+            box-shadow: 0 16px 38px rgba(140, 209, 71, 0.32), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+        }
+
+        #tap-start-btn:hover .btn-play-circle {
+            transform: scale(1.08);
+            box-shadow: 0 6px 20px rgba(140, 209, 71, 0.65);
         }
 
         #tap-start-btn:active {
             transform: translateY(0) scale(0.99);
-        }
-
-        .scene-pills-preview {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 7px;
-            margin-top: 22px;
-            max-width: 780px;
-        }
-
-        .scene-pill-tag {
-            font-size: 11px;
-            color: #dff7b5;
-            background: rgba(243, 247, 238, 0.08);
-            padding: 5px 12px;
-            border-radius: 999px;
-            border: 1px solid rgba(167, 225, 99, 0.24);
-            cursor: pointer;
-            transition: all 0.18s ease;
-        }
-
-        .scene-pill-tag:hover {
-            background: rgba(167, 225, 99, 0.22);
-            border-color: rgba(167, 225, 99, 0.65);
-            color: #ffffff;
         }
 
         /* Top HUD: Active Audio Cues */
@@ -448,34 +519,26 @@
                 <div id="active-audio-tags"></div>
             </div>
 
-            <!-- Start Screen Overlay (Required for Web Audio API Gesture) -->
+            <!-- Start Screen Overlay -->
             <div id="start-overlay">
-                <div class="film-badge">Sylhet Tea Estate Cinema • 6 Fast-Paced 5s Cuts • 0:30 Reel</div>
-                <h1 class="film-title-bn">সবুজ টিলার কাব্য — দুটি পাতা একটি কুঁড়ি</h1>
-                <div class="film-title-en">Whispers of the Tea Tillas: A Sylhet &amp; Srimangal Cinematic Reel</div>
-                <p class="film-desc">
-                    A fast-paced 30-second, 6-cut travel-cinema reel (5.0s per cut) across the terraced <em>tillas</em>
-                    (টিলা) of
-                    Sylhet—where every individual <em>Camellia sinensis</em> tea bush is rendered with its gnarled woody
-                    stems,
-                    serrated emerald leaf canopy, and bright <em>duti pata ekti kuri</em> shoots, alongside
-                    <em>Tukri</em> tea
-                    pluckers, a crystal <em>jhiri</em> stream, a leaf-laden tractor, and a hilltop <em>Boro
-                        Bungalow</em>.
-                </p>
-                <button id="tap-start-btn" type="button">
-                    <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
-                        <path d="M8 5v14l11-7z" />
-                    </svg>
-                    Tap to Begin Tea Garden Film
-                </button>
-                <div class="scene-pills-preview" id="overlay-scene-pills">
-                    <span class="scene-pill-tag" data-jump="0">১ • 0:00–0:05 Tilla Drone</span>
-                    <span class="scene-pill-tag" data-jump="5">২ • 0:05–0:10 Tea Pluckers</span>
-                    <span class="scene-pill-tag" data-jump="10">৩ • 0:10–0:15 Jhiri Stream</span>
-                    <span class="scene-pill-tag" data-jump="15">৪ • 0:15–0:20 Tea Tractor</span>
-                    <span class="scene-pill-tag" data-jump="20">৫ • 0:20–0:25 Hilltop Bungalow</span>
-                    <span class="scene-pill-tag" data-jump="25">৬ • 0:25–0:30 Golden Dusk</span>
+                <div class="start-card">
+                    <div class="film-kicker">
+                        <span class="film-kicker-dot"></span>
+                        Sylhet Tea Garden Cinema
+                    </div>
+                    <h1 class="film-title-bn">সবুজ টিলার কাব্য</h1>
+                    <div class="film-title-en">Whispers of the Tea Tillas</div>
+                    <div class="film-divider"></div>
+                    <p class="film-desc">টিলা, ঝিরি ও দুটি পাতা একটি কুঁড়ির মেলবন্ধন — সিলেটের চা বাগানের এক নিসর্গ চিত্রনাট্য</p>
+                    <button id="tap-start-btn" type="button" aria-label="Play Tea Garden Film">
+                        <span class="btn-play-circle">
+                            <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+                                <path d="M8 5v14l11-7z" />
+                            </svg>
+                        </span>
+                        <span class="btn-play-text">Play Film</span>
+                        <span class="btn-runtime-badge">0:30 Reel</span>
+                    </button>
                 </div>
             </div>
 
